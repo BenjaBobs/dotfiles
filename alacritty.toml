@@ -1,0 +1,13 @@
+[general]
+live_config_reload = true
+
+[terminal]
+shell = "fish"
+
+[[hints.enabled]]
+regex = "[^ ]*\\.[a-zA-Z]+"
+post_processing = true
+action = "Copy"
+mouse = { enabled = true }
+binding = { key = "X", mods = "Control" }
+
