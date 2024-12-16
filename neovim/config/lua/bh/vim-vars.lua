@@ -1,3 +1,6 @@
+-- paths
+vim.env.PATH = vim.env.HOME .. "/.local/share/mise/shims:" .. vim.env.PATH
+
 -- line numbers
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -13,3 +16,5 @@ vim.opt.wrap = false
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+-- clipboard / yank
+vim.opt.clipboard = "unnamedplus"
