@@ -1,13 +1,15 @@
 return {
 	"neovim/nvim-lspconfig",
 	dependencies = {
-		"williamboman/mason.nvim",
+		{ "williamboman/mason.nvim", config = true },
 		"williamboman/mason-lspconfig.nvim",
+		'WhoIsSethDaniel/mason-tool-installer.nvim',
 		"hrsh7th/nvim-cmp",
 		"hrsh7th/cmp-nvim-lsp",
 		"hrsh7th/cmp-buffer",
 		"hrsh7th/cmp-path",
 		"hrsh7th/cmp-cmdline",
+		{ 'j-hui/fidget.nvim', opts = {} }
 	},
 	config = function()
 		require("mason").setup()
