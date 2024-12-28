@@ -1,7 +1,5 @@
 require('bh.vim-vars')
 
-vim.keymap.set("n", "<leader>pb", vim.cmd.Ex, { desc = "[B]rowse files" })
-
 --/telesco Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then

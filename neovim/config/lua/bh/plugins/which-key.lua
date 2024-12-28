@@ -21,5 +21,13 @@ return {
 		wk.add({
 			{"<leader>f", group = "[F]ind", icon = {icon = "🔍"}}
 		})
+
+		-- Move current line or selected lines up
+		vim.keymap.set('n', '<A-k>', ":m .-2<CR>==", { noremap = true, silent = true })
+		vim.keymap.set('n', '<A-j>', ":m .+1<CR>==", { noremap = true, silent = true })
+
+		-- Move selected lines up or down in visual mode
+		vim.keymap.set('v', '<A-k>', ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
+		vim.keymap.set('v', '<A-j>', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
 	end
 }
