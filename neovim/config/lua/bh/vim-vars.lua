@@ -18,3 +18,6 @@ vim.g.maplocalleader = "\\"
 
 -- clipboard / yank
 vim.opt.clipboard = "unnamedplus"
+
+-- font stuff
+vim.g.have_nerd_font = true
