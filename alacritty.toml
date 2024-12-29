@@ -2,10 +2,10 @@
 live_config_reload = true
 
 [font]
-normal = { family = "MonaspiceAr Nerd Font Mono", style = "Regular" }
-bold = { family = "MonaspiceAr Nerd Font Mono", style = "Bold" }
-italic = { family = "MonaspiceRn Nerd Font Mono", style = "Regular" }
-bold_italic = { family = "MonaspiceRn Nerd Font Mono", style = "Bold" }
+normal = { family = "MonaspiceNe Nerd Font Mono", style = "Regular" }
+bold = { family = "MonaspiceNe Nerd Font Mono", style = "Bold" }
+italic = { family = "MonaspiceXe Nerd Font Mono", style = "Regular" }
+bold_italic = { family = "MonaspiceXe Nerd Font Mono", style = "Bold" }
 
 [terminal]
 shell = "fish"
