@@ -6,7 +6,7 @@ vim.opt.nu = true
 vim.opt.relativenumber = true
 
 -- distance to top/bottom of screen when scrolling
-vim.scrolloff = 8
+vim.opt.scrolloff = 8
 
 -- general
 vim.opt.updatetime = 50
