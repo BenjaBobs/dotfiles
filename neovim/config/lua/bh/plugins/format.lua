@@ -11,6 +11,6 @@ return {
 
 		vim.keymap.set("n", "<leader>bf", function()
 			conform.format({ async = true })
-		end, { desc = "[F]iles" })
+		end, { desc = "[F]ormat" })
 	end,
 }
