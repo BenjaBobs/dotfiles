@@ -24,6 +24,8 @@ return {
 			{ "<leader>c", group = "[C]ode", icon = { icon = "" } },
 		})
 
+		vim.keymap.set("n", "<leader>fb", ":Ex<CR>", { desc = "[B]rowse files" })
+
 		-- Move current line or selected lines up
 		vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { noremap = true, silent = true })
 		vim.keymap.set("n", "<A-j>", ":m .+1<CR>==", { noremap = true, silent = true })
