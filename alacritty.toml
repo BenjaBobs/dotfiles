@@ -11,9 +11,9 @@ bold_italic = { family = "MonaspiceXe Nerd Font Mono", style = "Bold" }
 shell = "fish"
 
 [[hints.enabled]]
+binding = { key = "X", mods = "Control|Shift" }
 regex = "[^ ]*\\.[a-zA-Z]+"
 post_processing = true
 action = "Copy"
 mouse = { enabled = true }
-binding = { key = "X", mods = "Control" }
 
