@@ -1,7 +1,7 @@
 return {
   "neovim/nvim-lspconfig",
   dependencies = {
-    {
+    { -- Neovim types and globals
       "folke/lazydev.nvim",
       ft = "lua",
       opts = {
@@ -10,7 +10,7 @@ return {
         }
       }
     },
-    {
+    { -- Auto-complete
       "saghen/blink.cmp",
       dependencies = "rafamadriz/friendly-snippets",
       version = "v0.*",
@@ -25,8 +25,12 @@ return {
     }
   },
   config = function()
+    local lspCfg = require("lspconfig")
     local capabilities = require("blink.cmp").get_lsp_capabilities()
-    require("lspconfig").lua_ls.setup { capabilities = capabilities }
+
+    lspCfg.lua_ls.setup { capabilities = capabilities }
+    lspCfg.zls.setup { capabilities = capabilities }
+    lspCfg.ts_ls.setup { capabilities = capabilities }
 
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(args)
