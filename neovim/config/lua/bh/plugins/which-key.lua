@@ -36,6 +36,12 @@ return {
     vim.keymap.set("v", "<A-Up>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
     vim.keymap.set("v", "<A-Down>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
 
+    -- Bracketing highlighted text
+    vim.keymap.set('v', '(', '"tdi(<C-r>t)<Esc>va(', { noremap = true, silent = true })
+    vim.keymap.set('v', '[', '"tdi[<C-r>t]<Esc>va[', { noremap = true, silent = true })
+    vim.keymap.set('v', '{', '"tdi{<C-r>t}<Esc>va{', { noremap = true, silent = true })
+
+
     -- Keymaps that avoid shift
     vim.keymap.set("n", ".", ":")
   end,
