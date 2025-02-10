@@ -9,11 +9,11 @@ fi
 # Use readlink to get the absolute path of this script
 SCRIPT_PATH="$(dirname $(readlink -f "$0"))"
 
-# Define the source configuration directory.
-SOURCE_CONFIG="$SCRIPT_PATH/config"
+# Define the source configuration
+SOURCE_CONFIG="$SCRIPT_PATH/alacritty.toml"
 
 # Define the destination for the Neovim configuration symlink.
-DEST_CONFIG="$HOME/.config/nvim"
+DEST_CONFIG="$HOME/.config/alacritty/alacritty.toml"
 
 # Call the link-cfg.sh script (located at the repository root) with the appropriate arguments.
 "$SCRIPT_PATH/../link-cfg.sh" $force_flag "$SOURCE_CONFIG" "$DEST_CONFIG"
