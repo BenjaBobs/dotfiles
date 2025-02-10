@@ -2,18 +2,26 @@
 live_config_reload = true
 
 [font]
-normal = { family = "MonaspiceNe Nerd Font Mono", style = "Regular" }
-bold = { family = "MonaspiceNe Nerd Font Mono", style = "Bold" }
-italic = { family = "MonaspiceXe Nerd Font Mono", style = "Regular" }
-bold_italic = { family = "MonaspiceXe Nerd Font Mono", style = "Bold" }
+normal = { family = "Monaspace Neon", style = "Regular" }
+bold = { family = "Monaspace Neon", style = "Bold" }
+italic = { family = "Monaspace Xenon", style = "Italic" }
+bold_italic = { family = "Monaspace Xenon", style = "Bold Italic" }
 
 [terminal]
 shell = "fish"
 
 [[hints.enabled]]
 binding = { key = "F1" }
-regex = "[^ ]*\\.[a-zA-Z]+"
+regex = "\\S{8,}" # non-whitespace groups
 post_processing = true
 action = "Copy"
+mouse = { enabled = true }
+
+[[hints.enabled]]
+binding = { key = "F2" }
+regex = "\\S{8,}" # non-whitespace groups
+post_processing = true
+command = "xdg-open"
+hyperlinks = true
 mouse = { enabled = true }
 
