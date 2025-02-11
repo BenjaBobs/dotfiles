@@ -41,6 +41,9 @@ return {
     vim.keymap.set('v', '[', '"tdi[<C-r>t]<Esc>va[', { noremap = true, silent = true })
     vim.keymap.set('v', '{', '"tdi{<C-r>t}<Esc>va{', { noremap = true, silent = true })
 
+    -- Alt + left/right nav
+    vim.keymap.set('n', '<A-Left>', '<C-o>', { noremap = true, silent = true })
+    vim.keymap.set('n', '<A-Right>', '<C-i>', { noremap = true, silent = true })
 
     -- Keymaps that avoid shift
     vim.keymap.set("n", ".", ":")

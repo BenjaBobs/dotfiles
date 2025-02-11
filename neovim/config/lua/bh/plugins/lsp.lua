@@ -15,13 +15,25 @@ return {
       dependencies = "rafamadriz/friendly-snippets",
       version = "v0.*",
       opts = {
-        keymap = { preset = "default" },
+        keymap = {
+          preset = "super-tab",
+          ['<A-.>'] = { 'show', 'show_documentation', 'hide_documentation' },
+          ['<C-.>'] = { 'show', 'show_documentation', 'hide_documentation' },
+        },
         appearance = {
           use_nvim_cmp_as_default = true,
           nerd_font_variant = "mono",
         },
         signature = { enabled = true },
-      }
+        completion = {
+          list = {
+            selection = {
+              preselect = false,
+              auto_insert = false,
+            }
+          }
+        },
+      },
     }
   },
   config = function()
@@ -46,6 +58,19 @@ return {
             end
           })
         end
+
+        local mapN = function(keys, action, description)
+          vim.keymap.set('n', keys, action, { buffer = args.buf, silent = true, noremap = true, desc = description })
+        end
+
+        mapN('gd', vim.lsp.buf.definition, 'Go to Definition')
+        mapN('gD', vim.lsp.buf.declaration, 'Go to Declaration')
+        mapN('gi', vim.lsp.buf.implementation, 'Go to Implementation')
+        mapN('gr', vim.lsp.buf.references, 'Go to References')
+        mapN('gy', vim.lsp.buf.type_definition, 'Go to Type Definition')
+        mapN('K', vim.lsp.buf.hover, 'Hover Documentation')
+        mapN('<leader>cr', vim.lsp.buf.rename, '[R]ename Symbol')
+        mapN('<leader>ca', vim.lsp.buf.code_action, '[A]ctions')
       end
     })
   end,
