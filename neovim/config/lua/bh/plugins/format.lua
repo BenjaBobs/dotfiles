@@ -5,8 +5,26 @@ return {
 
     conform.setup({
       formatters_by_ft = {
+        javascript = { "prettier" },
+        javascriptreact = { "prettier" },
+        typescript = { "prettier" },
+        typescriptreact = { "prettier" },
+        css = { "prettier" },
+        scss = { "prettier" },
+        html = { "prettier" },
+        json = { "prettier" },
+        yaml = { "prettier" },
+        markdown = { "prettier" },
+        cs = { "csharpier" },
         lua = { "stylua" },
       },
+
+      -- format_on_save = {
+      --   enabled = true,      -- Globally enable format on save.
+      --   timeout = 1000,      -- Timeout (in ms) for formatting.
+      --   lsp_fallback = true, -- If no formatter is available for the filetype, fall back to LSP formatting.
+      --   async = true,
+      -- },
     })
 
     vim.keymap.set("n", "<leader>bf", function()

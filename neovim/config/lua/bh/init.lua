@@ -1,4 +1,5 @@
 require('bh.vim-vars')
+require('bh.windows')
 
 --/telesco Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"

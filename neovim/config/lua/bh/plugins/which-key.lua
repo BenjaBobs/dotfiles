@@ -22,9 +22,10 @@ return {
       { "<leader>f", group = "[F]ind", icon = { icon = "🔍" } },
       { "<leader>b", group = "[B]uffer", icon = { icon = "" } },
       { "<leader>c", group = "[C]ode", icon = { icon = "" } },
+      { "<leader>w", group = "[W]indow"  }
     })
 
-    vim.keymap.set("n", "<leader>fb", ":Oil<CR>", { desc = "[B]rowse files" })
+    vim.keymap.set("n", "<leader>o", ":Oil<CR>", { desc = "[O]il" })
 
     -- Move current line or selected lines up
     vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { noremap = true, silent = true })

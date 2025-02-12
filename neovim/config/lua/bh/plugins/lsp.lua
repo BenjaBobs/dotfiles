@@ -49,16 +49,6 @@ return {
         local client = vim.lsp.get_client_by_id(args.data.client_id)
         if not client then return end
 
-        -- Format on save
-        if client.supports_method("textDocument/formatting") then
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            buffer = args.buf,
-            callback = function()
-              vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
-            end
-          })
-        end
-
         local mapN = function(keys, action, description)
           vim.keymap.set('n', keys, action, { buffer = args.buf, silent = true, noremap = true, desc = description })
         end
