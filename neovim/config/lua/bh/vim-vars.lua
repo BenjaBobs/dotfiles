@@ -18,6 +18,11 @@ vim.g.maplocalleader = "\\"
 
 -- clipboard / yank
 vim.opt.clipboard = "unnamedplus"
+--   make deletes not use clipboard
+vim.keymap.set('n', 'd', '"_d', { noremap = true, silent = true })
+vim.keymap.set('v', 'd', '"_d', { noremap = true, silent = true })
 
 -- font stuff
 vim.g.have_nerd_font = true
+
+
