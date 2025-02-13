@@ -5,7 +5,7 @@ return {
   config = function()
     require('telescope').setup({
       defaults = {
-        path_display = { 'smart' },
+        path_display = { 'shorten' },
       }
     })
 
@@ -17,7 +17,7 @@ return {
     vim.keymap.set('n', '<leader>fn', function()
       builtin.find_files({ cwd = vim.fn.stdpath('config') })
     end, { desc = '[N]eovim config files' })
-    vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[B]uffers' })
-    vim.keymap.set('n', '<leader>fc', builtin.current_buffer_fuzzy_find, { desc = '[C]urrent buffer' })
+    vim.keymap.set('n', '<leader>fo', builtin.buffers, { desc = '[O]pen buffers' })
+    vim.keymap.set('n', '<leader>fb', builtin.current_buffer_fuzzy_find, { desc = 'Current [b]uffer' })
   end
 }
