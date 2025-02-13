@@ -1,6 +1,6 @@
 return {
-  -- the colorscheme should be available when starting Neovim
   {
+    -- the colorscheme should be available when starting Neovim
     "catppuccin/nvim",
     name = "catppuccin",
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
@@ -16,6 +16,7 @@ return {
           notify = true,
           flash = true,
           which_key = true,
+          rainbow_delimiters = true,
           telescope = {
             enabled = true,
           },
@@ -25,5 +26,12 @@ return {
       -- load the colorscheme here
       vim.cmd([[colorscheme catppuccin]])
     end,
+  },
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+    },
+    config = function() end,
   },
 }
