@@ -14,6 +14,7 @@ return {
           gitsigns = true,
           treesitter = true,
           notify = true,
+          fidget = true,
           flash = true,
           which_key = true,
           rainbow_delimiters = true,
