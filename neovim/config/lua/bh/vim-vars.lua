@@ -3,7 +3,7 @@ vim.env.PATH = vim.env.HOME .. "/.local/share/mise/shims:" .. vim.env.PATH
 
 -- line numbers
 vim.opt.nu = true
-vim.opt.relativenumber = true
+vim.opt.relativenumber = false
 
 -- distance to top/bottom of screen when scrolling
 vim.opt.scrolloff = 8
@@ -19,10 +19,8 @@ vim.g.maplocalleader = "\\"
 -- clipboard / yank
 vim.opt.clipboard = "unnamedplus"
 --   make deletes not use clipboard
-vim.keymap.set('n', 'd', '"_d', { noremap = true, silent = true })
-vim.keymap.set('v', 'd', '"_d', { noremap = true, silent = true })
+vim.keymap.set("n", "d", '"_d', { noremap = true, silent = true })
+vim.keymap.set("v", "d", '"_d', { noremap = true, silent = true })
 
 -- font stuff
 vim.g.have_nerd_font = true
-
-
