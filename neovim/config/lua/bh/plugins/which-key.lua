@@ -22,7 +22,7 @@ return {
       { "<leader>f", group = "[F]ind", icon = { icon = "🔍" } },
       { "<leader>b", group = "[B]uffer", icon = { icon = "" } },
       { "<leader>c", group = "[C]ode", icon = { icon = "" } },
-      { "<leader>w", group = "[W]indow"  }
+      { "<leader>w", group = "[W]indow" },
     })
 
     vim.keymap.set("n", "<leader>o", ":Oil<CR>", { desc = "[O]il" })
@@ -38,15 +38,15 @@ return {
     vim.keymap.set("v", "<A-Down>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
 
     -- Bracketing highlighted text
-    vim.keymap.set('v', '(', '"tdi(<C-r>t)<Esc>va(', { noremap = true, silent = true })
-    vim.keymap.set('v', '[', '"tdi[<C-r>t]<Esc>va[', { noremap = true, silent = true })
-    vim.keymap.set('v', '{', '"tdi{<C-r>t}<Esc>va{', { noremap = true, silent = true })
+    vim.keymap.set("v", "(", '"tdi(<C-r>t)<Esc>va(', { noremap = true, silent = true })
+    vim.keymap.set("v", "[", '"tdi[<C-r>t]<Esc>va[', { noremap = true, silent = true })
+    vim.keymap.set("v", "{", '"tdi{<C-r>t}<Esc>va{', { noremap = true, silent = true })
 
     -- Alt + left/right nav
-    vim.keymap.set('n', '<A-Left>', '<C-o>', { noremap = true, silent = true })
-    vim.keymap.set('n', '<A-Right>', '<C-i>', { noremap = true, silent = true })
+    vim.keymap.set("n", "<A-Left>", "<C-o>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<A-Right>", "<C-i>", { noremap = true, silent = true })
 
     -- Keymaps that avoid shift
-    vim.keymap.set("n", ".", ":")
+    vim.keymap.set("n", ",", ":")
   end,
 }
