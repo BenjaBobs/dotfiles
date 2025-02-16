@@ -24,3 +24,6 @@ vim.keymap.set("v", "d", '"_d', { noremap = true, silent = true })
 
 -- font stuff
 vim.g.have_nerd_font = true
+
+-- terminal colors
+vim.opt.termguicolors = true

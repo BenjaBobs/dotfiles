@@ -1,6 +1,12 @@
 return {
-  "j-hui/fidget.nvim",
+  "rcarriga/nvim-notify",
+  dependencies = {
+    "mrded/nvim-lsp-notify",
+  },
   config = function()
-    require("fidget").setup()
-  end
+    local notify = require("notify")
+    notify.setup()
+
+    require("lsp-notify").setup({ notify = notify })
+  end,
 }
