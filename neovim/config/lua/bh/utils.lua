@@ -2,6 +2,11 @@ local export = {}
 
 local defaultMarkers = { ".git", "package.json" }
 
+-- for paths including '-' we need to escape the '-'
+local function escape_pattern(text)
+  return text:gsub("([^%w])", "%%%1")
+end
+
 function export.find_root_dir(start_path, markers)
   if vim.uv.fs_stat(start_path) == nil then
     return nil
@@ -38,8 +43,7 @@ function export.find_root_relative_file_path(start_path, markers)
 
   if projectDir ~= nil then
     -- remove one extra level so we don't sub the root dir
-    projectDir = vim.fn.fnamemodify(projectDir, ":h")
-    path = string.gsub(path, projectDir, "")
+    path = "~" .. string.gsub(path, escape_pattern(projectDir), "")
   end
 
   return path

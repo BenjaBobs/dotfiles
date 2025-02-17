@@ -37,7 +37,7 @@ return {
 
         -- Get the file path of the current buffer and its size in bytes.
         local file_path = require("bh.utils").find_root_relative_buffer_path()
-        local bytes_written = vim.fn.getfsize(file_path)
+        local bytes_written = vim.fn.getfsize(vim.fn.expand("%:p"))
 
         -- Build the message.
         local msg = string.format("Saved %d bytes in %.2f ms", bytes_written, elapsed_ms)
