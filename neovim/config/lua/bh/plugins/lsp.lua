@@ -59,7 +59,8 @@ return {
     {
       "mrded/nvim-lsp-notify",
       config = function()
-        require("lsp-notify").setup()
+        -- Currently throws some errors because of malformed notification formats, not sure why
+        -- require("lsp-notify").setup()
       end,
     },
   },
