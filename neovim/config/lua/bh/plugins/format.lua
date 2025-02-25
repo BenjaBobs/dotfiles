@@ -5,23 +5,23 @@ return {
 
     conform.setup({
       formatters_by_ft = {
-        javascript = { "eslint_d", "prettier", "biome" },
-        javascriptreact = { "eslint_d", "prettier", "biome" },
-        typescript = { "eslint_d", "prettier", "biome" },
-        typescriptreact = { "eslint_d", "prettier", "biome" },
-        css = { "prettier", "biome" },
-        scss = { "prettier", "biome" },
-        html = { "prettier", "biome" },
-        json = { "prettier", "biome" },
-        yaml = { "prettier", "biome" },
-        markdown = { "prettier", "biome" },
+        javascript = { "eslint_d", "prettier" },
+        javascriptreact = { "eslint_d", "prettier" },
+        typescript = { "eslint_d", "prettier" },
+        typescriptreact = { "eslint_d", "prettier" },
+        css = { "prettier" },
+        scss = { "prettier" },
+        html = { "prettier" },
+        json = { "prettier" },
+        yaml = { "prettier" },
+        markdown = { "prettier" },
         cs = { "csharpier" },
         lua = { "stylua" },
       },
 
       format_on_save = {
         enabled = true, -- Globally enable format on save.
-        timeout = 1000, -- Timeout (in ms) for formatting.
+        timeout = 2000, -- Timeout (in ms) for formatting.
         lsp_fallback = true, -- If no formatter is available for the filetype, fall back to LSP formatting.
         async = false,
       },
