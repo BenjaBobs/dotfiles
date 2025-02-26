@@ -8,6 +8,8 @@ local function escape_pattern(text)
 end
 
 function export.find_root_dir(start_path, markers)
+  start_path = start_path or vim.fn.expand("%:p")
+
   if vim.uv.fs_stat(start_path) == nil then
     return nil
   end
