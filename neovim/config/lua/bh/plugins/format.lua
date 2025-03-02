@@ -28,7 +28,7 @@ return {
     })
 
     vim.keymap.set("n", "<leader>bf", function()
-      conform.format({ async = true })
+      conform.format({ async = true, lsp_fallback = true })
     end, { desc = "[F]ormat" })
   end,
 }
