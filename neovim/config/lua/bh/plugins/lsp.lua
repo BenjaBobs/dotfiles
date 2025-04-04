@@ -63,6 +63,10 @@ return {
         -- require("lsp-notify").setup()
       end,
     },
+    {
+      "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+      opts = {},
+    },
   },
   config = function()
     local lspCfg = require("lspconfig")
@@ -85,6 +89,9 @@ return {
 
         local telescope = require("telescope.builtin")
 
+        local lspLines = require('lsp_lines');
+
+        mapN("<leader>cl", lspLines.toggle, "Toggle multi[L]ine errors")
         mapN("gd", vim.lsp.buf.definition, "Go to [D]efinition")
         mapN("gD", vim.lsp.buf.declaration, "Go to Declaration")
         mapN("gi", function()
@@ -93,7 +100,7 @@ return {
         mapN("gr", function()
           telescope.lsp_references()
         end, "Go to [R]eferences")
-        mapN("gy", vim.lsp.buf.type_definition, "Go to Type Definition")
+        mapN("gy", vim.lsp.buf.type_definition, "Go to T[y]pe Definition")
         mapN("K", vim.lsp.buf.hover, "Hover Documentation")
         mapN("<leader>cr", vim.lsp.buf.rename, "[R]ename Symbol")
         mapN("<leader>ca", vim.lsp.buf.code_action, "[A]ctions")
