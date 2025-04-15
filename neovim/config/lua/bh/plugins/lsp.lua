@@ -74,7 +74,28 @@ return {
 
     lspCfg.lua_ls.setup({ capabilities = capabilities })
     lspCfg.zls.setup({ capabilities = capabilities })
-    lspCfg.ts_ls.setup({ capabilities = capabilities })
+    lspCfg.ts_ls.setup({
+      capabilities = capabilities,
+      init_options = {
+        preferences = {
+          importModuleSpecifierPreference = "non-relative", -- this is the magic
+          importModuleSpecifierEnding = "auto",
+          includePackageJsonAutoImports = "on",
+        },
+      },
+      settings = {
+        typescript = {
+          preferences = {
+            importModuleSpecifierPreference = "non-relative",
+          },
+        },
+        javascript = {
+          preferences = {
+            importModuleSpecifierPreference = "non-relative",
+          },
+        },
+      },
+    })
 
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(args)
@@ -89,7 +110,7 @@ return {
 
         local telescope = require("telescope.builtin")
 
-        local lspLines = require('lsp_lines');
+        local lspLines = require("lsp_lines")
 
         mapN("<leader>cl", lspLines.toggle, "Toggle multi[L]ine errors")
         mapN("gd", vim.lsp.buf.definition, "Go to [D]efinition")
