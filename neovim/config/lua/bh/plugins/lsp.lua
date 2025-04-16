@@ -138,34 +138,6 @@ return {
       vim.lsp.enable(server)
     end
 
-    -- local lspCfg = require("lspconfig")
-    -- local capabilities = require("blink.cmp").get_lsp_capabilities()
-    --
-    -- lspCfg.lua_ls.setup({ capabilities = capabilities })
-    -- lspCfg.zls.setup({ capabilities = capabilities })
-    -- lspCfg.ts_ls.setup({
-    --   capabilities = capabilities,
-    --   init_options = {
-    --     preferences = {
-    --       importModuleSpecifierPreference = "non-relative", -- this is the magic
-    --       importModuleSpecifierEnding = "auto",
-    --       includePackageJsonAutoImports = "on",
-    --     },
-    --   },
-    --   settings = {
-    --     typescript = {
-    --       preferences = {
-    --         importModuleSpecifierPreference = "non-relative",
-    --       },
-    --     },
-    --     javascript = {
-    --       preferences = {
-    --         importModuleSpecifierPreference = "non-relative",
-    --       },
-    --     },
-    --   },
-    -- })
-
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
@@ -177,30 +149,27 @@ return {
           vim.keymap.set("n", keys, action, { buffer = args.buf, silent = true, noremap = true, desc = description })
         end
 
-        local telescope = require("telescope.builtin")
-
-        -- local lspLines = require("lsp_lines")
-        -- mapN("<leader>cl", lspLines.toggle, "Toggle multi[L]ine errors")
-
-        mapN("gd", vim.lsp.buf.definition, "Go to [D]efinition")
-        mapN("gD", vim.lsp.buf.declaration, "Go to Declaration")
-        mapN("gi", function()
-          telescope.lsp_implementations()
-        end, "Go to [I]mplementation")
+        mapN("gd", function()
+          Snacks.picker.lsp_definitions()
+        end, "Goto [d]efinition")
+        mapN("gD", function()
+          Snacks.picker.lsp_declarations()
+        end, "Goto [D]eclaration")
         mapN("gr", function()
-          telescope.lsp_references()
-        end, "Go to [R]eferences")
-        mapN("gy", vim.lsp.buf.type_definition, "Go to T[y]pe Definition")
-        mapN("K", vim.lsp.buf.hover, "Hover Documentation")
-        mapN("<leader>cr", vim.lsp.buf.rename, "[R]ename Symbol")
-        mapN("<leader>ca", vim.lsp.buf.code_action, "[A]ctions")
-        mapN("<C-.>", vim.lsp.buf.code_action, "[A]ctions")
+          Snacks.picker.lsp_references()
+        end, "Goto [r]eferences") -- nowait = true
+        mapN("gI", function()
+          Snacks.picker.lsp_implementations()
+        end, "Goto [I]mplementation")
+        mapN("gy", function()
+          Snacks.picker.lsp_type_definitions()
+        end, "Goto T[y]pe Definition")
         mapN("<leader>fs", function()
-          telescope.lsp_document_symbols()
-        end, "[S]ymbols (document)")
+          Snacks.picker.lsp_symbols()
+        end, "[F]ind LSP [S]ymbols")
         mapN("<leader>fS", function()
-          telescope.lsp_workspace_symbols()
-        end, "[S]ymbols (workspace)")
+          Snacks.picker.lsp_workspace_symbols()
+        end, "[F]ind LSP Workspace [S]ymbols")
       end,
     })
   end,

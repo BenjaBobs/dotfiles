@@ -18,9 +18,6 @@ return {
           flash = true,
           which_key = true,
           rainbow_delimiters = true,
-          telescope = {
-            enabled = true,
-          },
         },
       })
 
