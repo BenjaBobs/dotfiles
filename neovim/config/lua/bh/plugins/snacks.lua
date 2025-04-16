@@ -46,6 +46,13 @@ return {
       desc = "[F]ind [H]elp",
     },
     {
+      "<leader>fk",
+      function()
+        Snacks.picker.keymaps()
+      end,
+      desc = "[F]ind [K]eymaps",
+    },
+    {
       "<leader>fn",
       function()
         Snacks.picker.files({ cwd = vim.fn.stdpath("config") })
@@ -58,6 +65,34 @@ return {
         Snacks.picker.lines()
       end,
       desc = "[F]ind in [B]uffer",
+    },
+    {
+      "<leader>fo",
+      function()
+        Snacks.picker.buffers()
+      end,
+      desc = "[F]ind [O]pen Buffers",
+    },
+    {
+      "<leader>fe",
+      function()
+        Snacks.picker.diagnostics()
+      end,
+      desc = "[F]ind [E]rror",
+    },
+    {
+      "<leader>gb",
+      function()
+        Snacks.picker.git_branches()
+      end,
+      desc = "[G]it [B]ranches",
+    },
+    {
+      "<leader>gs",
+      function()
+        Snacks.picker.git_status()
+      end,
+      desc = "[G]it [S]tatus",
     },
   },
   init = function()
