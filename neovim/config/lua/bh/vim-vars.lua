@@ -27,3 +27,27 @@ vim.g.have_nerd_font = true
 
 -- terminal colors
 vim.opt.termguicolors = true
+
+-- Diagnostics
+-- See `:help vim.diagnostic.config()`
+vim.diagnostic.config({
+  underline = true,
+  update_in_insert = false, -- Diagnostics are only updated when not entering text
+  virtual_lines = { current_line = true },
+  severity_sort = true,
+  -- default for vim.diagnostic.JumpOpts sets float to false
+  jump = {
+    float = true,
+  },
+})
+
+-- Highlight when yanking (copying) text
+--  Try it with `yap` in normal mode
+--  See `:help vim.highlight.on_yank()`
+vim.api.nvim_create_autocmd("TextYankPost", {
+  desc = "Highlight when yanking (copying) text",
+  group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
