@@ -149,6 +149,9 @@ return {
           vim.keymap.set("n", keys, action, { buffer = args.buf, silent = true, noremap = true, desc = description })
         end
 
+        mapN("<leader>cr", vim.lsp.buf.rename, "[R]ename Symbol")
+        mapN("<leader>ca", vim.lsp.buf.code_action, "[A]ctions")
+
         mapN("gd", function()
           Snacks.picker.lsp_definitions()
         end, "Goto [d]efinition")
