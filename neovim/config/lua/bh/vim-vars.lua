@@ -28,6 +28,10 @@ vim.g.have_nerd_font = true
 -- terminal colors
 vim.opt.termguicolors = true
 
+-- Smart case sensitivity in searches
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
 -- Diagnostics
 -- See `:help vim.diagnostic.config()`
 vim.diagnostic.config({

@@ -20,8 +20,8 @@ return {
       },
 
       format_on_save = {
-        enabled = true, -- Globally enable format on save.
-        timeout = 2000, -- Timeout (in ms) for formatting.
+        enabled = true,      -- Globally enable format on save.
+        timeout = 2000,      -- Timeout (in ms) for formatting.
         lsp_fallback = true, -- If no formatter is available for the filetype, fall back to LSP formatting.
         async = false,
       },
@@ -30,5 +30,7 @@ return {
     vim.keymap.set("n", "<leader>bf", function()
       conform.format({ async = true, lsp_fallback = true })
     end, { desc = "[F]ormat" })
+
+    vim.keymap.set("n", "<leader>bw", ":noau w", { desc = "[W]rite without formatting" })
   end,
 }
