@@ -4,3 +4,8 @@ end
 zoxide init fish | source
 ~/.local/bin/mise activate fish | source
 set EDITOR nvim
+
+# Source local overrides if they exist
+if test -f ~/.config/fish/local_config.fish
+    source ~/.config/fish/local_config.fish
+end
