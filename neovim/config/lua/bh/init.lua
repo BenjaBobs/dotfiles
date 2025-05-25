@@ -1,6 +1,7 @@
 require("bh.vim-vars")
 require("bh.windows")
 require("bh.clipboard")
+require("bh.insert-mode-tweaks")
 
 --/telesco Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
