@@ -16,12 +16,6 @@ vim.opt.wrap = false
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
--- clipboard / yank
-vim.opt.clipboard = "unnamedplus"
---   make deletes not use clipboard
-vim.keymap.set("n", "d", '"_d', { noremap = true, silent = true })
-vim.keymap.set("v", "d", '"_d', { noremap = true, silent = true })
-
 -- font stuff
 vim.g.have_nerd_font = true
 
@@ -43,15 +37,4 @@ vim.diagnostic.config({
   jump = {
     float = true,
   },
-})
-
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
-vim.api.nvim_create_autocmd("TextYankPost", {
-  desc = "Highlight when yanking (copying) text",
-  group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
-  callback = function()
-    vim.highlight.on_yank()
-  end,
 })
