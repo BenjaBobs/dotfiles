@@ -17,6 +17,8 @@ return {
         markdown = { "prettier" },
         cs = { "csharpier" },
         lua = { "stylua" },
+        http = { "kulala_fmt" },
+        rest = { "kulala_fmt" }
       },
 
       format_on_save = {
