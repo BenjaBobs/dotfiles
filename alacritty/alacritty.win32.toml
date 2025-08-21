@@ -1,0 +1,11 @@
+[general]
+import = ["alacritty.toml"]
+
+[[hints.enabled]]
+binding = { key = "F2" }
+regex = "\\S{8,}" # non-whitespace groups
+post_processing = true
+command = "start"
+hyperlinks = true
+mouse = { enabled = true }
+

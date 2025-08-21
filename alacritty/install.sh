@@ -10,7 +10,7 @@ fi
 SCRIPT_PATH="$(dirname $(readlink -f "$0"))"
 
 # Define the source configuration
-SOURCE_CONFIG="$SCRIPT_PATH/alacritty.toml"
+SOURCE_CONFIG="$SCRIPT_PATH/alacritty.linux.toml"
 
 # Define the destination for the Neovim configuration symlink.
 DEST_CONFIG="$HOME/.config/alacritty/alacritty.toml"
