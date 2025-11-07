@@ -124,8 +124,6 @@ return {
       },
       -- Css
       cssls = {},
-      -- http / rest client kulala
-      kulala_ls = {},
     }
 
     local ensure_installed = vim.tbl_keys(servers or {})
