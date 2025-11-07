@@ -1,7 +1,7 @@
 return {
-  'nvim-tree/nvim-web-devicons',
-  version = '*',
+  "nvim-tree/nvim-web-devicons",
+  version = "*",
   config = function()
-    require('nvim-web-devicons').setup()
-  end
+    require("nvim-web-devicons").setup()
+  end,
 }

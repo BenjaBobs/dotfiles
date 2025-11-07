@@ -6,7 +6,7 @@ return {
     label = {
       rainbow = {
         enabled = true,
-      }
+      },
     },
     modes = {
       char = {
@@ -15,7 +15,21 @@ return {
     },
   },
   keys = {
-    { "s", mode = { "n", "x", "o" }, function() require("flash").jump({ mode = "smart-case" }) end, desc = "Flash" },
-    { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end,                  desc = "Flash Treesitter" },
+    {
+      "s",
+      mode = { "n", "x", "o" },
+      function()
+        require("flash").jump({ mode = "smart-case" })
+      end,
+      desc = "Flash",
+    },
+    {
+      "S",
+      mode = { "n", "x", "o" },
+      function()
+        require("flash").treesitter()
+      end,
+      desc = "Flash Treesitter",
+    },
   },
 }

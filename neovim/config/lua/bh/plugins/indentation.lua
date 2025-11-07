@@ -13,14 +13,14 @@ return {
           left_top = "╭",
           left_bottom = "╰",
           right_arrow = "─",
-        }
+        },
       },
       indent = {
         enable = true,
       },
       line_num = {
         enable = true,
-      }
+      },
     })
-  end
+  end,
 }

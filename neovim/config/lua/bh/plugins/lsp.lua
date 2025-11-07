@@ -48,7 +48,7 @@ return {
             draw = {
               columns = {
                 { "kind_icon" },
-                { "label",       gap = 1 },
+                { "label", gap = 1 },
                 { "source_name", gap = 1 },
               },
             },
