@@ -177,5 +177,26 @@ return {
         end, "[F]ind LSP Workspace [S]ymbols")
       end,
     })
+
+    -- Clean neovim ShaDa temporary files (Windows only)
+    if vim.fn.has("win32") == 1 then
+      local function clean_shada_tmp_files()
+        local shada_dir = vim.fn.stdpath("data") .. "/shada"
+        local full_cmd = 'del /q "' .. shada_dir:gsub("/", "\\") .. '\\main.shada.tmp.*"'
+        vim.fn.system(full_cmd)
+      end
+
+      -- Manual cleanup keymap
+      vim.keymap.set("n", "<leader>rc", function()
+        clean_shada_tmp_files()
+        print("ShaDa temporary files cleaned")
+      end, { desc = "[R]un [C]lean neovim ShaDa files", silent = true })
+
+      -- Auto cleanup on exit
+      vim.api.nvim_create_autocmd("VimLeavePre", {
+        callback = clean_shada_tmp_files,
+        desc = "Clean ShaDa temporary files on exit",
+      })
+    end
   end,
 }
