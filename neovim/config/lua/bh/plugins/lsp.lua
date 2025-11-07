@@ -56,8 +56,8 @@ return {
         },
       },
     },
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
+    "mason-org/mason.nvim",
+    "mason-org/mason-lspconfig.nvim",
   },
   config = function()
     -- See `:help lspconfig-all` or https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md
