@@ -7,7 +7,12 @@ return {
       rainbow = {
         enabled = true,
       }
-    }
+    },
+    modes = {
+      char = {
+        enabled = false,
+      },
+    },
   },
   keys = {
     { "s", mode = { "n", "x", "o" }, function() require("flash").jump({ mode = "smart-case" }) end, desc = "Flash" },
