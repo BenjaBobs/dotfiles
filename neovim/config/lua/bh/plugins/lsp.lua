@@ -128,7 +128,12 @@ return {
 
     local ensure_installed = vim.tbl_keys(servers or {})
 
-    require("mason").setup()
+    require("mason").setup({
+      registries = {
+        "github:mason-org/mason-registry",
+        "github:Crashdummyy/mason-registry", -- Custom registry for roslyn
+      },
+    })
     require("mason-lspconfig").setup({
       ensure_installed = ensure_installed,
     })
