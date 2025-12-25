@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(tree:*)",
+      "Bash(cat:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []

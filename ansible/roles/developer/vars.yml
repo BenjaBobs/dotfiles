@@ -1,0 +1,29 @@
+---
+# Developer role variables
+
+# Development tools and languages
+dev_packages:
+  - neovim
+  - nodejs
+  - npm
+  - python
+  - python-pip
+  - rustup
+  - go
+  - docker
+  - docker-compose
+  - ripgrep
+  - fd
+  - fzf
+  - lazygit
+  - github-cli
+
+# VSCode extensions to install
+vscode_extensions:
+  - ms-vscode.cpptools
+  - ms-python.python
+  - rust-lang.rust-analyzer
+  - golang.go
+  - eamodio.gitlens
+  - esbenp.prettier-vscode
+  - dbaeumer.vscode-eslint

@@ -1,0 +1,24 @@
+---
+# Install VSCode and extensions
+
+- name: Install Visual Studio Code via AUR
+  shell: yay -S --noconfirm visual-studio-code-bin
+  args:
+    creates: /usr/bin/code
+  become: yes
+  become_user: "{{ ansible_env.USER }}"
+
+- name: Install VSCode extensions
+  command: code --install-extension {{ item }}
+  loop: "{{ vscode_extensions }}"
+  register: vscode_ext_result
+  changed_when: "'successfully installed' in vscode_ext_result.stdout"
+  failed_when: false
+
+- name: Create VSCode settings directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/Code/User"
+    state: directory
+    mode: '0755'
+
+# Note: Add VSCode settings.json and keybindings.json to tasks/vscode/config/ if needed

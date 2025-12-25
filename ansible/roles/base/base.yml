@@ -1,0 +1,37 @@
+---
+# Base role entry point - always executed
+# Orchestrates system setup and common tool installation
+
+- name: Load base role variables
+  include_vars: vars.yml
+
+- name: System setup tasks
+  block:
+    - name: Update system
+      include_tasks: tasks/system/update.yml
+
+    - name: Configure hardware drivers
+      include_tasks: tasks/system/drivers.yml
+
+    - name: Install KDE Plasma
+      include_tasks: tasks/system/kde-plasma.yml
+
+- name: Common tools setup
+  block:
+    - name: Setup Firefox
+      include_tasks: tasks/tools/firefox/install.yml
+
+    - name: Setup Alacritty
+      include_tasks: tasks/tools/alacritty/install.yml
+
+    - name: Setup Fish shell
+      include_tasks: tasks/tools/fish/install.yml
+
+    - name: Setup Bash
+      include_tasks: tasks/tools/bash/install.yml
+
+    - name: Setup Git
+      include_tasks: tasks/tools/git/install.yml
+
+    - name: Setup Tmux
+      include_tasks: tasks/tools/tmux/install.yml

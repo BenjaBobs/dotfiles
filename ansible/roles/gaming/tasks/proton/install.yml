@@ -1,0 +1,10 @@
+---
+# Install Proton GE (custom Proton build)
+
+- name: Display Proton GE information
+  debug:
+    msg: "ProtonUp-Qt will be installed for easy Proton GE management. Launch it to install Proton GE versions."
+
+# Note: Proton GE is managed through ProtonUp-Qt (GUI tool)
+# User can download and install specific versions via the GUI
+# Alternative: Could automate download/installation of latest GE-Proton here

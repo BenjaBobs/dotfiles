@@ -1,0 +1,14 @@
+---
+# Deploy bash configuration
+
+- name: Remove old bashrc if exists
+  file:
+    path: "{{ user_home }}/.bashrc"
+    state: absent
+
+- name: Symlink bashrc configuration
+  file:
+    src: "{{ role_path }}/tasks/tools/bash/.bashrc"
+    dest: "{{ user_home }}/.bashrc"
+    state: link
+    force: yes

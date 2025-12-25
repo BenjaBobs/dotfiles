@@ -1,0 +1,20 @@
+---
+# Install tmux and deploy configuration
+
+- name: Install tmux
+  pacman:
+    name: tmux
+    state: present
+  become: yes
+
+- name: Ensure old tmux config is removed
+  file:
+    path: "{{ user_home }}/.tmux.conf"
+    state: absent
+
+- name: Symlink tmux configuration
+  file:
+    src: "{{ role_path }}/tasks/tools/tmux/config/tmux.conf"
+    dest: "{{ user_home }}/.tmux.conf"
+    state: link
+    force: yes

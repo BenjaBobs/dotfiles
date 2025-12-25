@@ -1,0 +1,30 @@
+---
+# Enable multilib repository for 32-bit library support
+
+- name: Check if multilib is enabled
+  shell: grep -q '^\[multilib\]' /etc/pacman.conf
+  register: multilib_enabled
+  failed_when: false
+  changed_when: false
+
+- name: Enable multilib repository
+  block:
+    - name: Uncomment multilib section
+      replace:
+        path: /etc/pacman.conf
+        regexp: '^#\[multilib\]$'
+        replace: '[multilib]'
+      become: yes
+
+    - name: Uncomment multilib Include line
+      replace:
+        path: /etc/pacman.conf
+        regexp: '^#(Include = /etc/pacman.d/mirrorlist)$'
+        replace: '\1'
+      become: yes
+
+    - name: Update package database
+      pacman:
+        update_cache: yes
+      become: yes
+  when: multilib_enabled.rc != 0

@@ -1,0 +1,12 @@
+---
+# Install Lutris game launcher
+
+- name: Create Lutris config directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/lutris"
+    state: directory
+    mode: '0755'
+
+- name: Display Lutris installation note
+  debug:
+    msg: "Lutris will be installed via AUR in the main gaming.yml playbook."

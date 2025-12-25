@@ -1,0 +1,9 @@
+---
+# Ansible inventory for local machine bootstrap
+# This inventory targets the local machine only
+
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python3

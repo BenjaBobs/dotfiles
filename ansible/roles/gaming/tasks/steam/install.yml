@@ -1,0 +1,20 @@
+---
+# Install Steam and configure
+
+- name: Install Steam
+  pacman:
+    name:
+      - steam
+      - steam-native-runtime
+    state: present
+  become: yes
+
+- name: Create Steam config directory
+  file:
+    path: "{{ ansible_env.HOME }}/.steam"
+    state: directory
+    mode: '0755'
+
+- name: Display Steam installation complete
+  debug:
+    msg: "Steam installed. Launch Steam to complete initial setup and enable Proton in Settings > Steam Play."

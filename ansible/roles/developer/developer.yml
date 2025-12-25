@@ -1,0 +1,34 @@
+---
+# Developer role entry point - executed when 'dev' tag is specified
+# Installs development tools, IDEs, and configurations
+
+- name: Load developer role variables
+  include_vars: vars.yml
+
+- name: Development tools setup
+  block:
+    - name: Setup Neovim
+      include_tasks: tasks/neovim/install.yml
+
+    - name: Setup VSCode
+      include_tasks: tasks/vscode/install.yml
+
+    - name: Install development packages
+      pacman:
+        name: "{{ dev_packages }}"
+        state: present
+      become: yes
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+      become: yes
+
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_env.USER }}"
+        groups: docker
+        append: yes
+      become: yes
