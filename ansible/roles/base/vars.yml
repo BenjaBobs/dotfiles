@@ -1,0 +1,18 @@
+---
+# Base role variables
+# User configuration
+target_user: "{{ ansible_env.USER }}"
+user_home: "{{ ansible_env.HOME }}"
+
+# System packages (always installed)
+base_packages:
+  - base-devel
+  - git
+  - curl
+  - wget
+  - unzip
+  - htop
+  - neofetch
+
+# AUR helper
+aur_helper: yay

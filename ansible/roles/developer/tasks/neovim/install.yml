@@ -1,0 +1,33 @@
+---
+# Install Neovim and deploy configuration
+
+- name: Ensure Neovim config directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config"
+    state: directory
+    mode: '0755'
+
+- name: Remove old nvim config if exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config/nvim"
+    state: absent
+
+- name: Symlink Neovim configuration
+  file:
+    src: "{{ role_path }}/tasks/neovim/config/config"
+    dest: "{{ ansible_env.HOME }}/.config/nvim"
+    state: link
+    force: yes
+
+- name: Install Neovim dependencies
+  pacman:
+    name:
+      - xclip              # Clipboard support
+      - wl-clipboard       # Wayland clipboard support
+      - stylua             # Lua formatter
+    state: present
+  become: yes
+
+- name: Display Neovim setup complete message
+  debug:
+    msg: "Neovim installed and configured. Run 'nvim' to trigger lazy.nvim plugin installation."

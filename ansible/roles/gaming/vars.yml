@@ -1,0 +1,23 @@
+---
+# Gaming role variables
+
+# Gaming packages
+gaming_packages:
+  - steam
+  - gamemode
+  - lib32-gamemode
+  - mangohud
+  - lib32-mangohud
+  - wine
+  - wine-mono
+  - wine-gecko
+  - winetricks
+  - lib32-vulkan-icd-loader
+  - vkd3d
+  - lib32-vkd3d
+
+# Additional gaming tools via AUR
+gaming_aur_packages:
+  - protonup-qt          # ProtonGE manager with GUI
+  - lutris              # Game launcher
+  - discord             # Voice chat

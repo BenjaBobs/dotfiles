@@ -1,0 +1,71 @@
+---
+# Auto-detect hardware and install appropriate drivers
+
+- name: Gather GPU information
+  shell: lspci | grep -i vga
+  register: gpu_info
+  changed_when: false
+
+- name: Install AMD drivers
+  block:
+    - name: Install AMD GPU drivers
+      pacman:
+        name:
+          - mesa
+          - lib32-mesa
+          - vulkan-radeon
+          - lib32-vulkan-radeon
+          - libva-mesa-driver
+          - lib32-libva-mesa-driver
+          - mesa-vdpau
+          - lib32-mesa-vdpau
+        state: present
+      become: yes
+
+    - name: Display AMD driver installation
+      debug:
+        msg: "AMD GPU detected - Mesa drivers installed"
+  when: "'AMD' in gpu_info.stdout or 'ATI' in gpu_info.stdout"
+
+- name: Install Nvidia drivers
+  block:
+    - name: Install Nvidia GPU drivers
+      pacman:
+        name:
+          - nvidia
+          - nvidia-utils
+          - lib32-nvidia-utils
+          - nvidia-settings
+        state: present
+      become: yes
+
+    - name: Enable nvidia-drm modeset
+      lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+        line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet nvidia-drm.modeset=1"'
+      become: yes
+      notify: update-grub
+
+    - name: Display Nvidia driver installation
+      debug:
+        msg: "Nvidia GPU detected - Proprietary drivers installed"
+  when: "'NVIDIA' in gpu_info.stdout"
+
+- name: Install Intel drivers
+  block:
+    - name: Install Intel GPU drivers
+      pacman:
+        name:
+          - mesa
+          - lib32-mesa
+          - vulkan-intel
+          - lib32-vulkan-intel
+          - intel-media-driver
+        state: present
+      become: yes
+
+    - name: Display Intel driver installation
+      debug:
+        msg: "Intel GPU detected - Mesa drivers installed"
+  when: "'Intel' in gpu_info.stdout"

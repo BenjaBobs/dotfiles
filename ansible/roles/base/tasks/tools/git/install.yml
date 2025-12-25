@@ -1,0 +1,27 @@
+---
+# Deploy git configuration
+
+- name: Ensure git config directory exists
+  file:
+    path: "{{ user_home }}/.config/git"
+    state: directory
+    mode: '0755'
+
+- name: Remove old gitconfig if exists
+  file:
+    path: "{{ user_home }}/.config/git/.gitconfig"
+    state: absent
+
+- name: Symlink git configuration
+  file:
+    src: "{{ role_path }}/tasks/tools/git/config/.gitconfig"
+    dest: "{{ user_home }}/.config/git/.gitconfig"
+    state: link
+    force: yes
+
+- name: Also symlink to home directory for compatibility
+  file:
+    src: "{{ role_path }}/tasks/tools/git/config/.gitconfig"
+    dest: "{{ user_home }}/.gitconfig"
+    state: link
+    force: yes

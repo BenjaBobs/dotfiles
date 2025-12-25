@@ -1,0 +1,90 @@
+---
+# Main playbook - orchestrates all roles based on tags
+# Usage:
+#   ansible-playbook playbooks/site.yml -e "install_tags=dev"
+#   ansible-playbook playbooks/site.yml -e "install_tags=gaming"
+#   ansible-playbook playbooks/site.yml -e "install_tags=dev,gaming"
+
+- name: Bootstrap EndeavourOS System
+  hosts: localhost
+  connection: local
+  become: no
+
+  vars:
+    # Default to empty tags if not provided
+    install_tags: ""
+
+  pre_tasks:
+    - name: Display installation plan
+      debug:
+        msg: |
+          ===================================
+          EndeavourOS Bootstrap
+          ===================================
+          Tags: {{ install_tags if install_tags else 'base only' }}
+
+          Roles to execute:
+          - base (always)
+          {% if 'dev' in install_tags %}
+          - developer
+          {% endif %}
+          {% if 'gaming' in install_tags %}
+          - gaming
+          {% endif %}
+          ===================================
+
+    - name: Verify running on EndeavourOS/Arch
+      shell: cat /etc/os-release | grep -i "endeavour\|arch"
+      register: os_check
+      failed_when: false
+      changed_when: false
+
+    - name: Warn if not on EndeavourOS
+      debug:
+        msg: "WARNING: This playbook is designed for EndeavourOS. Detected: {{ os_check.stdout }}"
+      when: os_check.rc != 0
+
+  tasks:
+    # Base role - ALWAYS executes
+    - name: Execute base system setup
+      include_role:
+        name: base
+        tasks_from: base.yml
+
+    # Developer role - executes when 'dev' tag present
+    - name: Execute developer setup
+      include_role:
+        name: developer
+        tasks_from: developer.yml
+      when: "'dev' in install_tags"
+
+    # Gaming role - executes when 'gaming' tag present
+    - name: Execute gaming setup
+      include_role:
+        name: gaming
+        tasks_from: gaming.yml
+      when: "'gaming' in install_tags"
+
+  post_tasks:
+    - name: Display completion message
+      debug:
+        msg: |
+          ===================================
+          Bootstrap Complete!
+          ===================================
+
+          Next steps:
+          1. Reboot your system
+          2. Log out and back in for group changes to take effect
+          {% if 'dev' in install_tags %}
+          3. Launch Neovim to complete plugin installation: nvim
+          4. Verify Docker: docker run hello-world
+          {% endif %}
+          {% if 'gaming' in install_tags %}
+          3. Launch Steam and enable Proton in Settings > Steam Play
+          4. Use ProtonUp-Qt to install Proton GE
+          {% endif %}
+
+          Configuration files are symlinked from this repo.
+          Changes to configs will be tracked by git.
+          ===================================
