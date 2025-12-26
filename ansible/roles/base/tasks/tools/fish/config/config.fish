@@ -3,6 +3,7 @@ if status is-interactive
 end
 zoxide init fish | source
 ~/.local/bin/mise activate fish | source
+starship init fish | source
 set EDITOR nvim
 
 # Source local overrides if they exist

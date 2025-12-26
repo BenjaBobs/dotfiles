@@ -1,0 +1,13 @@
+---
+# Install Monaspace Nerd Fonts and refresh font cache
+
+- name: Install Monaspace Nerd Fonts via AUR
+  become: no
+  command: yay -S --noconfirm --needed {{ monaspace_font_package }}
+  register: monaspace_install
+  changed_when: false
+
+- name: Refresh font cache
+  become: no
+  command: fc-cache -f
+  changed_when: false

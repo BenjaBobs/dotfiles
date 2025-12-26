@@ -19,6 +19,12 @@
     - name: Setup Mise
       include_tasks: tools/mise/install.yml
 
+    - name: Setup Fonts
+      include_tasks: tools/fonts/install.yml
+
+    - name: Setup Starship
+      include_tasks: tools/starship/install.yml
+
     - name: Setup Ghostty
       include_tasks: tools/ghostty/install.yml
 

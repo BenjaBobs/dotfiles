@@ -1,0 +1,19 @@
+---
+# Install Starship prompt and generate a Catppuccin preset config
+
+- name: Install Starship
+  become: yes
+  pacman:
+    name: starship
+    state: present
+
+- name: Ensure Starship config directory exists
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config"
+    state: directory
+    mode: '0755'
+
+- name: Generate Starship config with Catppuccin Macchiato preset
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.config/starship.toml"
+  command: starship preset catppuccin_macchiato -o {{ ansible_facts['env']['HOME'] }}/.config/starship.toml
