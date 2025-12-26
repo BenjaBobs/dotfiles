@@ -4,15 +4,19 @@
 target_user: "{{ ansible_env.USER }}"
 user_home: "{{ ansible_env.HOME }}"
 
-# System packages (always installed)
+# System Layer packages (always installed)
 base_packages:
-  - base-devel
-  - git
-  - curl
-  - wget
-  - unzip
-  - htop
-  - neofetch
+  - base-devel  # Essential build tools (gcc, make, etc.) for compiling from source
+  - git         # Version control system
+  - curl        # Command-line tool for transferring data with URLs
+  - wget        # Network downloader for retrieving files
+  - unzip       # Archive extraction utility
+  - htop        # Interactive process viewer (TUI)
+  - btop        # Resource monitor with graphs (modern alternative to htop)
+  - neofetch    # System information tool with ASCII art
+  - rust        # Rust toolchain (for Cargo-based Tool Layer installs)
+  - bat         # cat with syntax highlighting and Git integration
+  - zoxide      # Smart cd replacement (learns frequently used directories)
 
 # AUR helper
 aur_helper: yay

@@ -1,26 +1,42 @@
 ---
-# Install alacritty terminal and deploy configuration
+# Install alacritty terminal (Tool Layer - Cargo) and deploy configuration
 
-- name: Install alacritty
-  pacman:
-    name: alacritty
-    state: present
+- name: Install alacritty via Cargo
+  args:
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/alacritty"
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.cargo/bin:{{ ansible_env.PATH }}"
+  shell: cargo install alacritty
+
+- name: Install alacritty terminfo (for proper terminal support)
   become: yes
+  args:
+    creates: /usr/share/terminfo/a/alacritty
+  shell: |
+    if [ ! -f /usr/share/terminfo/a/alacritty ]; then
+      curl -sSL https://raw.githubusercontent.com/alacritty/alacritty/master/extra/alacritty.info -o /tmp/alacritty.info
+      tic -xe alacritty,alacritty-direct /tmp/alacritty.info
+      rm /tmp/alacritty.info
+    fi
 
 - name: Ensure alacritty config directory exists
   file:
-    path: "{{ user_home }}/.config/alacritty"
+    path: "{{ ansible_env.HOME }}/.config/alacritty"
     state: directory
     mode: '0755'
 
 - name: Remove old alacritty config if exists
   file:
-    path: "{{ user_home }}/.config/alacritty/alacritty.toml"
+    path: "{{ ansible_env.HOME }}/.config/alacritty/alacritty.toml"
     state: absent
 
 - name: Symlink alacritty configuration
   file:
     src: "{{ role_path }}/tasks/tools/alacritty/config/alacritty.toml"
-    dest: "{{ user_home }}/.config/alacritty/alacritty.toml"
+    dest: "{{ ansible_env.HOME }}/.config/alacritty/alacritty.toml"
     state: link
     force: yes
+
+- name: Display Alacritty update instructions
+  debug:
+    msg: "Alacritty installed via Cargo (Tool Layer). Update with: cargo install --force alacritty"

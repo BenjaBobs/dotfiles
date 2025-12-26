@@ -1,17 +1,11 @@
 ---
-# System update and base packages installation
-
-- name: Update system packages
-  pacman:
-    update_cache: yes
-    upgrade: yes
-  become: yes
+# Install base packages (NO auto-update - user manages manually)
 
 - name: Install base development packages
+  become: yes
   pacman:
     name: "{{ base_packages }}"
     state: present
-  become: yes
 
 - name: Check if yay is installed
   command: which yay
@@ -20,6 +14,7 @@
   changed_when: false
 
 - name: Install yay AUR helper
+  when: yay_installed.rc != 0
   block:
     - name: Clone yay repository
       git:
@@ -28,14 +23,13 @@
         update: yes
 
     - name: Build and install yay
-      command: makepkg -si --noconfirm
-      args:
-        chdir: /tmp/yay
       become: yes
       become_user: "{{ target_user }}"
+      args:
+        chdir: /tmp/yay
+      command: makepkg -si --noconfirm
 
     - name: Clean up yay build directory
       file:
         path: /tmp/yay
         state: absent
-  when: yay_installed.rc != 0

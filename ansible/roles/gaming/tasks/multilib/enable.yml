@@ -8,23 +8,23 @@
   changed_when: false
 
 - name: Enable multilib repository
+  when: multilib_enabled.rc != 0
   block:
     - name: Uncomment multilib section
+      become: yes
       replace:
         path: /etc/pacman.conf
         regexp: '^#\[multilib\]$'
         replace: '[multilib]'
-      become: yes
 
     - name: Uncomment multilib Include line
+      become: yes
       replace:
         path: /etc/pacman.conf
         regexp: '^#(Include = /etc/pacman.d/mirrorlist)$'
         replace: '\1'
-      become: yes
 
     - name: Update package database
+      become: yes
       pacman:
         update_cache: yes
-      become: yes
-  when: multilib_enabled.rc != 0

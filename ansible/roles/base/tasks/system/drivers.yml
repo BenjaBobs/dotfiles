@@ -7,8 +7,10 @@
   changed_when: false
 
 - name: Install AMD drivers
+  when: "'AMD' in gpu_info.stdout or 'ATI' in gpu_info.stdout"
   block:
     - name: Install AMD GPU drivers
+      become: yes
       pacman:
         name:
           - mesa
@@ -20,16 +22,16 @@
           - mesa-vdpau
           - lib32-mesa-vdpau
         state: present
-      become: yes
 
     - name: Display AMD driver installation
       debug:
         msg: "AMD GPU detected - Mesa drivers installed"
-  when: "'AMD' in gpu_info.stdout or 'ATI' in gpu_info.stdout"
 
 - name: Install Nvidia drivers
+  when: "'NVIDIA' in gpu_info.stdout"
   block:
     - name: Install Nvidia GPU drivers
+      become: yes
       pacman:
         name:
           - nvidia
@@ -37,24 +39,29 @@
           - lib32-nvidia-utils
           - nvidia-settings
         state: present
-      become: yes
 
-    - name: Enable nvidia-drm modeset
-      lineinfile:
-        path: /etc/default/grub
-        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
-        line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet nvidia-drm.modeset=1"'
+    - name: Add Nvidia kernel parameters for systemd-boot
       become: yes
-      notify: update-grub
+      lineinfile:
+        path: /etc/kernel/cmdline
+        line: "nvidia-drm.modeset=1"
+        create: yes
+      register: nvidia_cmdline
+
+    - name: Reinstall kernel to apply Nvidia parameters
+      when: nvidia_cmdline.changed
+      become: yes
+      command: reinstall-kernels
 
     - name: Display Nvidia driver installation
       debug:
-        msg: "Nvidia GPU detected - Proprietary drivers installed"
-  when: "'NVIDIA' in gpu_info.stdout"
+        msg: "Nvidia GPU detected - Proprietary drivers installed and systemd-boot configured"
 
 - name: Install Intel drivers
+  when: "'Intel' in gpu_info.stdout"
   block:
     - name: Install Intel GPU drivers
+      become: yes
       pacman:
         name:
           - mesa
@@ -63,9 +70,7 @@
           - lib32-vulkan-intel
           - intel-media-driver
         state: present
-      become: yes
 
     - name: Display Intel driver installation
       debug:
         msg: "Intel GPU detected - Mesa drivers installed"
-  when: "'Intel' in gpu_info.stdout"

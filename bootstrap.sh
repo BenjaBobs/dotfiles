@@ -37,10 +37,10 @@ ${GREEN}EXAMPLES:${NC}
 ${GREEN}WHAT GETS INSTALLED:${NC}
 
     ${BLUE}Base (always installed):${NC}
-    - KDE Plasma desktop environment
     - Hardware drivers (auto-detected AMD/Nvidia/Intel)
-    - Common tools: Firefox, Alacritty, Fish, Git, Tmux
+    - Common tools: Vivaldi (snap), Alacritty, Fish, Git, Tmux, Mise
     - System utilities and configurations
+    - Cleanup: Removes Firefox and other unwanted pre-installed software
 
     ${BLUE}Developer tag (dev):${NC}
     - Neovim with full configuration
@@ -64,9 +64,6 @@ ${GREEN}REQUIREMENTS:${NC}
 
 ${GREEN}NOTES:${NC}
     - All dotfiles are symlinked from this repo
-    - Changes to configs are tracked by git
-    - Run 'git pull' in this repo to update configs on all machines
-    - Safe to re-run to update/fix installations
 
 EOF
 }
@@ -155,12 +152,11 @@ main() {
 
     # Run Ansible playbook
     echo -e "${BLUE}Running Ansible playbook...${NC}"
-    ansible-playbook playbooks/site.yml -e "install_tags=$INSTALL_TAGS" -K
+    ansible-playbook playbooks/bootstrap.yml -e "install_tags=$INSTALL_TAGS" -K
 
     echo -e "${GREEN}====================================${NC}"
     echo -e "${GREEN}Bootstrap complete!${NC}"
     echo -e "${GREEN}====================================${NC}"
-    echo -e "${YELLOW}Please reboot your system and log back in.${NC}"
 }
 
 main "$@"

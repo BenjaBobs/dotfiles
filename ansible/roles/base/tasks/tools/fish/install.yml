@@ -2,10 +2,10 @@
 # Install fish shell and deploy configuration
 
 - name: Install fish shell
+  become: yes
   pacman:
     name: fish
     state: present
-  become: yes
 
 - name: Ensure fish config directory exists
   file:
@@ -26,7 +26,7 @@
     force: yes
 
 - name: Set fish as default shell
+  become: yes
   user:
     name: "{{ target_user }}"
     shell: /usr/bin/fish
-  become: yes
