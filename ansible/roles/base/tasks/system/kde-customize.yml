@@ -40,22 +40,24 @@
       exit 1
     fi
 
-    # Find the task manager applet ID within the panel (plugin=org.kde.plasma.icontasks)
-    APPLET_ID=$(awk -v panel="$PANEL_ID" '
+    # Find all task manager applet IDs within the panel (plugin=org.kde.plasma.icontasks)
+    APPLET_IDS=$(awk -v panel="$PANEL_ID" '
       $0 ~ "^\\[Containments\\]\\[" panel "\\]\\[Applets\\]\\[[0-9]+\\]$" {match($0, /\\[Applets\\]\\[([0-9]+)\\]/, m); app=m[1]; in_app=1; next}
       /^\[/ {in_app=0; next}
-      in_app && /^plugin=org\.kde\.plasma\.icontasks$/ {print app; exit}
+      in_app && /^plugin=org\.kde\.plasma\.icontasks$/ {print app}
     ' "$CONFIG_FILE")
 
-    if [ -z "$APPLET_ID" ]; then
+    if [ -z "$APPLET_IDS" ]; then
       echo "Task manager applet not found, skipping taskbar customization"
       exit 1
     fi
 
     # Configure pinned applications in order: ghostty, vivaldi
-    $KWRITE --file plasma-org.kde.plasma.desktop-appletsrc \
-      --group "Containments[$PANEL_ID][Applets][$APPLET_ID][Configuration][General]" \
-      --key "launchers" "applications:com.mitchellh.ghostty.desktop,applications:com.vivaldi.Vivaldi.desktop"
+    for APPLET_ID in $APPLET_IDS; do
+      $KWRITE --file plasma-org.kde.plasma.desktop-appletsrc \
+        --group "Containments[$PANEL_ID][Applets][$APPLET_ID][Configuration][General]" \
+        --key "launchers" "applications:com.mitchellh.ghostty.desktop,applications:com.vivaldi.Vivaldi.desktop"
+    done
   register: kde_taskbar_config
   changed_when: kde_taskbar_config.rc == 0
   failed_when: false
