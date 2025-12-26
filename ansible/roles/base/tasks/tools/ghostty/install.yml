@@ -4,9 +4,11 @@
 - name: Install Ghostty via AUR
   become: yes
   become_user: "{{ ansible_facts['env']['USER'] }}"
-  args:
-    creates: /usr/bin/ghostty
-  shell: yay -S --noconfirm ghostty
+  community.general.pacman:
+    name: ghostty
+    state: present
+    executable: yay
+    extra_args: --noconfirm
 
 - name: Ensure Ghostty config directory exists
   file:
