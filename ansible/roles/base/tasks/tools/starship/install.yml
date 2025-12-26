@@ -7,13 +7,25 @@
     name: starship
     state: present
 
-- name: Ensure Starship config directory exists
+- name: Ensure Starship config directory exists in repo
   file:
-    path: "{{ ansible_facts['env']['HOME'] }}/.config"
+    path: "{{ role_path }}/tasks/tools/starship/config"
     state: directory
     mode: '0755'
 
-- name: Generate Starship config with Catppuccin Powerline preset
+- name: Generate Starship config with Catppuccin Powerline preset (repo)
   args:
-    creates: "{{ ansible_facts['env']['HOME'] }}/.config/starship.toml"
-  command: starship preset catppuccin-powerline -o {{ ansible_facts['env']['HOME'] }}/.config/starship.toml
+    creates: "{{ role_path }}/tasks/tools/starship/config/starship.toml"
+  command: starship preset catppuccin-powerline -o {{ role_path }}/tasks/tools/starship/config/starship.toml
+
+- name: Remove old Starship config if exists
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/starship.toml"
+    state: absent
+
+- name: Symlink Starship configuration
+  file:
+    src: "{{ role_path }}/tasks/tools/starship/config/starship.toml"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/starship.toml"
+    state: link
+    force: yes
