@@ -24,7 +24,7 @@
 
 - name: Symlink Neovim configuration
   file:
-    src: "{{ role_path }}/tasks/neovim/config/config"
+    src: "{{ role_path }}/tasks/tools/neovim/config/config"
     dest: "{{ ansible_facts['env']['HOME'] }}/.config/nvim"
     state: link
     follow: no
