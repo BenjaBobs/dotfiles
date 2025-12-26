@@ -1,15 +1,14 @@
 ---
-# Install VSCode and extensions
+# Install VSCode (Application Layer - Flatpak) and extensions
 
-- name: Install Visual Studio Code via AUR
-  shell: yay -S --noconfirm visual-studio-code-bin
-  args:
-    creates: /usr/bin/code
+- name: Install Visual Studio Code via Flatpak
   become: yes
-  become_user: "{{ ansible_env.USER }}"
+  community.general.flatpak:
+    name: com.visualstudio.code
+    state: present
 
 - name: Install VSCode extensions
-  command: code --install-extension {{ item }}
+  command: flatpak run com.visualstudio.code --install-extension {{ item }}
   loop: "{{ vscode_extensions }}"
   register: vscode_ext_result
   changed_when: "'successfully installed' in vscode_ext_result.stdout"
@@ -17,8 +16,9 @@
 
 - name: Create VSCode settings directory
   file:
-    path: "{{ ansible_env.HOME }}/.config/Code/User"
+    path: "{{ ansible_env.HOME }}/.var/app/com.visualstudio.code/config/Code/User"
     state: directory
     mode: '0755'
 
 # Note: Add VSCode settings.json and keybindings.json to tasks/vscode/config/ if needed
+# Flatpak VSCode config location: ~/.var/app/com.visualstudio.code/config/Code/User

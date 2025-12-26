@@ -1,27 +1,40 @@
 ---
-# Deploy git configuration
+# Deploy git configuration (shared + local architecture)
 
-- name: Ensure git config directory exists
-  file:
-    path: "{{ user_home }}/.config/git"
-    state: directory
-    mode: '0755'
-
-- name: Remove old gitconfig if exists
-  file:
-    path: "{{ user_home }}/.config/git/.gitconfig"
-    state: absent
-
-- name: Symlink git configuration
+- name: Symlink shared git configuration
   file:
     src: "{{ role_path }}/tasks/tools/git/config/.gitconfig"
-    dest: "{{ user_home }}/.config/git/.gitconfig"
+    dest: "{{ ansible_env.HOME }}/.gitconfig.shared"
     state: link
     force: yes
 
-- name: Also symlink to home directory for compatibility
-  file:
-    src: "{{ role_path }}/tasks/tools/git/config/.gitconfig"
-    dest: "{{ user_home }}/.gitconfig"
-    state: link
-    force: yes
+- name: Check if local gitconfig exists
+  stat:
+    path: "{{ ansible_env.HOME }}/.gitconfig"
+  register: gitconfig_local
+
+- name: Create local gitconfig with include directive
+  when: not gitconfig_local.stat.exists
+  copy:
+    dest: "{{ ansible_env.HOME }}/.gitconfig"
+    content: |
+      # Local git configuration (machine-specific)
+      # Add your user.name, user.email, and other local settings here
+      # Example:
+      #   [user]
+      #       name = Your Name
+      #       email = your.email@example.com
+
+      # Include shared settings from dotfiles repo
+      [include]
+          path = ~/.gitconfig.shared
+    mode: "0644"
+
+- name: Display git configuration message
+  debug:
+    msg: |
+      Git configuration deployed:
+      - Shared settings: ~/.gitconfig.shared (symlinked from repo)
+      - Local settings: ~/.gitconfig (machine-specific, configure with 'git config --global')
+      - Set your identity: git config --global user.name "Your Name"
+      - Set your email: git config --global user.email "you@example.com"

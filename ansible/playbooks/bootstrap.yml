@@ -1,9 +1,9 @@
 ---
-# Main playbook - orchestrates all roles based on tags
+# Bootstrap playbook - orchestrates all roles based on tags
 # Usage:
-#   ansible-playbook playbooks/site.yml -e "install_tags=dev"
-#   ansible-playbook playbooks/site.yml -e "install_tags=gaming"
-#   ansible-playbook playbooks/site.yml -e "install_tags=dev,gaming"
+#   ansible-playbook playbooks/bootstrap.yml -e "install_tags=dev"
+#   ansible-playbook playbooks/bootstrap.yml -e "install_tags=gaming"
+#   ansible-playbook playbooks/bootstrap.yml -e "install_tags=dev,gaming"
 
 - name: Bootstrap EndeavourOS System
   hosts: localhost
@@ -40,9 +40,33 @@
       changed_when: false
 
     - name: Warn if not on EndeavourOS
+      when: os_check.rc != 0
       debug:
         msg: "WARNING: This playbook is designed for EndeavourOS. Detected: {{ os_check.stdout }}"
-      when: os_check.rc != 0
+
+    - name: Check bootloader type
+      stat:
+        path: /boot/loader/loader.conf
+      register: systemd_boot_check
+
+    - name: Verify systemd-boot is installed
+      when: not systemd_boot_check.stat.exists
+      fail:
+        msg: |
+          ===================================
+          BOOTLOADER MISMATCH
+          ===================================
+          This bootstrap is configured for systemd-boot.
+          systemd-boot was NOT detected on this system.
+
+          Expected: /boot/loader/loader.conf
+          Found: Does not exist
+
+          Please review the bootloader configuration in:
+          - ansible/roles/base/tasks/system/drivers.yml (Nvidia settings)
+
+          Aborting to prevent misconfiguration.
+          ===================================
 
   tasks:
     # Base role - ALWAYS executes
@@ -53,17 +77,17 @@
 
     # Developer role - executes when 'dev' tag present
     - name: Execute developer setup
+      when: "'dev' in install_tags"
       include_role:
         name: developer
         tasks_from: developer.yml
-      when: "'dev' in install_tags"
 
     # Gaming role - executes when 'gaming' tag present
     - name: Execute gaming setup
+      when: "'gaming' in install_tags"
       include_role:
         name: gaming
         tasks_from: gaming.yml
-      when: "'gaming' in install_tags"
 
   post_tasks:
     - name: Display completion message

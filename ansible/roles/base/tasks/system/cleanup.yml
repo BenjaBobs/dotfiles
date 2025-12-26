@@ -1,0 +1,26 @@
+---
+# Remove unwanted pre-installed packages from EndeavourOS
+
+- name: Remove Firefox (replaced with Vivaldi)
+  become: yes
+  pacman:
+    name:
+      - firefox
+    state: absent
+  ignore_errors: yes  # Don't fail if Firefox isn't installed
+
+- name: Remove other unwanted pre-installed software
+  become: yes
+  pacman:
+    name:
+      # Add any other packages you want removed here
+      # Examples:
+      # - thunderbird
+      # - libreoffice-still
+    state: absent
+  ignore_errors: yes
+
+- name: Clean package cache
+  become: yes
+  command: pacman -Sc --noconfirm
+  changed_when: false

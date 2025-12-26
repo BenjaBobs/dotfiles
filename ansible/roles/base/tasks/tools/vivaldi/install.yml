@@ -1,0 +1,11 @@
+---
+# Install Vivaldi browser
+
+- name: Install Vivaldi via snap
+  become: yes
+  community.general.snap:
+    name: vivaldi
+    state: present
+
+# Note: Vivaldi settings are typically synced via Vivaldi account
+# If you want to manage profiles/extensions via Ansible, add tasks here

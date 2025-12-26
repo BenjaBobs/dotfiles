@@ -2,12 +2,12 @@
 # Install Steam and configure
 
 - name: Install Steam
+  become: yes
   pacman:
     name:
       - steam
       - steam-native-runtime
     state: present
-  become: yes
 
 - name: Create Steam config directory
   file:

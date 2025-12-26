@@ -1,0 +1,4 @@
+---
+# Neovim version configuration
+# Update this version when ready to test new Neovim releases
+neovim_version: "0.11.4"
