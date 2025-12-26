@@ -2,10 +2,27 @@
 # Install Monaspace Nerd Fonts and refresh font cache
 
 - name: Install Monaspace Nerd Fonts via AUR
-  become: no
-  command: yay -S --noconfirm --needed {{ monaspace_font_package }}
-  register: monaspace_install
-  changed_when: false
+  block:
+    - name: Allow passwordless pacman for font install
+      become: yes
+      copy:
+        dest: /etc/sudoers.d/99-bootstrap-pacman
+        content: |
+          {{ ansible_facts['env']['USER'] }} ALL=(ALL) NOPASSWD: /usr/bin/pacman
+        mode: '0440'
+        validate: 'visudo -cf %s'
+
+    - name: Install Monaspace Nerd Fonts via AUR
+      become: no
+      command: yay -S --noconfirm --needed {{ monaspace_font_package }}
+      register: monaspace_install
+      changed_when: false
+  always:
+    - name: Remove passwordless pacman sudoers
+      become: yes
+      file:
+        path: /etc/sudoers.d/99-bootstrap-pacman
+        state: absent
 
 - name: Refresh font cache
   become: no
