@@ -6,7 +6,6 @@
   pacman:
     name:
       - steam
-      - steam-native-runtime
     state: present
 
 - name: Create Steam config directory
