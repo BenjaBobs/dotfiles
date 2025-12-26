@@ -1,27 +1,38 @@
 ---
 # KDE Plasma customization tasks
 
-- name: Get current task manager configuration
-  shell: |
-    kreadconfig5 --file plasma-org.kde.plasma.desktop-appletsrc \
-      --group "Containments" --group "2" --group "Applets" \
-      --key "plugin" 2>/dev/null || echo "not found"
-  register: taskmanager_check
-  changed_when: false
-  failed_when: false
+- name: Install KDE configuration tools
+  become: yes
+  pacman:
+    name:
+      - kde-cli-tools     # Provides kwriteconfig5/kreadconfig5
+    state: present
 
 - name: Configure KDE task manager pinned applications
   shell: |
+    # Determine which version of kwriteconfig to use
+    if command -v kwriteconfig6 &> /dev/null; then
+      KWRITE="kwriteconfig6"
+      KREAD="kreadconfig6"
+    elif command -v kwriteconfig5 &> /dev/null; then
+      KWRITE="kwriteconfig5"
+      KREAD="kreadconfig5"
+    else
+      echo "KDE config tools not found, skipping taskbar customization"
+      exit 1
+    fi
+
     # Find the task manager applet ID
-    APPLET_ID=$(kreadconfig5 --file plasma-org.kde.plasma.desktop-appletsrc \
+    APPLET_ID=$($KREAD --file plasma-org.kde.plasma.desktop-appletsrc \
       --list-groups | grep -m1 "Containments.*Applets" | grep -o "[0-9]*" | head -1)
 
     # Configure pinned applications in order: alacritty, vivaldi
-    kwriteconfig5 --file plasma-org.kde.plasma.desktop-appletsrc \
+    $KWRITE --file plasma-org.kde.plasma.desktop-appletsrc \
       --group "Containments[2][Applets][$APPLET_ID][Configuration][General]" \
       --key "launchers" "applications:org.alacritty.Alacritty.desktop,applications:vivaldi-stable.desktop"
   register: kde_taskbar_config
-  changed_when: true
+  changed_when: kde_taskbar_config.rc == 0
+  failed_when: false
 
 - name: Restart plasmashell to apply changes
   when: kde_taskbar_config.changed
@@ -36,5 +47,5 @@
   debug:
     msg: |
       KDE taskbar configured with pinned apps: Alacritty, Vivaldi
+      - Changes applied after plasmashell restart
       - If changes don't appear, log out and back in
-      - Or manually restart: killall plasmashell && plasmashell &
