@@ -3,9 +3,9 @@
 
 - name: Install alacritty via Cargo
   args:
-    creates: "{{ ansible_env.HOME }}/.cargo/bin/alacritty"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/alacritty"
   environment:
-    PATH: "{{ ansible_env.HOME }}/.cargo/bin:{{ ansible_env.PATH }}"
+    PATH: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin:{{ ansible_facts['env']['PATH'] }}"
   shell: cargo install alacritty
 
 - name: Install alacritty terminfo (for proper terminal support)
@@ -21,19 +21,19 @@
 
 - name: Ensure alacritty config directory exists
   file:
-    path: "{{ ansible_env.HOME }}/.config/alacritty"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/alacritty"
     state: directory
     mode: '0755'
 
 - name: Remove old alacritty config if exists
   file:
-    path: "{{ ansible_env.HOME }}/.config/alacritty/alacritty.toml"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/alacritty/alacritty.toml"
     state: absent
 
 - name: Symlink alacritty configuration
   file:
     src: "{{ role_path }}/tasks/tools/alacritty/config/alacritty.toml"
-    dest: "{{ ansible_env.HOME }}/.config/alacritty/alacritty.toml"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/alacritty/alacritty.toml"
     state: link
     force: yes
 

@@ -1,8 +1,8 @@
 ---
 # Base role variables
 # User configuration
-target_user: "{{ ansible_env.USER }}"
-user_home: "{{ ansible_env.HOME }}"
+target_user: "{{ ansible_facts['env']['USER'] }}"
+user_home: "{{ ansible_facts['env']['HOME'] }}"
 
 # System Layer packages (always installed)
 base_packages:

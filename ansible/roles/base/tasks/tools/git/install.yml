@@ -4,19 +4,19 @@
 - name: Symlink shared git configuration
   file:
     src: "{{ role_path }}/tasks/tools/git/config/.gitconfig"
-    dest: "{{ ansible_env.HOME }}/.gitconfig.shared"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.gitconfig.shared"
     state: link
     force: yes
 
 - name: Check if local gitconfig exists
   stat:
-    path: "{{ ansible_env.HOME }}/.gitconfig"
+    path: "{{ ansible_facts['env']['HOME'] }}/.gitconfig"
   register: gitconfig_local
 
 - name: Create local gitconfig with include directive
   when: not gitconfig_local.stat.exists
   copy:
-    dest: "{{ ansible_env.HOME }}/.gitconfig"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.gitconfig"
     content: |
       # Local git configuration (machine-specific)
       # Add your user.name, user.email, and other local settings here

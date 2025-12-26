@@ -6,26 +6,26 @@
 
 - name: Install Neovim via mise
   args:
-    creates: "{{ ansible_env.HOME }}/.local/share/mise/installs/neovim/{{ neovim_version }}"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/share/mise/installs/neovim/{{ neovim_version }}"
   environment:
-    PATH: "{{ ansible_env.HOME }}/.cargo/bin:{{ ansible_env.PATH }}"  # mise is installed in cargo/bin
+    PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
   shell: mise use -g neovim@{{ neovim_version }}
 
 - name: Ensure Neovim config directory exists
   file:
-    path: "{{ ansible_env.HOME }}/.config"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config"
     state: directory
     mode: '0755'
 
 - name: Remove old nvim config if exists
   file:
-    path: "{{ ansible_env.HOME }}/.config/nvim"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/nvim"
     state: absent
 
 - name: Symlink Neovim configuration
   file:
     src: "{{ role_path }}/tasks/neovim/config/config"
-    dest: "{{ ansible_env.HOME }}/.config/nvim"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/nvim"
     state: link
     force: yes
 
@@ -40,9 +40,9 @@
 
 - name: Install stylua via mise
   args:
-    creates: "{{ ansible_env.HOME }}/.local/share/mise/installs/stylua"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/share/mise/installs/stylua"
   environment:
-    PATH: "{{ ansible_env.HOME }}/.cargo/bin:{{ ansible_env.PATH }}"  # mise is installed in cargo/bin
+    PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
   shell: mise use -g stylua@latest
 
 - name: Display Neovim setup complete message

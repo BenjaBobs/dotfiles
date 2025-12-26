@@ -3,7 +3,7 @@
 
 - name: Create Lutris config directory
   file:
-    path: "{{ ansible_env.HOME }}/.config/lutris"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/lutris"
     state: directory
     mode: '0755'
 
