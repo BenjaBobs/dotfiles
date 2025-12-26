@@ -2,13 +2,9 @@
 # Install Ghostty terminal (System Layer - AUR) and deploy configuration
 
 - name: Install Ghostty via AUR
-  become: yes
-  shell: |
-    if ! command -v ghostty &> /dev/null; then
-      sudo -u {{ ansible_facts['env']['USER'] }} yay -S --noconfirm ghostty
-    fi
   args:
     creates: /usr/bin/ghostty
+  shell: yay -S --noconfirm ghostty
 
 - name: Ensure Ghostty config directory exists
   file:
