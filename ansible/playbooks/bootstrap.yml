@@ -44,13 +44,20 @@
       debug:
         msg: "WARNING: This playbook is designed for EndeavourOS. Detected: {{ os_check.stdout }}"
 
-    - name: Check bootloader type
+    - name: Check bootloader type (standard /boot location)
+      become: yes
       stat:
         path: /boot/loader/loader.conf
-      register: systemd_boot_check
+      register: systemd_boot_check_boot
+
+    - name: Check bootloader type (alternative /efi location)
+      become: yes
+      stat:
+        path: /efi/loader/loader.conf
+      register: systemd_boot_check_efi
 
     - name: Verify systemd-boot is installed
-      when: not systemd_boot_check.stat.exists
+      when: not systemd_boot_check_boot.stat.exists and not systemd_boot_check_efi.stat.exists
       fail:
         msg: |
           ===================================
@@ -59,8 +66,9 @@
           This bootstrap is configured for systemd-boot.
           systemd-boot was NOT detected on this system.
 
-          Expected: /boot/loader/loader.conf
-          Found: Does not exist
+          Checked locations:
+          - /boot/loader/loader.conf (not found)
+          - /efi/loader/loader.conf (not found)
 
           Please review the bootloader configuration in:
           - ansible/roles/base/tasks/system/drivers.yml (Nvidia settings)
