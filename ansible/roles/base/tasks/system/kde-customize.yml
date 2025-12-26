@@ -8,63 +8,57 @@
       - kde-cli-tools     # Provides kwriteconfig5/kreadconfig5
     state: present
 
-- name: Ensure KDE autostart scripts directory exists
-  file:
-    path: "{{ ansible_facts['env']['HOME'] }}/.config/autostart-scripts"
-    state: directory
-    mode: '0755'
+- name: Configure KDE task manager pinned applications
+  become: no
+  shell: |
+    if command -v kwriteconfig6 >/dev/null 2>&1; then
+      KWRITE="kwriteconfig6"
+    elif command -v kwriteconfig5 >/dev/null 2>&1; then
+      KWRITE="kwriteconfig5"
+    else
+      echo "KDE config tools not found, skipping taskbar customization"
+      exit 1
+    fi
 
-- name: Install KDE taskbar pinning script
-  copy:
-    dest: "{{ ansible_facts['env']['HOME'] }}/.config/autostart-scripts/ensure-taskbar-launchers.sh"
-    mode: '0755'
-    content: |
-      #!/usr/bin/env sh
-      set -u
+    CONFIG_FILE="$HOME/.config/plasma-org.kde.plasma.desktop-appletsrc"
+    if [ ! -f "$CONFIG_FILE" ]; then
+      echo "KDE config file not found, skipping taskbar customization"
+      exit 1
+    fi
 
-      if command -v kwriteconfig6 >/dev/null 2>&1; then
-        KWRITE="kwriteconfig6"
-      elif command -v kwriteconfig5 >/dev/null 2>&1; then
-        KWRITE="kwriteconfig5"
-      else
-        exit 0
-      fi
+    PANEL_ID=$(awk '
+      /^\[Containments\]\[[0-9]+\]$/ {match($0, /\[Containments\]\[([0-9]+)\]/, m); cid=m[1]; in_cont=1; next}
+      /^\[/ {in_cont=0; next}
+      in_cont && /^plugin=org\.kde\.panel$/ {print cid; exit}
+    ' "$CONFIG_FILE")
 
-      CONFIG_FILE="$HOME/.config/plasma-org.kde.plasma.desktop-appletsrc"
-      [ -f "$CONFIG_FILE" ] || exit 0
+    if [ -z "$PANEL_ID" ]; then
+      echo "Panel containment not found, skipping taskbar customization"
+      exit 1
+    fi
 
-      PANEL_ID=$(awk '
-        /^\[Containments\]\[[0-9]+\]$/ {match($0, /\[Containments\]\[([0-9]+)\]/, m); cid=m[1]; in_cont=1; next}
-        /^\[/ {in_cont=0; next}
-        in_cont && /^plugin=org\.kde\.panel$/ {print cid; exit}
-      ' "$CONFIG_FILE")
-      [ -n "$PANEL_ID" ] || exit 0
+    APPLET_IDS=$(awk -v panel="$PANEL_ID" '
+      $0 ~ "^\\[Containments\\]\\[" panel "\\]\\[Applets\\]\\[[0-9]+\\]$" {match($0, /\\[Applets\\]\\[([0-9]+)\\]/, m); app=m[1]; in_app=1; next}
+      /^\[/ {in_app=0; next}
+      in_app && /^plugin=org\.kde\.plasma\.icontasks$/ {print app}
+    ' "$CONFIG_FILE")
 
-      APPLET_IDS=$(awk -v panel="$PANEL_ID" '
-        $0 ~ "^\\[Containments\\]\\[" panel "\\]\\[Applets\\]\\[[0-9]+\\]$" {match($0, /\\[Applets\\]\\[([0-9]+)\\]/, m); app=m[1]; in_app=1; next}
-        /^\[/ {in_app=0; next}
-        in_app && /^plugin=org\.kde\.plasma\.icontasks$/ {print app}
-      ' "$CONFIG_FILE")
-      [ -n "$APPLET_IDS" ] || exit 0
+    if [ -z "$APPLET_IDS" ]; then
+      echo "Task manager applet not found, skipping taskbar customization"
+      exit 1
+    fi
 
-      for APPLET_ID in $APPLET_IDS; do
-        $KWRITE --file plasma-org.kde.plasma.desktop-appletsrc \
-          --group "Containments[$PANEL_ID][Applets][$APPLET_ID][Configuration][General]" \
-          --key "launchers" "applications:com.mitchellh.ghostty.desktop,applications:com.vivaldi.Vivaldi.desktop"
-      done
-
-      if command -v qdbus >/dev/null 2>&1; then
-        qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.reloadConfig >/dev/null 2>&1 || true
-      fi
-
-      rm -f "$HOME/.config/autostart-scripts/ensure-taskbar-launchers.sh"
-
-- name: Run KDE taskbar pinning script once
-  command: "{{ ansible_facts['env']['HOME'] }}/.config/autostart-scripts/ensure-taskbar-launchers.sh"
-  changed_when: false
+    for APPLET_ID in $APPLET_IDS; do
+      $KWRITE --file plasma-org.kde.plasma.desktop-appletsrc \
+        --group "Containments[$PANEL_ID][Applets][$APPLET_ID][Configuration][General]" \
+        --key "launchers" "applications:com.mitchellh.ghostty.desktop,applications:com.vivaldi.Vivaldi.desktop"
+    done
+  register: kde_taskbar_config
+  changed_when: kde_taskbar_config.rc == 0
   failed_when: false
 
 - name: Display KDE customization note
+  become: no
   debug:
     msg: |
       KDE taskbar configured with pinned apps: Ghostty, Vivaldi
