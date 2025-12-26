@@ -1,14 +1,12 @@
 ---
 # Developer role entry point - executed when 'dev' tag is specified
 # Installs development tools, IDEs, and configurations
-
-- name: Load developer role variables
-  include_vars: vars.yml
+# Note: Variables loaded by playbook via vars_from: vars.yml
 
 - name: Development tools setup
   block:
     - name: Setup VSCode
-      include_tasks: tasks/vscode/install.yml
+      include_tasks: vscode/install.yml
 
     - name: Install development packages
       pacman:
