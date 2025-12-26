@@ -26,10 +26,10 @@
     APPLET_ID=$($KREAD --file plasma-org.kde.plasma.desktop-appletsrc \
       --list-groups | grep -m1 "Containments.*Applets" | grep -o "[0-9]*" | head -1)
 
-    # Configure pinned applications in order: alacritty, vivaldi
+    # Configure pinned applications in order: ghostty, vivaldi
     $KWRITE --file plasma-org.kde.plasma.desktop-appletsrc \
       --group "Containments[2][Applets][$APPLET_ID][Configuration][General]" \
-      --key "launchers" "applications:org.alacritty.Alacritty.desktop,applications:vivaldi-stable.desktop"
+      --key "launchers" "applications:com.mitchellh.ghostty.desktop,applications:com.vivaldi.Vivaldi.desktop"
   register: kde_taskbar_config
   changed_when: kde_taskbar_config.rc == 0
   failed_when: false
@@ -46,6 +46,6 @@
 - name: Display KDE customization note
   debug:
     msg: |
-      KDE taskbar configured with pinned apps: Alacritty, Vivaldi
+      KDE taskbar configured with pinned apps: Ghostty, Vivaldi
       - Changes applied after plasmashell restart
       - If changes don't appear, log out and back in
