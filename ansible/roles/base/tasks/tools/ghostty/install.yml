@@ -1,12 +1,11 @@
 ---
-# Install Ghostty terminal (System Layer - AUR) and deploy configuration
+# Install Ghostty terminal (System Layer) and deploy configuration
 
 - name: Install Ghostty via AUR
-  community.general.pacman:
+  become: yes
+  pacman:
     name: ghostty
     state: present
-    executable: yay
-    extra_args: --noconfirm
 
 - name: Ensure Ghostty config directory exists
   file:
@@ -30,6 +29,6 @@
 - name: Display Ghostty installation complete
   debug:
     msg: |
-      Ghostty installed via AUR (System Layer).
-      - Update with: yay -S ghostty
+      Ghostty installed via pacman (System Layer).
+      - Update with: pacman -Syu
       - Config: ~/.config/ghostty/config (symlinked from repo)

@@ -24,8 +24,25 @@
       become: yes
 
     - name: Install AUR gaming packages
-      community.general.pacman:
-        name: "{{ gaming_aur_packages }}"
-        state: present
-        executable: yay
-        extra_args: --noconfirm
+      block:
+        - name: Allow passwordless pacman for AUR installs
+          become: yes
+          copy:
+            dest: /etc/sudoers.d/99-bootstrap-pacman
+            content: |
+              {{ ansible_facts['env']['USER'] }} ALL=(ALL) NOPASSWD: /usr/bin/pacman
+            mode: '0440'
+            validate: 'visudo -cf %s'
+
+        - name: Install AUR gaming packages
+          community.general.pacman:
+            name: "{{ gaming_aur_packages }}"
+            state: present
+            executable: "{{ aur_helper }}"
+            extra_args: --noconfirm
+      always:
+        - name: Remove passwordless pacman sudoers
+          become: yes
+          file:
+            path: /etc/sudoers.d/99-bootstrap-pacman
+            state: absent
