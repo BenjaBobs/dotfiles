@@ -13,7 +13,7 @@ base_packages:
   - unzip       # Archive extraction utility
   - htop        # Interactive process viewer (TUI)
   - btop        # Resource monitor with graphs (modern alternative to htop)
-  - neofetch    # System information tool with ASCII art
+  - fastfetch   # System information tool with ASCII art (maintained neofetch alternative)
   - rust        # Rust toolchain (for Cargo-based Tool Layer installs)
   - bat         # cat with syntax highlighting and Git integration
   - zoxide      # Smart cd replacement (learns frequently used directories)
