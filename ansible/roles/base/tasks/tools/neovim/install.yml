@@ -2,7 +2,7 @@
 # Install Neovim (Tool Layer - mise) and deploy configuration
 
 - name: Load Neovim variables
-  include_vars: vars.yml
+  include_vars: "{{ role_path }}/tasks/tools/neovim/vars.yml"
 
 - name: Install Neovim via mise
   args:
