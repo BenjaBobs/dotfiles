@@ -2,8 +2,6 @@
 # Install Ghostty terminal (System Layer - AUR) and deploy configuration
 
 - name: Install Ghostty via AUR
-  become: yes
-  become_user: "{{ ansible_facts['env']['USER'] }}"
   community.general.pacman:
     name: ghostty
     state: present
