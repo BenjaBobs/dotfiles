@@ -17,6 +17,7 @@ base_packages:
   - rust        # Rust toolchain (for Cargo-based Tool Layer installs)
   - bat         # cat with syntax highlighting and Git integration
   - zoxide      # Smart cd replacement (learns frequently used directories)
+  - flatpak     # Application isolation and sandboxing (for Application Layer)
 
 # AUR helper
 aur_helper: yay
