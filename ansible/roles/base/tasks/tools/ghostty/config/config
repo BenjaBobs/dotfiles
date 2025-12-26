@@ -14,9 +14,6 @@ font-style-bold-italic = Bold Italic
 # Shell integration
 shell-integration = fish
 
-# Config auto-reload
-config-file-watch = true
-
 # Key bindings
 # Note: Ghostty uses different keybinding syntax than Alacritty
 # Example: keybind = ctrl+shift+c=copy_to_clipboard
