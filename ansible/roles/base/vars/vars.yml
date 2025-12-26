@@ -21,3 +21,6 @@ base_packages:
 
 # AUR helper
 aur_helper: yay
+
+# Fonts
+monaspace_font_package: otf-monaspace-nerdfonts
