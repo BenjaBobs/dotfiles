@@ -1,11 +1,11 @@
 ---
-# Install Vivaldi browser
+# Install Vivaldi browser (Application Layer - Flatpak)
 
-- name: Install Vivaldi via snap
+- name: Install Vivaldi via Flatpak
   become: yes
-  community.general.snap:
-    name: vivaldi
+  community.general.flatpak:
+    name: com.vivaldi.Vivaldi
     state: present
 
 # Note: Vivaldi settings are typically synced via Vivaldi account
-# If you want to manage profiles/extensions via Ansible, add tasks here
+# Flatpak Vivaldi config location: ~/.var/app/com.vivaldi.Vivaldi/

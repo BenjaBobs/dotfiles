@@ -27,6 +27,7 @@
     src: "{{ role_path }}/tasks/neovim/config/config"
     dest: "{{ ansible_facts['env']['HOME'] }}/.config/nvim"
     state: link
+    follow: no
     force: yes
 
 - name: Install Neovim dependencies
