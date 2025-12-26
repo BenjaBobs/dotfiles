@@ -10,18 +10,12 @@
 - name: Ensure Ghostty config directory exists
   file:
     path: "{{ ansible_facts['env']['HOME'] }}/.config/ghostty"
-    state: directory
-    mode: '0755'
-
-- name: Remove old Ghostty config if exists
-  file:
-    path: "{{ ansible_facts['env']['HOME'] }}/.config/ghostty/config"
     state: absent
 
-- name: Symlink Ghostty configuration
+- name: Symlink Ghostty configuration directory
   file:
-    src: "{{ role_path }}/tasks/tools/ghostty/config/config"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.config/ghostty/config"
+    src: "{{ role_path }}/tasks/tools/ghostty/config"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/ghostty"
     state: link
     follow: no
     force: yes

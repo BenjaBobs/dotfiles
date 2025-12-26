@@ -21,3 +21,6 @@ shell-integration = fish
 # Hints/URL detection
 # Ghostty has built-in URL detection - no additional config needed
 # URLs are automatically detected and can be clicked with ctrl+click
+
+# Shaders to make cursor look better
+custom-shader = ~/.config/ghostty/shaders/shader.glsl
