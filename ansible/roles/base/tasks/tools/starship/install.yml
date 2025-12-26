@@ -13,7 +13,7 @@
     state: directory
     mode: '0755'
 
-- name: Generate Starship config with Catppuccin Macchiato preset
+- name: Generate Starship config with Catppuccin Powerline preset
   args:
     creates: "{{ ansible_facts['env']['HOME'] }}/.config/starship.toml"
-  command: starship preset catppuccin_macchiato -o {{ ansible_facts['env']['HOME'] }}/.config/starship.toml
+  command: starship preset catppuccin-powerline -o {{ ansible_facts['env']['HOME'] }}/.config/starship.toml
