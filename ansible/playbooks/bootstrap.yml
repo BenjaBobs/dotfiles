@@ -113,7 +113,7 @@
           2. Log out and back in for group changes to take effect
           {% if 'dev' in install_tags %}
           3. Launch Neovim to complete plugin installation: nvim
-          4. Verify Docker: docker run hello-world
+          4. Verify Podman: podman run hello-world
           {% endif %}
           {% if 'gaming' in install_tags %}
           3. Launch Steam and enable Proton in Settings > Steam Play

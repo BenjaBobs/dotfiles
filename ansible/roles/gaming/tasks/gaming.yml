@@ -24,10 +24,8 @@
       become: yes
 
     - name: Install AUR gaming packages
-      shell: yay -S --noconfirm {{ item }}
-      loop: "{{ gaming_aur_packages }}"
-      become: yes
-      become_user: "{{ ansible_facts['env']['USER'] }}"
-      register: aur_install
-      changed_when: "'already installed' not in aur_install.stdout"
-      failed_when: false
+      community.general.pacman:
+        name: "{{ gaming_aur_packages }}"
+        state: present
+        executable: yay
+        extra_args: --noconfirm

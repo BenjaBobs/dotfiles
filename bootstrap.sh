@@ -46,15 +46,15 @@ show_help() {
 
     printf "    ${BLUE}Base (always installed):${NC}\n"
     printf "    - Hardware drivers (auto-detected AMD/Nvidia/Intel)\n"
-    printf "    - Common tools: Vivaldi (snap), Alacritty, Fish, Git, Tmux, Mise\n"
+    printf "    - Common tools: Vivaldi (Flatpak), Ghostty, Fish, Git, Tmux, Mise\n"
     printf "    - System utilities and configurations\n"
     printf "    - Cleanup: Removes Firefox and other unwanted pre-installed software\n\n"
 
     printf "    ${BLUE}Developer tag (dev):${NC}\n"
     printf "    - Neovim with full configuration\n"
     printf "    - Visual Studio Code\n"
-    printf "    - Docker & Docker Compose\n"
-    printf "    - Programming languages: Node.js, Python, Rust, Go\n"
+    printf "    - Podman & podman-compose\n"
+    printf "    - Programming languages managed via mise (Node.js, Python, Go, etc.)\n"
     printf "    - CLI tools: ripgrep, fd, fzf, lazygit, gh\n\n"
 
     printf "    ${BLUE}Gaming tag (gaming):${NC}\n"
@@ -150,6 +150,11 @@ main() {
         exit 1
     fi
 
+    # Prompt for sudo once and keep it alive during bootstrap
+    sudo -v
+    while true; do sudo -v; sleep 60; done & SUDO_KEEPALIVE_PID=$!
+    trap 'kill $SUDO_KEEPALIVE_PID' EXIT
+
     # Install prerequisites
     install_prerequisites
 
@@ -158,7 +163,7 @@ main() {
 
     # Run Ansible playbook
     echo -e "${BLUE}Running Ansible playbook...${NC}"
-    ansible-playbook playbooks/bootstrap.yml -e "install_tags=$INSTALL_TAGS" -K
+    ansible-playbook playbooks/bootstrap.yml -e "install_tags=$INSTALL_TAGS"
 
     echo -e "${GREEN}====================================${NC}"
     echo -e "${GREEN}Bootstrap complete!${NC}"
