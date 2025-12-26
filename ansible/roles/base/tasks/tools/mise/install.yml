@@ -13,19 +13,6 @@
     state: directory
     mode: '0755'
 
-- name: Add mise bin to PATH in fish
-  lineinfile:
-    path: "{{ ansible_facts['env']['HOME'] }}/.config/fish/config.fish"
-    line: "fish_add_path {{ ansible_facts['env']['HOME'] }}/.local/bin"
-    create: yes
-    state: present
-
-- name: Enable mise in fish shell
-  lineinfile:
-    path: "{{ ansible_facts['env']['HOME'] }}/.config/fish/config.fish"
-    line: "mise activate fish | source"
-    state: present
-
 - name: Display mise installation note
   debug:
     msg: |

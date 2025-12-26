@@ -3,12 +3,6 @@
 
 # Development tools and languages
 dev_packages:
-  - neovim
-  - nodejs
-  - npm
-  - python
-  - python-pip
-  - go
   - podman
   - podman-compose
   - ripgrep

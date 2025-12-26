@@ -64,9 +64,9 @@ This bootstrap uses a **three-layer architecture** for package management, balan
 - **Communication**: Discord, Slack, Signal
 - **Media**: Spotify, VLC
 - **Office**: LibreOffice (if needed)
-- **Any Electron apps**: VS Code could go here (currently AUR)
+- **Any Electron apps**: VS Code (Flatpak)
 
-**Philosophy**: Isolated applications with independent update cycles. Slight performance trade-off for stability and security. Desktop integration is good with Flatpak (better than Snap).
+**Philosophy**: Isolated applications with independent update cycles. Slight performance trade-off for stability and security. Desktop integration is good with Flatpak.
 
 ### **Tool Layer** (User-space)
 
@@ -80,7 +80,7 @@ This bootstrap uses a **three-layer architecture** for package management, balan
 
 **What belongs here:**
 - **Development tools**: Mise (runtime manager)
-- **Terminal emulator**: Alacritty (Rust, Cargo-installed)
+- **Editor**: Neovim (installed via mise)
 - **CLI utilities**: ripgrep, fd, bat (if using self-update)
 - **Fast-changing tools**: Things you want latest features of immediately
 
@@ -104,7 +104,7 @@ mise self-update      # Tool layer (as needed)
 
 # Daily: Just tools you're actively developing with
 mise self-update
-cargo install --force alacritty  # If new version available
+mise use -g neovim@<version>     # Example tool update
 ```
 
 **Key insight**: Each layer updates at its natural cadence without interfering with the others.
@@ -115,8 +115,8 @@ cargo install --force alacritty  # If new version available
 
 - **Cleanup**: Removes Firefox and other unwanted pre-installed software
 - **Hardware Drivers**: Auto-detected (AMD Mesa, Nvidia proprietary, or Intel)
-- **Browser**: Vivaldi (via Snap)
-- **Terminal**: Alacritty
+- **Browser**: Vivaldi (via Flatpak)
+- **Terminal**: Ghostty
 - **Shell**: Fish (default)
 - **Version Control**: Git
 - **Terminal Multiplexer**: Tmux
@@ -129,8 +129,8 @@ cargo install --force alacritty  # If new version available
 
 - **Editor**: Neovim with full Lua configuration (lazy.nvim, LSP, Treesitter, etc.)
 - **IDE**: Visual Studio Code with common extensions
-- **Containers**: Docker & Docker Compose
-- **Languages**: Node.js, Python, Rust, Go
+- **Containers**: Podman & podman-compose
+- **Languages**: Managed via mise (Node.js, Python, Go, etc.)
 - **CLI Tools**: ripgrep, fd, fzf, lazygit, GitHub CLI
 - **Additional**: Clipboard support (xclip, wl-clipboard), stylua formatter
 
@@ -361,12 +361,12 @@ sudo usermod -aG wheel $USER
 After running the bootstrap:
 
 1. **Reboot** your system for all changes to take effect
-2. **Log out and back in** for group changes (Docker, etc.)
+2. **Log out and back in** for group changes (Podman, etc.)
 
 ### For Developer Setup
 
 - Launch Neovim: `nvim` (lazy.nvim will install plugins automatically)
-- Verify Docker: `docker run hello-world`
+- Verify Podman: `podman run hello-world`
 - Configure Git:
   ```bash
   git config --global user.name "Your Name"
