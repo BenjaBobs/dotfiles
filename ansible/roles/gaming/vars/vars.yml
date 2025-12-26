@@ -21,3 +21,6 @@ gaming_aur_packages:
   - protonup-qt          # ProtonGE manager with GUI
   - lutris              # Game launcher
   - discord             # Voice chat
+
+# AUR helper (kept local to avoid cross-role dependencies)
+aur_helper: yay
