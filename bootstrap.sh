@@ -11,61 +11,67 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Disable colors if terminal doesn't support them
+if [ ! -t 1 ] || [ "$TERM" = "dumb" ]; then
+    RED=''
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    NC=''
+fi
+
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ANSIBLE_DIR="$SCRIPT_DIR/ansible"
 
 show_help() {
-    cat << EOF
-${BLUE}===================================
-EndeavourOS Bootstrap Script
-===================================${NC}
+    printf "${BLUE}===================================\n"
+    printf "EndeavourOS Bootstrap Script\n"
+    printf "===================================${NC}\n\n"
 
-${GREEN}USAGE:${NC}
-    ./bootstrap.sh <tags>
+    printf "${GREEN}USAGE:${NC}\n"
+    printf "    ./bootstrap.sh <tags>\n\n"
 
-${GREEN}TAGS:${NC}
-    ${YELLOW}dev${NC}        Install developer tools (neovim, vscode, docker, etc.)
-    ${YELLOW}gaming${NC}     Install gaming setup (steam, proton, lutris, etc.)
+    printf "${GREEN}TAGS:${NC}\n"
+    printf "    ${YELLOW}dev${NC}        Install developer tools (neovim, vscode, docker, etc.)\n"
+    printf "    ${YELLOW}gaming${NC}     Install gaming setup (steam, proton, lutris, etc.)\n\n"
 
-${GREEN}EXAMPLES:${NC}
-    ./bootstrap.sh dev              # Base system + developer tools
-    ./bootstrap.sh gaming           # Base system + gaming setup
-    ./bootstrap.sh dev,gaming       # Base system + developer + gaming
-    ./bootstrap.sh gaming,dev       # Same as above (order doesn't matter)
+    printf "${GREEN}EXAMPLES:${NC}\n"
+    printf "    ./bootstrap.sh dev              # Base system + developer tools\n"
+    printf "    ./bootstrap.sh gaming           # Base system + gaming setup\n"
+    printf "    ./bootstrap.sh dev,gaming       # Base system + developer + gaming\n"
+    printf "    ./bootstrap.sh gaming,dev       # Same as above (order doesn't matter)\n\n"
 
-${GREEN}WHAT GETS INSTALLED:${NC}
+    printf "${GREEN}WHAT GETS INSTALLED:${NC}\n\n"
 
-    ${BLUE}Base (always installed):${NC}
-    - Hardware drivers (auto-detected AMD/Nvidia/Intel)
-    - Common tools: Vivaldi (snap), Alacritty, Fish, Git, Tmux, Mise
-    - System utilities and configurations
-    - Cleanup: Removes Firefox and other unwanted pre-installed software
+    printf "    ${BLUE}Base (always installed):${NC}\n"
+    printf "    - Hardware drivers (auto-detected AMD/Nvidia/Intel)\n"
+    printf "    - Common tools: Vivaldi (snap), Alacritty, Fish, Git, Tmux, Mise\n"
+    printf "    - System utilities and configurations\n"
+    printf "    - Cleanup: Removes Firefox and other unwanted pre-installed software\n\n"
 
-    ${BLUE}Developer tag (dev):${NC}
-    - Neovim with full configuration
-    - Visual Studio Code
-    - Docker & Docker Compose
-    - Programming languages: Node.js, Python, Rust, Go
-    - CLI tools: ripgrep, fd, fzf, lazygit, gh
+    printf "    ${BLUE}Developer tag (dev):${NC}\n"
+    printf "    - Neovim with full configuration\n"
+    printf "    - Visual Studio Code\n"
+    printf "    - Docker & Docker Compose\n"
+    printf "    - Programming languages: Node.js, Python, Rust, Go\n"
+    printf "    - CLI tools: ripgrep, fd, fzf, lazygit, gh\n\n"
 
-    ${BLUE}Gaming tag (gaming):${NC}
-    - Steam with multilib support
-    - Proton GE (via ProtonUp-Qt)
-    - Lutris game launcher
-    - Wine, Winetricks
-    - GameMode, MangoHud
-    - Discord
+    printf "    ${BLUE}Gaming tag (gaming):${NC}\n"
+    printf "    - Steam with multilib support\n"
+    printf "    - Proton GE (via ProtonUp-Qt)\n"
+    printf "    - Lutris game launcher\n"
+    printf "    - Wine, Winetricks\n"
+    printf "    - GameMode, MangoHud\n"
+    printf "    - Discord\n\n"
 
-${GREEN}REQUIREMENTS:${NC}
-    - Fresh EndeavourOS installation
-    - Internet connection
-    - Sudo privileges
+    printf "${GREEN}REQUIREMENTS:${NC}\n"
+    printf "    - Fresh EndeavourOS installation\n"
+    printf "    - Internet connection\n"
+    printf "    - Sudo privileges\n\n"
 
-${GREEN}NOTES:${NC}
-    - All dotfiles are symlinked from this repo
-
-EOF
+    printf "${GREEN}NOTES:${NC}\n"
+    printf "    - All dotfiles are symlinked from this repo\n\n"
 }
 
 install_prerequisites() {
