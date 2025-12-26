@@ -1,0 +1,26 @@
+# Ghostty terminal configuration
+
+# Font configuration
+font-family = "Monaspace Neon NF"
+font-style = Regular
+font-style-bold = Bold
+font-style-italic = Italic
+font-style-bold-italic = Bold Italic
+
+# Use different font for italic (Monaspace Xenon)
+# Note: Ghostty doesn't support per-style font families like Alacritty
+# You may need to choose one font family or configure differently
+
+# Shell integration
+shell-integration = fish
+
+# Config auto-reload
+config-file-watch = true
+
+# Key bindings
+# Note: Ghostty uses different keybinding syntax than Alacritty
+# Example: keybind = ctrl+shift+c=copy_to_clipboard
+
+# Hints/URL detection
+# Ghostty has built-in URL detection - no additional config needed
+# URLs are automatically detected and can be clicked with ctrl+click

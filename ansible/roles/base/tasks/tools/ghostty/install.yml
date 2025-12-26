@@ -1,0 +1,37 @@
+---
+# Install Ghostty terminal (System Layer - AUR) and deploy configuration
+
+- name: Install Ghostty via AUR
+  become: yes
+  shell: |
+    if ! command -v ghostty &> /dev/null; then
+      sudo -u {{ ansible_facts['env']['USER'] }} yay -S --noconfirm ghostty
+    fi
+  args:
+    creates: /usr/bin/ghostty
+
+- name: Ensure Ghostty config directory exists
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/ghostty"
+    state: directory
+    mode: '0755'
+
+- name: Remove old Ghostty config if exists
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/ghostty/config"
+    state: absent
+
+- name: Symlink Ghostty configuration
+  file:
+    src: "{{ role_path }}/tasks/tools/ghostty/config/config"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/ghostty/config"
+    state: link
+    follow: no
+    force: yes
+
+- name: Display Ghostty installation complete
+  debug:
+    msg: |
+      Ghostty installed via AUR (System Layer).
+      - Update with: yay -S ghostty
+      - Config: ~/.config/ghostty/config (symlinked from repo)

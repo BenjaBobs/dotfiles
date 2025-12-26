@@ -19,8 +19,8 @@
     - name: Setup Mise
       include_tasks: tools/mise/install.yml
 
-    - name: Setup Alacritty
-      include_tasks: tools/alacritty/install.yml
+    - name: Setup Ghostty
+      include_tasks: tools/ghostty/install.yml
 
     - name: Setup Fish shell
       include_tasks: tools/fish/install.yml
