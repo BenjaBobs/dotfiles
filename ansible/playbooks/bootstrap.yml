@@ -82,6 +82,7 @@
       include_role:
         name: base
         tasks_from: base.yml
+        vars_from: vars.yml
 
     # Developer role - executes when 'dev' tag present
     - name: Execute developer setup
@@ -89,6 +90,7 @@
       include_role:
         name: developer
         tasks_from: developer.yml
+        vars_from: vars.yml
 
     # Gaming role - executes when 'gaming' tag present
     - name: Execute gaming setup
@@ -96,6 +98,7 @@
       include_role:
         name: gaming
         tasks_from: gaming.yml
+        vars_from: vars.yml
 
   post_tasks:
     - name: Display completion message

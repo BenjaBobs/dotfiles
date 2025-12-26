@@ -1,23 +1,21 @@
 ---
 # Gaming role entry point - executed when 'gaming' tag is specified
 # Installs Steam, Proton, gaming tools and optimizations
-
-- name: Load gaming role variables
-  include_vars: vars.yml
+# Note: Variables loaded by playbook via vars_from: vars.yml
 
 - name: Gaming setup
   block:
     - name: Enable multilib repository
-      include_tasks: tasks/multilib/enable.yml
+      include_tasks: multilib/enable.yml
 
     - name: Install Steam
-      include_tasks: tasks/steam/install.yml
+      include_tasks: steam/install.yml
 
     - name: Install Proton GE
-      include_tasks: tasks/proton/install.yml
+      include_tasks: proton/install.yml
 
     - name: Install Lutris
-      include_tasks: tasks/lutris/install.yml
+      include_tasks: lutris/install.yml
 
     - name: Install gaming packages
       pacman:
