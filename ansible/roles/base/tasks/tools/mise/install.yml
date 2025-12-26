@@ -1,43 +1,35 @@
 ---
 # Install mise (modern runtime version manager) - Tool Layer
-# Installed via Cargo to enable self-update functionality
+# Installed via official installer to avoid compilation issues
 
-- name: Ensure Rust toolchain is installed
-  become: yes
-  pacman:
-    name: rust
-    state: present
-
-- name: Install mise via Cargo
+- name: Install mise via official installer
   args:
-    creates: "{{ ansible_env.HOME }}/.cargo/bin/mise"
-  environment:
-    PATH: "{{ ansible_env.HOME }}/.cargo/bin:{{ ansible_env.PATH }}"
-  shell: cargo install mise
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/mise"
+  shell: curl https://mise.run | sh
 
 - name: Ensure mise config directory exists
   file:
-    path: "{{ ansible_env.HOME }}/.config/mise"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/mise"
     state: directory
     mode: '0755'
 
-- name: Add cargo bin to PATH in fish
+- name: Add mise bin to PATH in fish
   lineinfile:
-    path: "{{ ansible_env.HOME }}/.config/fish/config.fish"
-    line: "fish_add_path {{ ansible_env.HOME }}/.cargo/bin"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/fish/config.fish"
+    line: "fish_add_path {{ ansible_facts['env']['HOME'] }}/.local/bin"
     create: yes
     state: present
 
 - name: Enable mise in fish shell
   lineinfile:
-    path: "{{ ansible_env.HOME }}/.config/fish/config.fish"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/fish/config.fish"
     line: "mise activate fish | source"
     state: present
 
 - name: Display mise installation note
   debug:
     msg: |
-      Mise installed via Cargo (Tool Layer).
+      Mise installed via official installer (Tool Layer).
       - Update with: mise self-update
       - Use 'mise use <tool>@<version>' to install runtimes
       - Example: mise use node@20, mise use python@3.12

@@ -27,7 +27,7 @@
       shell: yay -S --noconfirm {{ item }}
       loop: "{{ gaming_aur_packages }}"
       become: yes
-      become_user: "{{ ansible_env.USER }}"
+      become_user: "{{ ansible_facts['env']['USER'] }}"
       register: aur_install
       changed_when: "'already installed' not in aur_install.stdout"
       failed_when: false
