@@ -8,10 +8,9 @@ dev_packages:
   - npm
   - python
   - python-pip
-  - rustup
   - go
-  - docker
-  - docker-compose
+  - podman
+  - podman-compose
   - ripgrep
   - fd
   - fzf
