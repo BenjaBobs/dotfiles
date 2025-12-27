@@ -38,47 +38,47 @@ Repo layout (abstract):
 
 ```java
 .
-├── bootstrap.sh                          // Entry point script
-├── README.md                             // This file
+├── bootstrap.sh // Entry point script
+├── README.md // This file
 │
 └── ansible/
     │
-    ├── ansible.cfg                       // Ansible configuration
+    ├── ansible.cfg // Ansible configuration
     │
     ├── playbooks/
-    │   └── bootstrap.yml                 // Main orchestrator
+    │   └── bootstrap.yml // Main orchestrator
     │
     ├── inventory/
-    │   └── localhost.yml                 // tells ansible to run on localhost
+    │   └── localhost.yml // tells ansible to run on localhost
     │
     └── roles/
-        ├── base/                         // Always-run base system
-        │   ├── base.yml                  // Role entry point
-        │   ├── vars.yml                  // Role variables
+        ├── base/ // Always-run base system
+        │   ├── base.yml // Role entry point
+        │   ├── vars.yml // Role variables
         │   └── tasks/
-        │       ├── system/               // OS-level tasks
-        │       │   ├── remove_bloat.yml       // Remove unwanted packages
-        │       │   ├── install_base_packages.yml        // Install base packages + AUR helper
-        │       │   └── gpu_drivers.yml       // Auto-detect and install GPU drivers
+        │       ├── system/ // OS-level tasks
+        │       │   ├── remove_bloat.yml // Remove unwanted packages
+        │       │   ├── install_base_packages.yml // Install base packages + AUR helper
+        │       │   └── gpu_drivers.yml // Auto-detect and install GPU drivers
         │       │
-        │       └── tools/                // Common tools (always installed)
-        │           └── <tool>/           // One directory per tool
+        │       └── tools/ // Common tools (always installed)
+        │           └── <tool>/ // One directory per tool
         │               ├── install.yml
-        │               └── config/       // Tool-specific configs, often sym-linked
+        │               └── config/ // Tool-specific configs, often sym-linked
         │
-        ├── developer/                    // 'dev' tag
-        │   ├── developer.yml             // Role entry point
-        │   ├── vars.yml                  // Role variables
+        ├── developer/ // 'dev' tag
+        │   ├── developer.yml // Role entry point
+        │   ├── vars.yml // Role variables
         │   └── tasks/
-        │       └── <tool>/               // Dev tools
+        │       └── <tool>/ // Dev tools
         │           ├── install.yml
-        │           └── config/           // (optional) Tool configs
+        │           └── config/ // Tool-specific configs, often sym-linked
         │
-        └── gaming/                       // 'gaming' tag
-            ├── gaming.yml                // Role entry point
-            ├── vars.yml                  // Role variables
+        └── gaming/ // 'gaming' tag
+            ├── gaming.yml // Role entry point
+            ├── vars.yml // Role variables
             └── tasks/
-                └── <component>/          // Gaming components
+                └── <component>/ // Gaming components
                     └── install.yml
 ```
 
