@@ -1,0 +1,7 @@
+---
+# Base role post-setup tasks (run after dev/gaming roles)
+
+- name: Post-setup cleanup
+  block:
+    - name: Clean up unwanted pre-installed software
+      include_tasks: system/cleanup.yml

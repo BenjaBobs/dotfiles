@@ -56,11 +56,3 @@
   register: kde_taskbar_config
   changed_when: kde_taskbar_config.rc == 0
   failed_when: false
-
-- name: Display KDE customization note
-  become: no
-  debug:
-    msg: |
-      KDE taskbar configured with pinned apps: Ghostty, Vivaldi
-      - Changes applied after plasmashell restart
-      - If changes don't appear, log out and back in

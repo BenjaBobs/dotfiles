@@ -33,10 +33,3 @@
 
     $KWRITE --file kdeglobals --group General --key TerminalApplication ghostty
     $KWRITE --file kdeglobals --group General --key TerminalService com.mitchellh.ghostty.desktop
-
-- name: Display Ghostty installation complete
-  debug:
-    msg: |
-      Ghostty installed via pacman (System Layer).
-      - Update with: pacman -Syu
-      - Config: ~/.config/ghostty/config (symlinked from repo)

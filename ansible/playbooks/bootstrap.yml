@@ -77,8 +77,8 @@
           ===================================
 
   tasks:
-    # Base role - ALWAYS executes
-    - name: Execute base system setup
+    # Base role (pre) - ALWAYS executes before dev/gaming
+    - name: Execute base system setup (pre)
       include_role:
         name: base
         tasks_from: base.yml
@@ -98,6 +98,13 @@
       include_role:
         name: gaming
         tasks_from: gaming.yml
+        vars_from: vars.yml
+
+    # Base role (post) - ALWAYS executes after dev/gaming
+    - name: Execute base system setup (post)
+      include_role:
+        name: base
+        tasks_from: base-post.yml
         vars_from: vars.yml
 
   post_tasks:

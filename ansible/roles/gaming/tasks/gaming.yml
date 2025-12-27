@@ -8,15 +8,6 @@
     - name: Enable multilib repository
       include_tasks: multilib/enable.yml
 
-    - name: Install Steam
-      include_tasks: steam/install.yml
-
-    - name: Install Proton GE
-      include_tasks: proton/install.yml
-
-    - name: Install Lutris
-      include_tasks: lutris/install.yml
-
     - name: Install gaming packages
       pacman:
         name: "{{ gaming_packages }}"

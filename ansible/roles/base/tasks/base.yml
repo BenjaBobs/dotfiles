@@ -5,9 +5,6 @@
 
 - name: System setup tasks
   block:
-    - name: Clean up unwanted pre-installed software
-      include_tasks: system/cleanup.yml
-
     - name: Install base packages and AUR helper
       include_tasks: system/update.yml
 
