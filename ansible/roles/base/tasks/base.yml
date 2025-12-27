@@ -6,10 +6,10 @@
 - name: System setup tasks
   block:
     - name: Install base packages and AUR helper
-      include_tasks: system/update.yml
+      include_tasks: system/install_base_packages.yml
 
-    - name: Configure hardware drivers
-      include_tasks: system/drivers.yml
+    - name: Configure gpu hardware drivers
+      include_tasks: system/gpu_drivers.yml
 
 - name: Common tools setup
   block:
@@ -39,9 +39,3 @@
 
     - name: Setup Vivaldi
       include_tasks: tools/vivaldi/install.yml
-
-- name: Desktop environment customization
-  block:
-    - name: Customize KDE Plasma
-      include_tasks: system/kde-customize.yml
-

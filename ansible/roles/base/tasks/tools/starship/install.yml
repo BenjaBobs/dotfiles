@@ -11,12 +11,7 @@
   file:
     path: "{{ role_path }}/tasks/tools/starship/config"
     state: directory
-    mode: '0755'
-
-- name: Generate Starship config with Catppuccin Powerline preset (repo)
-  args:
-    creates: "{{ role_path }}/tasks/tools/starship/config/starship.toml"
-  command: starship preset catppuccin-powerline -o {{ role_path }}/tasks/tools/starship/config/starship.toml
+    mode: "0755"
 
 - name: Remove old Starship config if exists
   file:
