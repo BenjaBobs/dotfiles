@@ -30,11 +30,3 @@
           path = ~/.gitconfig.shared
     mode: "0644"
 
-- name: Display git configuration message
-  debug:
-    msg: |
-      Git configuration deployed:
-      - Shared settings: ~/.gitconfig.shared (symlinked from repo)
-      - Local settings: ~/.gitconfig (machine-specific, configure with 'git config --global')
-      - Set your identity: git config --global user.name "Your Name"
-      - Set your email: git config --global user.email "you@example.com"

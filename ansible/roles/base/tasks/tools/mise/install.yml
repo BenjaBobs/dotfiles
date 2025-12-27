@@ -12,12 +12,3 @@
     path: "{{ ansible_facts['env']['HOME'] }}/.config/mise"
     state: directory
     mode: '0755'
-
-- name: Display mise installation note
-  debug:
-    msg: |
-      Mise installed via official installer (Tool Layer).
-      - Update with: mise self-update
-      - Use 'mise use <tool>@<version>' to install runtimes
-      - Example: mise use node@20, mise use python@3.12
-      - Config: ~/.config/mise/config.toml or project-level .mise.toml

@@ -23,9 +23,6 @@
           - lib32-mesa-vdpau
         state: present
 
-    - name: Display AMD driver installation
-      debug:
-        msg: "AMD GPU detected - Mesa drivers installed"
 
 - name: Install Nvidia drivers
   when: "'NVIDIA' in gpu_info.stdout"
@@ -53,9 +50,6 @@
       become: yes
       command: reinstall-kernels
 
-    - name: Display Nvidia driver installation
-      debug:
-        msg: "Nvidia GPU detected - Proprietary drivers installed and systemd-boot configured"
 
 - name: Install Intel drivers
   when: "'Intel' in gpu_info.stdout"
@@ -71,6 +65,3 @@
           - intel-media-driver
         state: present
 
-    - name: Display Intel driver installation
-      debug:
-        msg: "Intel GPU detected - Mesa drivers installed"

@@ -46,12 +46,3 @@
     PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
   shell: mise use -g stylua@latest
 
-- name: Display Neovim setup complete message
-  debug:
-    msg: |
-      Neovim {{ neovim_version }} installed via mise (Tool Layer).
-      - Pinned version for plugin stability
-      - Update version: Edit roles/base/tasks/tools/neovim/vars.yml, then run bootstrap
-      - Or manually upgrade via: mise use -g neovim@<version>
-      - Run 'nvim' to trigger lazy.nvim plugin installation
-      - stylua installed via mise (update with: mise upgrade stylua)

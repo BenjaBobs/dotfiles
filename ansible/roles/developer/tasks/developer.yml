@@ -14,11 +14,3 @@
         state: present
       become: yes
 
-    - name: Display Podman setup note
-      debug:
-        msg: |
-          Podman installed (rootless container runtime).
-          - No system service needed (unlike Docker)
-          - Run containers as non-root user: podman run ...
-          - Use podman-compose for docker-compose compatibility
-          - Podman Desktop GUI available via Flatpak if desired
