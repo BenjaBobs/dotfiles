@@ -4,4 +4,4 @@
 - name: Post-setup cleanup
   block:
     - name: Clean up unwanted pre-installed software
-      include_tasks: system/cleanup.yml
+      include_tasks: system/remove_bloat.yml

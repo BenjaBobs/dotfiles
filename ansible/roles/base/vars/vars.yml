@@ -6,19 +6,23 @@ user_home: "{{ ansible_facts['env']['HOME'] }}"
 
 # System Layer packages (always installed)
 base_packages:
-  - base-devel  # Essential build tools (gcc, make, etc.) for compiling from source
-  - git         # Version control system
-  - curl        # Command-line tool for transferring data with URLs
-  - wget        # Network downloader for retrieving files
-  - unzip       # Archive extraction utility
-  - htop        # Interactive process viewer (TUI)
-  - btop        # Resource monitor with graphs (modern alternative to htop)
-  - fastfetch   # System information tool with ASCII art (maintained neofetch alternative)
-  - rust        # Rust toolchain (for Cargo-based Tool Layer installs)
-  - bat         # cat with syntax highlighting and Git integration
-  - zoxide      # Smart cd replacement (learns frequently used directories)
-  - flatpak     # Application isolation and sandboxing (for Application Layer)
-  - pacseek     # TUI frontend for pacman
+  - base-devel # Essential build tools (gcc, make, etc.) for compiling from source
+  - git # Version control system
+  - curl # Command-line tool for transferring data with URLs
+  - wget # Network downloader for retrieving files
+  - unzip # Archive extraction utility
+  - htop # Interactive process viewer (TUI)
+  - btop # Resource monitor with graphs (modern alternative to htop)
+  - fastfetch # System information tool with ASCII art (maintained neofetch alternative)
+  - rust # Rust toolchain (for Cargo-based Tool Layer installs)
+  - bat # cat with syntax highlighting and Git integration
+  - zoxide # Smart cd replacement (learns frequently used directories)
+  - flatpak # Application isolation and sandboxing (for Application Layer)
+  - pacseek # TUI frontend for pacman
+
+# Packages to be removed
+bloat_packages:
+  - firefox # I'll use my own preferred browser, thank you very much
 
 # AUR helper
 aur_helper: yay

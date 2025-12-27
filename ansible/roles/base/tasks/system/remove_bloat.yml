@@ -4,10 +4,9 @@
 - name: Remove Firefox (replaced with Vivaldi)
   become: yes
   pacman:
-    name:
-      - firefox
+    name: "{{ bloat_packages }}"
     state: absent
-  ignore_errors: yes  # Don't fail if Firefox isn't installed
+  ignore_errors: yes # Don't fail if packages aren't installed in the first place
 
 - name: Clean package cache
   become: yes
