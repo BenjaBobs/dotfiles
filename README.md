@@ -1,6 +1,6 @@
 # EndeavourOS Bootstrap & Dotfiles
 
-Reproducible EndeavourOS setup via Ansible. Run on a fresh KDE install.
+Setup my dotfiles on a fresh EndeavourOS install with KDE and systemd-boot.
 
 Assumptions:
 - EndeavourOS with KDE Plasma
@@ -8,7 +8,7 @@ Assumptions:
 
 Quick start:
 ```bash
-git clone <your-repo-url> ~/dotfiles
+git clone https://github.com/BenjaBobs/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./bootstrap.sh dev,gaming
 ```
@@ -25,16 +25,16 @@ Tags:
 - `gaming` gaming stack
 
 Package layers:
-- System layer: pacman/AUR (drivers, system libs, core tools)
+- System layer: pacman/AUR (drivers, system libs, core tools), updated together
+- Tool layer: user-space custom installs (e.g. mise-managed tools/runtime or similar that need to be able to be updated individually and run fast)
 - Application layer: Flatpak (GUI apps)
-- Tool layer: user-space installs (mise-managed tools)
+
+## Project Structure
 
 Repo layout (abstract):
 - Roles are explicit entry points (`base.yml`, `developer.yml`, `gaming.yml`).
 - Each tool lives in `roles/<role>/tasks/<tool>/` with `install.yml` and optional `config/`.
 - Configs are symlinked from this repo into `~/.config` and `~/.*`.
-
-## Project Structure
 
 ```java
 .
