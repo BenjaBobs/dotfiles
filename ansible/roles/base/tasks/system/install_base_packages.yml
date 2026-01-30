@@ -35,7 +35,7 @@
         state: absent
 
 - name: Install base development packages (AUR)
-  become: yes
+  become: no
   community.general.yay:
     name: "{{ aur_packages }}"
     state: present
