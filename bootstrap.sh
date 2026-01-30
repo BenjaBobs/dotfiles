@@ -82,7 +82,7 @@ install_prerequisites() {
 
     # Install required Ansible collections
     echo -e "${BLUE}Installing Ansible collections...${NC}"
-    ansible-galaxy collection install community.general
+    ansible-galaxy collection install -r "$ANSIBLE_DIR/collection_requirements.yml" -p "$ANSIBLE_DIR/collections" --force
 }
 
 validate_tags() {
