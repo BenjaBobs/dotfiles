@@ -23,4 +23,4 @@ shell-integration = fish
 # URLs are automatically detected and can be clicked with ctrl+click
 
 # Shaders to make cursor look better
-custom-shader = ~/.config/ghostty/shaders/shader.glsl
+custom-shader = ~/.config/ghostty/shaders/cursor-blaze.glsl
