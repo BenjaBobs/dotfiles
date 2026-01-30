@@ -35,8 +35,25 @@
         state: absent
 
 - name: Install base development packages (AUR)
-  become: no
-  community.general.aur:
-    name: "{{ aur_packages }}"
-    state: present
-    use: yay
+  block:
+    - name: Allow passwordless pacman for AUR installs
+      become: yes
+      copy:
+        dest: /etc/sudoers.d/99-bootstrap-pacman
+        content: |
+          {{ ansible_facts['env']['USER'] }} ALL=(ALL) NOPASSWD: /usr/bin/pacman
+        mode: '0440'
+        validate: 'visudo -cf %s'
+
+    - name: Install base development packages (AUR)
+      become: no
+      kewlfft.aur.aur:
+        name: "{{ aur_packages }}"
+        state: present
+        use: yay
+  always:
+    - name: Remove passwordless pacman sudoers
+      become: yes
+      file:
+        path: /etc/sudoers.d/99-bootstrap-pacman
+        state: absent

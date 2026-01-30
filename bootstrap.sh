@@ -80,6 +80,10 @@ install_prerequisites() {
     # Update system
     sudo pacman -Syu --needed --noconfirm git ansible
 
+    # Ensure Ansible uses the repo config and local collections
+    export ANSIBLE_CONFIG="$ANSIBLE_DIR/ansible.cfg"
+    export ANSIBLE_COLLECTIONS_PATHS="$ANSIBLE_DIR/collections:$HOME/.ansible/collections:/usr/share/ansible/collections"
+
     # Install required Ansible collections
     echo -e "${BLUE}Installing Ansible collections...${NC}"
     ansible-galaxy collection install -r "$ANSIBLE_DIR/collection_requirements.yml" -p "$ANSIBLE_DIR/collections" --force
@@ -160,6 +164,10 @@ main() {
 
     # Change to ansible directory
     cd "$ANSIBLE_DIR"
+
+    # Ensure Ansible sees project-local collections and config
+    export ANSIBLE_CONFIG="$ANSIBLE_DIR/ansible.cfg"
+    export ANSIBLE_COLLECTIONS_PATHS="$ANSIBLE_DIR/collections:$HOME/.ansible/collections:/usr/share/ansible/collections"
 
     # Run Ansible playbook
     echo -e "${BLUE}Running Ansible playbook...${NC}"
