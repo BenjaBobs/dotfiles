@@ -36,6 +36,7 @@
 
 - name: Install base development packages (AUR)
   become: no
-  community.general.yay:
+  pacman:
     name: "{{ aur_packages }}"
+    executable: yay
     state: present
