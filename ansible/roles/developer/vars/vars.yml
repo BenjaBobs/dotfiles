@@ -5,11 +5,11 @@
 dev_packages:
   - podman
   - podman-compose
+  - podman-docker
   - ripgrep
   - fd
   - fzf
   - lazygit
-  - github-cli
 
 # VSCode extensions to install
 vscode_extensions:

@@ -14,3 +14,5 @@
         state: present
       become: yes
 
+    - name: Configure podman for docker compat
+      include_tasks: podman-docker/install.yml
