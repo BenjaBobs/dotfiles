@@ -18,6 +18,9 @@ base_packages:
   - bat # cat with syntax highlighting and Git integration
   - zoxide # Smart cd replacement (learns frequently used directories)
   - flatpak # Application isolation and sandboxing (for Application Layer)
+  - wl-clipboard # Pipe to/from clipboard
+
+aur_packages:
   - pacseek # TUI frontend for pacman
 
 # Packages to be removed
