@@ -12,6 +12,11 @@ vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
 vim.opt.wrap = false
 
+-- default indent rules
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+
 -- keys
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
