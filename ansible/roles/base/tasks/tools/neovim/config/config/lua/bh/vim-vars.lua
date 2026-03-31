@@ -42,7 +42,21 @@ vim.diagnostic.config({
   jump = {
     float = true,
   },
+  float = {
+    border = "rounded",
+    max_width = 80,
+    source = true,
+    header = "",
+  },
 })
+
+vim.keymap.set("n", "<leader>ce", function()
+  -- Try rulebook prettifyError first (formats TS errors nicely), fall back to plain float
+  local ok = pcall(function() require("rulebook").prettifyError() end)
+  if not ok then
+    vim.diagnostic.open_float()
+  end
+end, { desc = "[E]rror details" })
 
 -- Display whitespace
 -- Nerd Font characters that render well in almost every terminal
