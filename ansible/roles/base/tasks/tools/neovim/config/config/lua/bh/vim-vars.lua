@@ -58,6 +58,30 @@ vim.keymap.set("n", "<leader>ce", function()
   end
 end, { desc = "[E]rror details" })
 
+vim.keymap.set("n", "<leader>ci", function()
+  require("bh.issues").workspace_diagnostics_to_quickfix()
+end, { desc = "[I]ssues list" })
+
+vim.keymap.set("n", "<leader>cq", function()
+  require("bh.issues").open_quickfix()
+end, { desc = "Open [Q]uickfix" })
+
+vim.keymap.set("n", "]e", function()
+  require("bh.issues").diagnostic_next()
+end, { desc = "Next [E]rror" })
+
+vim.keymap.set("n", "[e", function()
+  require("bh.issues").diagnostic_prev()
+end, { desc = "Previous [E]rror" })
+
+vim.keymap.set("n", "]q", function()
+  require("bh.issues").quickfix_next()
+end, { desc = "Next [Q]uickfix item" })
+
+vim.keymap.set("n", "[q", function()
+  require("bh.issues").quickfix_prev()
+end, { desc = "Previous [Q]uickfix item" })
+
 -- Display whitespace
 -- Nerd Font characters that render well in almost every terminal
 local dots = "⋅" -- U+22C5  (middle dot)   for normal spaces

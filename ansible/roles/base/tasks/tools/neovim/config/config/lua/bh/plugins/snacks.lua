@@ -81,6 +81,13 @@ return {
       desc = "[F]ind [E]rror",
     },
     {
+      "<leader>fq",
+      function()
+        Snacks.picker.qflist()
+      end,
+      desc = "[F]ind [Q]uickfix",
+    },
+    {
       "<leader>gb",
       function()
         Snacks.picker.git_branches()
