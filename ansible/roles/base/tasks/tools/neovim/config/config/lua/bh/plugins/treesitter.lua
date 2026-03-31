@@ -30,7 +30,9 @@ return {
           "vim",
           "vimdoc",
           "javascript",
+          "jsx",
           "typescript",
+          "tsx",
           "zig",
         },
 
