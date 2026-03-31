@@ -15,11 +15,11 @@ if command -q claude
     if command -q nono
         function claude-work
             mkdir -p ~/.claude-work
-            CLAUDE_CONFIG_DIR=~/.claude-work nono run -v --profile claude-flex --allow-cwd --allow ~/.claude-work -- claude $argv
+            CLAUDE_CONFIG_DIR=~/.claude-work nono run -v --profile claude-multi --allow-cwd --allow ~/.claude-work -- claude $argv
         end
         function claude-home
             mkdir -p ~/.claude-home
-            CLAUDE_CONFIG_DIR=~/.claude-home nono run -v --profile claude-flex --allow-cwd --allow ~/.claude-home -- claude $argv
+            CLAUDE_CONFIG_DIR=~/.claude-home nono run -v --profile claude-multi --allow-cwd --allow ~/.claude-home -- claude $argv
         end
     else
         function claude-work
