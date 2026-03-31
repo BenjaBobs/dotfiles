@@ -69,7 +69,7 @@ return {
     {
       "<leader>fo",
       function()
-        Snacks.picker.buffers()
+        require("bh.buffer-picker").open()
       end,
       desc = "[F]ind [O]pen Buffers",
     },
