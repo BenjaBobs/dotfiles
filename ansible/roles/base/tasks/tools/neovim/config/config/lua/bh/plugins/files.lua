@@ -1,20 +1,38 @@
 return {
-  "stevearc/oil.nvim",
-  ---@module 'oil'
-  ---@type oil.SetupOpts
+  "A7Lavinraj/fyler.nvim",
+  branch = "stable",
   opts = {
-    default_file_explorer = true,
-    columns = {
-      "icon",
-      "size",
+    integrations = {
+      winpick = "snacks",
     },
-    view_options = {
-      show_hidden = true,
+    views = {
+      finder = {
+        default_explorer = true,
+        icon = {
+          directory_collapsed = "",
+          directory_expanded = "",
+          directory_empty = "",
+        },
+        mappings = {
+          ["<CR>"] = "Select",
+          ["l"] = "Select",
+          ["<Right>"] = "Select",
+          ["h"] = "CollapseNode",
+          ["<Left>"] = "CollapseNode",
+        },
+        win = {
+          kind = "float",
+          kinds = {
+            float = {
+              height = "80%",
+              width = "80%",
+              top = "8%",
+              left = "10%",
+            },
+          },
+        },
+      },
     },
   },
-  -- Optional dependencies
-  -- dependencies = { { "echasnovski/mini.icons", opts = {} } },
-  -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
-  -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
   lazy = false,
 }

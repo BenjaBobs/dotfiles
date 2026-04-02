@@ -11,7 +11,7 @@ return {
     -- https://github.com/folke/snacks.nvim/blob/main/docs/bigfile.md
     bigfile = { enabled = true },
     dashboard = { enabled = true },
-    explorer = { enabled = true }, -- maybe turn off?
+    explorer = { enabled = false },
     indent = { enabled = false },
     input = { enabled = true },
     picker = { enabled = true }, -- replaces telescope maybe?

@@ -28,7 +28,7 @@ return {
       { "<leader>w", group = "[W]indow" },
     })
 
-    vim.keymap.set("n", "<leader>o", ":Oil<CR>", { desc = "[O]il" })
+    vim.keymap.set("n", "<leader>o", ":Fyler<CR>", { desc = "[O]pen Files" })
 
     -- Move current line or selected lines up
     vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { noremap = true, silent = true })
