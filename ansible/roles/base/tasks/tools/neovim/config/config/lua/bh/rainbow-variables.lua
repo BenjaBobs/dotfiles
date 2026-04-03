@@ -1,18 +1,56 @@
--- Rainbow variables: assigns each identifier a unique foreground color
--- based on a hash of its name. Colors are generated in OKLCH space with
--- fixed lightness/chroma and evenly distributed hues, skipping hue ranges
--- that overlap with Catppuccin Mocha syntax highlighting colors.
+-- Rainbow variables: assign each identifier a stable foreground color
+-- based on a hash of its name.
+--
+-- This uses semantic tokens from the LSP and maps identifier names into a
+-- fixed palette generated in OKLCH space. The palette keeps lightness and
+-- chroma constant, while varying hue, so colors feel consistent in strength.
+--
+-- Hues that overlap too much with Catppuccin Mocha's main syntax colors are
+-- excluded so rainbow variables stand apart from normal highlighting.
 
--- Generate palette by distributing evenly across allowed hues
--- Use golden angle (~137.5°) distribution for maximum perceptual spacing
--- even between adjacent indices, rather than sequential distribution.
-local COLOR_COUNT = 16
+local bit = require("bit")
+local bxor = bit.bxor
+local lshift = bit.lshift
+local rshift = bit.rshift
+local tobit = bit.tobit
+
+-- Number of distinct rainbow colors to generate.
+local COLOR_COUNT = 61
+
+-- Fixed OKLCH values for all rainbow colors.
 local LIGHTNESS = 0.70
-local CHROMA = 0.2
+local CHROMA = 0.14
 
--- OKLCH → linear sRGB → sRGB hex conversion
--- Reference: https://bottosson.github.io/posts/oklab/
+-- Maximum file size (in bytes) to apply rainbow highlighting to.
+-- Larger files are skipped to avoid unnecessary work on frequent token updates.
+local MAX_FILE_SIZE = 100 * 1024
 
+-- Semantic token types to colorize.
+local token_types = {
+  variable = true,
+  parameter = true,
+  property = true,
+}
+
+-- Hue ranges to avoid so rainbow colors do not blend too much with the
+-- colors already used by the Catppuccin Mocha theme.
+local avoided_ranges = {
+  { 353, 360 },
+  { 0, 19 }, -- red / maroon
+  { 43, 63 }, -- peach
+  { 77, 97 }, -- yellow
+  { 133, 153 }, -- green
+  { 173, 193 }, -- teal
+  { 200, 220 }, -- sky
+  { 250, 287 }, -- blue / lavender
+  { 295, 315 }, -- mauve
+  { 326, 346 }, -- pink
+}
+
+-- Cache of buffers already classified as small enough or too large.
+local skipped_bufs = {}
+
+-- Convert OKLab to linear sRGB.
 local function oklab_to_linear_srgb(L, a, b)
   local l_ = L + 0.3963377774 * a + 0.2158037573 * b
   local m_ = L - 0.1055613458 * a - 0.0638541728 * b
@@ -27,18 +65,18 @@ local function oklab_to_linear_srgb(L, a, b)
     -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
 end
 
+-- Convert OKLCH to an sRGB hex string.
 local function oklch_to_hex(L, C, h_deg)
   local h_rad = h_deg * math.pi / 180
   local a = C * math.cos(h_rad)
   local b = C * math.sin(h_rad)
   local r, g, bl = oklab_to_linear_srgb(L, a, b)
 
-  -- Linear sRGB to sRGB gamma
   local function gamma(x)
     if x <= 0.0031308 then
       return 12.92 * x
     end
-    return 1.055 * math.pow(x, 1.0 / 2.4) - 0.055
+    return 1.055 * math.pow(x, 1 / 2.4) - 0.055
   end
 
   r = math.max(0, math.min(1, gamma(r)))
@@ -53,33 +91,6 @@ local function oklch_to_hex(L, C, h_deg)
   )
 end
 
--- Catppuccin Mocha hue ranges to avoid (measured OKLCH hues, ±10° margin).
--- We use lower lightness (0.70) than Catppuccin (0.75-0.92) to add
--- further separation even when hues are nearby.
---   Red:        353-13   (H=2.8)
---   Maroon:     359-19   (H=8.8)
---   Peach:      43-63    (H=52.6)
---   Yellow:     77-97    (H=86.5)
---   Green:      133-153  (H=142.7)
---   Teal:       173-193  (H=182.7)
---   Sky:        200-220  (H=210.3)
---   Blue:       250-270  (H=259.9)
---   Lavender:   267-287  (H=277.3)
---   Mauve:      295-315  (H=304.8)
---   Pink:       326-346  (H=336.3)
-local avoided_ranges = {
-  { 353, 360 },
-  { 0, 19 }, -- Red/Maroon
-  { 43, 63 }, -- Peach
-  { 77, 97 }, -- Yellow
-  { 133, 153 }, -- Green
-  { 173, 193 }, -- Teal
-  { 200, 220 }, -- Sky
-  { 250, 287 }, -- Blue/Lavender
-  { 295, 315 }, -- Mauve
-  { 326, 346 }, -- Pink
-}
-
 local function is_hue_avoided(h)
   for _, range in ipairs(avoided_ranges) do
     if h >= range[1] and h <= range[2] then
@@ -89,7 +100,7 @@ local function is_hue_avoided(h)
   return false
 end
 
--- Collect allowed hue slots (1-degree resolution)
+-- Collect all allowed hues at 1-degree resolution.
 local allowed_hues = {}
 for h = 0, 359 do
   if not is_hue_avoided(h) then
@@ -97,62 +108,46 @@ for h = 0, 359 do
   end
 end
 
+-- Build the palette by sampling evenly across the allowed hue list.
+-- This guarantees that each palette entry comes from a distinct allowed hue.
 local palette = {}
-local golden_angle = 137.508
 for i = 0, COLOR_COUNT - 1 do
-  -- Golden angle ensures any two adjacent indices are far apart in hue
-  local raw_hue = (i * golden_angle) % 360
-  -- Find the closest allowed hue
-  local best_dist = 360
-  local best_hue = allowed_hues[1]
-  for _, h in ipairs(allowed_hues) do
-    local dist = math.min(math.abs(h - raw_hue), 360 - math.abs(h - raw_hue))
-    if dist < best_dist then
-      best_dist = dist
-      best_hue = h
-    end
-  end
-  table.insert(palette, oklch_to_hex(LIGHTNESS, CHROMA, best_hue))
+  local idx = math.floor(i * (#allowed_hues - 1) / math.max(COLOR_COUNT - 1, 1)) + 1
+  palette[i + 1] = oklch_to_hex(LIGHTNESS, CHROMA, allowed_hues[idx])
 end
 
--- Semantic token types to colorize
-local token_types = {
-  variable = true,
-  parameter = true,
-  property = true,
-}
+-- Hash an identifier name into a stable 32-bit value.
+-- The final color index is produced by reducing this hash modulo the palette size.
+local function hash_name(name)
+  local h = 0
 
-local function hash_name(name, count)
-  -- djb2 hash — better distribution than simple polynomial
-  local h = 5381
   for i = 1, #name do
-    h = ((h * 33) + name:byte(i)) % 65536
+    h = tobit(h + name:byte(i))
+    h = tobit(h + lshift(h, 10))
+    h = bxor(h, rshift(h, 6))
   end
-  return h % count
+
+  h = tobit(h + lshift(h, 3))
+  h = bxor(h, rshift(h, 11))
+  h = tobit(h + lshift(h, 15))
+
+  return h % 0x100000000
 end
 
--- Create highlight groups
+-- Create one highlight group per palette color.
 for i, color in ipairs(palette) do
   vim.api.nvim_set_hl(0, "RainbowVar" .. (i - 1), { fg = color })
 end
-
--- Max file size (in bytes) for rainbow highlighting.
--- Beyond this, skip to avoid performance issues.
-local MAX_FILE_SIZE = 100 * 1024 -- 100 KB
-
--- Cache of buffers we've already decided to skip
-local skipped_bufs = {}
 
 vim.api.nvim_create_autocmd("LspTokenUpdate", {
   callback = function(args)
     local buf = args.buf
 
-    -- Check skip cache first (avoid repeated stat calls)
     if skipped_bufs[buf] then
       return
     end
 
-    -- Check file size on first token for this buffer
+    -- Check file size once per buffer and cache the result.
     if skipped_bufs[buf] == nil then
       local fname = vim.api.nvim_buf_get_name(buf)
       if fname ~= "" then
@@ -170,19 +165,22 @@ vim.api.nvim_create_autocmd("LspTokenUpdate", {
       return
     end
 
-    local line = vim.api.nvim_buf_get_lines(buf, token.line, token.line + 1, true)[1]
-    if not line then
+    -- Read the exact token text from the buffer.
+    local parts =
+      vim.api.nvim_buf_get_text(buf, token.line, token.start_col, token.end_line or token.line, token.end_col, {})
+
+    local name = table.concat(parts, "\n")
+    if name == "" then
       return
     end
 
-    local name = line:sub(token.start_col + 1, token.end_col)
-    local color_id = hash_name(name, #palette)
+    local color_id = hash_name(name) % #palette
 
     vim.lsp.semantic_tokens.highlight_token(token, buf, args.data.client_id, "RainbowVar" .. color_id)
   end,
 })
 
--- Clean up cache when buffers are deleted
+-- Clear cached size decisions when buffers are deleted.
 vim.api.nvim_create_autocmd("BufDelete", {
   callback = function(args)
     skipped_bufs[args.buf] = nil
