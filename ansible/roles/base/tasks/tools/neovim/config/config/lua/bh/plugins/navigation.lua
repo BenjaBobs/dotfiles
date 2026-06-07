@@ -1,5 +1,7 @@
 return {
   "folke/flash.nvim",
+  tag = "v2.1.0",
+  commit = "ec0bf2842189f65f60fd40bf3557cac1029cc932",
   event = "VeryLazy",
   ---@type Flash.Config
   opts = {

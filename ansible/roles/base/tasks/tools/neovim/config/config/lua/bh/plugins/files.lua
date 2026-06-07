@@ -1,6 +1,7 @@
 return {
   "A7Lavinraj/fyler.nvim",
-  branch = "stable",
+  tag = "v2.0.0",
+  commit = "bb8b9f30c652c948d35211958b0deec3496bcc08",
   opts = {
     integrations = {
       winpick = "snacks",

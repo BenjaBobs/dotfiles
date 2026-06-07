@@ -15,6 +15,8 @@ end
 
 return {
   "nvim-lualine/lualine.nvim",
+  -- No current semver release tag; compatibility tags point at old Neovim support branches.
+  commit = "221ce6b2d999187044529f49da6554a92f740a96",
   config = function()
     require("lualine").setup({
       sections = {

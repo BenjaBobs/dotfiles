@@ -7,6 +7,8 @@ local float_win = {
 
 return {
   "folke/snacks.nvim",
+  tag = "v2.31.0",
+  commit = "e6fd58c82f2f3fcddd3fe81703d47d6d48fc7b9f",
   keys = {
     {
       "<leader>rt",

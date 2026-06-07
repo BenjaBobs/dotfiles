@@ -1,5 +1,7 @@
 return {
   "shellRaining/hlchunk.nvim",
+  tag = "v1.3.0",
+  commit = "d5e45809ed93991ade8e10e4f706cd7699b17430",
   event = { "BufReadPre", "BufNewFile" },
   config = function()
     require("hlchunk").setup({

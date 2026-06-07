@@ -1,6 +1,7 @@
 return {
   "mg979/vim-visual-multi",
-  branch = "master",
+  tag = "v0.5.8",
+  commit = "1c9207b28c8898ab01b54e6d6b61b0b820a814bc",
   keys = {
     { "<A-n>", mode = { "n", "x" }, desc = "VM: Find next occurrence" },
     { "<A-d>", mode = { "n", "x" }, desc = "VM: Select all occurrences" },

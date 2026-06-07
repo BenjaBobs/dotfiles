@@ -11,6 +11,27 @@
     PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
   shell: mise use -g neovim@{{ neovim_version }}
 
+- name: Install .NET SDK via mise
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/share/mise/installs/dotnet/{{ dotnet_version }}"
+  environment:
+    PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
+  shell: mise use -g dotnet@{{ dotnet_version }}
+
+- name: Install Roslyn language server as a global .NET tool
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.dotnet/tools/roslyn-language-server"
+  environment:
+    PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['HOME'] }}/.local/share/mise/shims:{{ ansible_facts['env']['PATH'] }}"
+  shell: dotnet tool install --global roslyn-language-server --prerelease
+
+- name: Install CSharpier as a global .NET tool
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.dotnet/tools/csharpier"
+  environment:
+    PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['HOME'] }}/.local/share/mise/shims:{{ ansible_facts['env']['PATH'] }}"
+  shell: dotnet tool install --global csharpier
+
 - name: Ensure Neovim config directory exists
   file:
     path: "{{ ansible_facts['env']['HOME'] }}/.config"
@@ -45,4 +66,3 @@
   environment:
     PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
   shell: mise use -g stylua@latest
-

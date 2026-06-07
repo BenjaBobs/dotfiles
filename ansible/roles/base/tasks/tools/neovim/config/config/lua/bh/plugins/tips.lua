@@ -1,8 +1,18 @@
 return {
   "saxon1964/neovim-tips",
+  tag = "v0.8.4",
+  commit = "1339a0da1ff59fab8cfc07661ef92aa8c7d07f79",
   dependencies = {
-    "MunifTanjim/nui.nvim",
-    "MeanderingProgrammer/render-markdown.nvim", -- You already have this
+    {
+      "MunifTanjim/nui.nvim",
+      tag = "0.4.0",
+      commit = "f535005e6ad1016383f24e39559833759453564e",
+    },
+    {
+      "MeanderingProgrammer/render-markdown.nvim",
+      tag = "v8.12.0",
+      commit = "e3c18ddd27a853f85a6f513a864cf4f2982b9f26",
+    },
   },
   lazy = false, -- Load on startup for daily tip
   opts = {

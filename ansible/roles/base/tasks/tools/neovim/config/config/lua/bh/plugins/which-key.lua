@@ -1,5 +1,7 @@
 return {
   "folke/which-key.nvim",
+  tag = "v3.17.0",
+  commit = "fcbf4eea17cb299c02557d576f0d568878e354a4",
   event = "VeryLazy",
   opts = {
     -- your configuration comes here

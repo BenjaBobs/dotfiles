@@ -1,8 +1,12 @@
 return {
   "neovim/nvim-lspconfig",
+  tag = "v2.9.0",
+  commit = "f6738ef65dabade340b473d4ff2a1ad3352c10e7",
   dependencies = {
     { -- Neovim types and globals
       "folke/lazydev.nvim",
+      tag = "v1.10.0",
+      commit = "01bc2aacd51cf9021eb19d048e70ce3dd09f7f93",
       ft = "lua",
       opts = {
         library = {
@@ -12,8 +16,14 @@ return {
     },
     { -- Auto-complete
       "saghen/blink.cmp",
-      dependencies = "rafamadriz/friendly-snippets",
-      version = "v1.*",
+      tag = "v1.10.2",
+      commit = "78336bc89ee5365633bcf754d93df01678b5c08f",
+      dependencies = {
+        {
+          "rafamadriz/friendly-snippets",
+          commit = "6cd7280adead7f586db6fccbd15d2cac7e2188b9",
+        },
+      },
       opts = {
         keymap = {
           preset = "super-tab",
@@ -56,8 +66,16 @@ return {
         },
       },
     },
-    "mason-org/mason.nvim",
-    "mason-org/mason-lspconfig.nvim",
+    {
+      "mason-org/mason.nvim",
+      tag = "v2.3.0",
+      commit = "bb639d4bf385a4d89f478b83af4d770be05ab7eb",
+    },
+    {
+      "mason-org/mason-lspconfig.nvim",
+      tag = "v2.2.0",
+      commit = "0c2823e0418f3d9230ff8b201c976e84de1cb401",
+    },
   },
   config = function()
     -- See `:help lspconfig-all` or https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md
@@ -131,17 +149,34 @@ return {
     require("mason").setup({
       registries = {
         "github:mason-org/mason-registry",
-        "github:Crashdummyy/mason-registry", -- Custom registry for roslyn
       },
     })
     require("mason-lspconfig").setup({
       ensure_installed = ensure_installed,
+      automatic_enable = false,
     })
 
     for server, settings in pairs(servers) do
       vim.lsp.config(server, settings)
       vim.lsp.enable(server)
     end
+
+    local dotnet_tools = vim.fn.expand("~/.dotnet/tools")
+    local roslyn_language_server = dotnet_tools .. "/roslyn-language-server"
+
+    vim.lsp.config("roslyn_ls", {
+      cmd = {
+        vim.fn.executable(roslyn_language_server) == 1 and roslyn_language_server or "roslyn-language-server",
+        "--stdio",
+      },
+      settings = {
+        ["csharp|background_analysis"] = {
+          dotnet_analyzer_diagnostics_scope = "openFiles",
+          dotnet_compiler_diagnostics_scope = "openFiles",
+        },
+      },
+    })
+    vim.lsp.enable("roslyn_ls")
 
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(args)
@@ -180,26 +215,5 @@ return {
         end, "[F]ind LSP Workspace [S]ymbols")
       end,
     })
-
-    -- Clean neovim ShaDa temporary files (Windows only)
-    if vim.fn.has("win32") == 1 then
-      local function clean_shada_tmp_files()
-        local shada_dir = vim.fn.stdpath("data") .. "/shada"
-        local full_cmd = 'del /q "' .. shada_dir:gsub("/", "\\") .. '\\main.shada.tmp.*"'
-        vim.fn.system(full_cmd)
-      end
-
-      -- Manual cleanup keymap
-      vim.keymap.set("n", "<leader>rc", function()
-        clean_shada_tmp_files()
-        print("ShaDa temporary files cleaned")
-      end, { desc = "[R]un [C]lean neovim ShaDa files", silent = true })
-
-      -- Auto cleanup on exit
-      vim.api.nvim_create_autocmd("VimLeavePre", {
-        callback = clean_shada_tmp_files,
-        desc = "Clean ShaDa temporary files on exit",
-      })
-    end
   end,
 }

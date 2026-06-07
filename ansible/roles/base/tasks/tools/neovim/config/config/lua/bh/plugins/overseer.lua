@@ -1,5 +1,7 @@
 return {
   "stevearc/overseer.nvim",
+  tag = "v2.1.0",
+  commit = "95b1099c043e4231a1204abd9a394d379e69f029",
   cmd = {
     "OverseerOpen",
     "OverseerClose",

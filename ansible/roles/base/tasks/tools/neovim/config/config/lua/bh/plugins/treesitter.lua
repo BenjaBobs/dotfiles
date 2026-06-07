@@ -1,17 +1,12 @@
 return {
   { -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
+    -- Release tags lag the current main branch and use the old setup API.
+    commit = "4916d6592ede8c07973490d9322f187e07dfefac",
 
     -- Treesitter maintains its own parsers; this keeps them up to date
     build = ":TSUpdate",
 
-    -- NOTE:
-    -- On the *main* branch of nvim-treesitter, we must NOT use `main = ...`
-    -- Lazy.nvim would try to `require()` the module too early,
-    -- before treesitter has finished setting up its runtime paths.
-    --
-    -- Because of this, we use an explicit `config` function instead of
-    -- `main + opts`.
     config = function()
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
       require("nvim-treesitter").setup({
@@ -20,6 +15,7 @@ return {
         ensure_installed = {
           "bash",
           "c",
+          "c_sharp",
           "diff",
           "html",
           "lua",

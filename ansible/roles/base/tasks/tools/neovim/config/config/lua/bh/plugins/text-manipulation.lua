@@ -142,7 +142,14 @@ return {
   -- Treesitter textobjects: select and move
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    commit = "851e865342e5a4cb1ae23d31caf6e991e1c99f1e",
+    dependencies = {
+      {
+        "nvim-treesitter/nvim-treesitter",
+        -- Release tags lag the current main branch and use the old setup API.
+        commit = "4916d6592ede8c07973490d9322f187e07dfefac",
+      },
+    },
     config = function()
       local select = require("nvim-treesitter-textobjects.select")
       local move = require("nvim-treesitter-textobjects.move")
@@ -194,20 +201,75 @@ return {
   -- Sibling swap: for small inline nodes (parameters, types, object keys)
   {
     "Wansmer/sibling-swap.nvim",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    commit = "ae5aef7e62faf16228d570757e97ca92bf49f849",
+    dependencies = {
+      {
+        "nvim-treesitter/nvim-treesitter",
+        -- Release tags lag the current main branch and use the old setup API.
+        commit = "4916d6592ede8c07973490d9322f187e07dfefac",
+      },
+    },
     opts = {
       use_default_keymaps = false,
     },
     keys = {
-      { "<A-S-Right>", guarded_sibling_swap(function() require("sibling-swap").swap_with_right() end), desc = "Swap inline node right" },
-      { "<A-S-l>", guarded_sibling_swap(function() require("sibling-swap").swap_with_right() end), desc = "Swap inline node right" },
-      { "<A-S-Left>", guarded_sibling_swap(function() require("sibling-swap").swap_with_left() end), desc = "Swap inline node left" },
-      { "<A-S-h>", guarded_sibling_swap(function() require("sibling-swap").swap_with_left() end), desc = "Swap inline node left" },
+      {
+        "<A-S-Right>",
+        guarded_sibling_swap(function()
+          require("sibling-swap").swap_with_right()
+        end),
+        desc = "Swap inline node right",
+      },
+      {
+        "<A-S-l>",
+        guarded_sibling_swap(function()
+          require("sibling-swap").swap_with_right()
+        end),
+        desc = "Swap inline node right",
+      },
+      {
+        "<A-S-Left>",
+        guarded_sibling_swap(function()
+          require("sibling-swap").swap_with_left()
+        end),
+        desc = "Swap inline node left",
+      },
+      {
+        "<A-S-h>",
+        guarded_sibling_swap(function()
+          require("sibling-swap").swap_with_left()
+        end),
+        desc = "Swap inline node left",
+      },
       -- Block swap: functions, classes, types, etc.
-      { "<A-S-Down>", function() swap_block("next") end, desc = "Swap block down" },
-      { "<A-S-j>", function() swap_block("next") end, desc = "Swap block down" },
-      { "<A-S-Up>", function() swap_block("prev") end, desc = "Swap block up" },
-      { "<A-S-k>", function() swap_block("prev") end, desc = "Swap block up" },
+      {
+        "<A-S-Down>",
+        function()
+          swap_block("next")
+        end,
+        desc = "Swap block down",
+      },
+      {
+        "<A-S-j>",
+        function()
+          swap_block("next")
+        end,
+        desc = "Swap block down",
+      },
+      {
+        "<A-S-Up>",
+        function()
+          swap_block("prev")
+        end,
+        desc = "Swap block up",
+      },
+      {
+        "<A-S-k>",
+        function()
+          swap_block("prev")
+        end,
+        desc = "Swap block up",
+      },
     },
   },
 }
