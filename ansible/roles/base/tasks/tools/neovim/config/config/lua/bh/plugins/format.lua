@@ -11,6 +11,8 @@ return {
       formatters = vim.fn.executable(csharpier) == 1 and {
         csharpier = {
           command = csharpier,
+          args = { "format", "--stdin-path", "$FILENAME" },
+          stdin = true,
         },
       } or {},
       formatters_by_ft = {
