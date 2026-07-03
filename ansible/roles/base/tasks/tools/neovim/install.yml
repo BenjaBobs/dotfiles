@@ -57,7 +57,8 @@
     name:
       - xclip              # Clipboard support
       - wl-clipboard       # Wayland clipboard support
-      - tree-sitter        # Tree-sitter CLI
+      - tree-sitter        # Tree-sitter library (libtree-sitter)
+      - tree-sitter-cli    # Tree-sitter CLI (provides /usr/bin/tree-sitter; kulala.nvim needs it)
     state: present
 
 - name: Install stylua via mise
