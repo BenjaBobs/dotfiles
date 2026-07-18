@@ -18,7 +18,6 @@ return {
           "c_sharp",
           "diff",
           "html",
-          "lua",
           "luadoc",
           "markdown",
           "markdown_inline",
@@ -53,6 +52,14 @@ return {
           disable = { "ruby" },
         },
       })
+
+      -- Neovim 0.12 ships a Lua parser that matches its runtime queries.
+      -- Prefer it over nvim-treesitter's parser when both are on runtimepath.
+      local lua_parser = vim.iter(vim.api.nvim_get_runtime_file("parser/lua.so", true)):find(function(path)
+        return not path:find("/nvim%-treesitter/")
+      end)
+      assert(lua_parser, "Neovim's bundled Lua parser was not found")
+      vim.treesitter.language.add("lua", { path = lua_parser })
     end,
 
     -- There are additional nvim-treesitter modules that you can use to interact

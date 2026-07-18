@@ -1,5 +1,5 @@
 ---
 # Neovim version configuration
 # Update this version when ready to test new Neovim releases
-neovim_version: "0.12.0"
+neovim_version: "0.12.4"
 dotnet_version: "10.0.202"
