@@ -94,11 +94,27 @@ local function unique_sorted_paths(paths)
   return deduped
 end
 
+local function unique_sorted_values(values)
+  local seen = {}
+  local deduped = {}
+
+  for _, value in ipairs(values) do
+    if not seen[value] then
+      seen[value] = true
+      table.insert(deduped, value)
+    end
+  end
+
+  table.sort(deduped)
+  return deduped
+end
+
 local function detect_project_files(root)
   local package_jsons = {}
   local sln_files = {}
   local csproj_files = {}
   local tsconfig_files = {}
+  local build_zig_files = {}
 
   walk(root, function(path, name)
     if name == "package.json" then
@@ -109,6 +125,8 @@ local function detect_project_files(root)
       table.insert(csproj_files, path)
     elseif name == "tsconfig.json" then
       table.insert(tsconfig_files, path)
+    elseif name == "build.zig" then
+      table.insert(build_zig_files, path)
     end
   end)
 
@@ -117,6 +135,7 @@ local function detect_project_files(root)
     sln_files = unique_sorted_paths(sln_files),
     csproj_files = unique_sorted_paths(csproj_files),
     tsconfig_files = unique_sorted_paths(tsconfig_files),
+    build_zig_files = unique_sorted_paths(build_zig_files),
   }
 end
 
@@ -413,6 +432,58 @@ local function add_typescript_tasks(root, files, tasks, seen)
   end
 end
 
+local function zig_build_steps(cwd)
+  if vim.fn.executable("zig") ~= 1 then
+    return {}
+  end
+
+  local result = vim.system({ "zig", "build", "--list-steps" }, { cwd = cwd, text = true }):wait()
+  if result.code ~= 0 then
+    return {}
+  end
+
+  local steps = {}
+  for line in result.stdout:gmatch("[^\r\n]+") do
+    local step = line:match("^%s*([%w][%w%-%._]*)")
+    if step then
+      table.insert(steps, step)
+    end
+  end
+
+  return unique_sorted_values(steps)
+end
+
+local function add_zig_tasks(root, files, tasks, seen)
+  for _, build_zig_path in ipairs(files.build_zig_files) do
+    local cwd = vim.fs.dirname(build_zig_path)
+    local scope = relative_to(root, cwd)
+
+    add_task(tasks, seen, {
+      root = root,
+      kind = "zig",
+      scope = scope == "." and "all" or scope,
+      action = "build",
+      cwd = cwd,
+      cmd = "zig",
+      args = { "build" },
+    })
+
+    for _, step in ipairs(zig_build_steps(cwd)) do
+      if step ~= "install" then
+        add_task(tasks, seen, {
+          root = root,
+          kind = "zig",
+          scope = scope == "." and "all" or scope,
+          action = step,
+          cwd = cwd,
+          cmd = "zig",
+          args = { "build", step },
+        })
+      end
+    end
+  end
+end
+
 local function populate_quickfix_from_lines(task, lines)
   if vim.tbl_isempty(lines) then
     if task.exit_code and task.exit_code ~= 0 then
@@ -505,6 +576,7 @@ function M.collect(root)
   add_bun_tasks(root, files, tasks, seen)
   add_typescript_tasks(root, files, tasks, seen)
   add_dotnet_tasks(root, files, tasks, seen)
+  add_zig_tasks(root, files, tasks, seen)
 
   table.sort(tasks, function(a, b)
     return a.display < b.display

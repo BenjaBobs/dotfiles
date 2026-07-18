@@ -26,7 +26,8 @@ return {
       { "<leader>g", group = "[G]it", icon = { icon = "" } },
       { "<leader>d", group = "[D]otnet", icon = { icon = "󰪮" } },
       { "<leader>c", group = "[C]ode", icon = { icon = "" } },
-      { "<leader>t", group = "[T]ask" },
+      { "<leader>r", group = "[R]un" },
+      { "<leader>t", group = "[T]oggle" },
       { "<leader>w", group = "[W]indow" },
     })
 

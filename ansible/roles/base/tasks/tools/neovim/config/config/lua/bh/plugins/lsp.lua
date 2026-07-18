@@ -34,7 +34,10 @@ return {
           use_nvim_cmp_as_default = true,
           nerd_font_variant = "mono",
         },
-        signature = { enabled = true },
+        signature = {
+          enabled = true,
+          window = { border = "rounded" },
+        },
         sources = {
           providers = {
             markdown = {
@@ -142,6 +145,7 @@ return {
       },
       -- Css
       cssls = {},
+      zls = {},
     }
 
     local ensure_installed = vim.tbl_keys(servers or {})
@@ -191,6 +195,18 @@ return {
 
         mapN("<leader>cr", vim.lsp.buf.rename, "[R]ename Symbol")
         mapN("<leader>ca", vim.lsp.buf.code_action, "[A]ctions")
+        mapN("K", function()
+          vim.lsp.buf.hover({ border = "rounded" })
+        end, "Hover Documentation")
+
+        if client:supports_method("textDocument/inlayHint") then
+          vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+          mapN("<leader>ch", function()
+            local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = args.buf })
+            vim.lsp.inlay_hint.enable(not enabled, { bufnr = args.buf })
+            vim.notify("Inlay hints " .. (enabled and "disabled" or "enabled"))
+          end, "[C]ode Inlay [H]ints")
+        end
 
         mapN("gd", function()
           Snacks.picker.lsp_definitions()

@@ -10,25 +10,25 @@ return {
   },
   keys = {
     {
-      "<leader>tr",
+      "<leader>rr",
       function()
         require("bh.tasks").pick()
       end,
-      desc = "[T]ask [R]un",
+      desc = "[R]un Project Task",
     },
     {
-      "<leader>tl",
+      "<leader>rl",
       function()
         require("bh.overseer-float").toggle()
       end,
-      desc = "[T]ask [L]ist",
+      desc = "[R]un Task [L]ist",
     },
     {
-      "<leader>tc",
+      "<leader>rc",
       function()
         require("bh.tasks").run_custom()
       end,
-      desc = "[T]ask Run [C]ustom",
+      desc = "[R]un [C]ustom Task",
     },
   },
   opts = {

@@ -18,13 +18,6 @@ return {
       desc = "[R]un [T]erminal",
     },
     {
-      "<leader>rg",
-      function()
-        Snacks.terminal("gitui", { win = float_win })
-      end,
-      desc = "[R]un [G]itui",
-    },
-    {
       "<leader>rn",
       function()
         Snacks.picker.commands()
