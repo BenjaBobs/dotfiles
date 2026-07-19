@@ -116,6 +116,13 @@ return {
         if not client or type(value) ~= "table" then
           return
         end
+
+        -- ZLS emits progress updates while editing build.zig. Rendering a
+        -- notification for each one causes disruptive full-screen redraws.
+        if client.name == "zls" then
+          return
+        end
+
         local p = progress[client.id]
 
         for i = 1, #p + 1 do

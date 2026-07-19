@@ -160,6 +160,49 @@ return {
       automatic_enable = false,
     })
 
+    -- ZLS republishes diagnostics frequently while editing, which causes
+    -- statusline and floating-window redraws even though diagnostic rendering
+    -- itself is disabled in insert mode. Keep only the latest update and apply
+    -- it when insert mode ends.
+    local publish_diagnostics = vim.lsp.handlers["textDocument/publishDiagnostics"]
+    local pending_zls_diagnostics = {}
+
+    vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
+      local client = vim.lsp.get_client_by_id(ctx.client_id)
+      local bufnr = result and result.uri and vim.uri_to_bufnr(result.uri)
+      local mode = vim.api.nvim_get_mode().mode
+
+      if client and client.name == "zls" and bufnr == vim.api.nvim_get_current_buf() and mode:sub(1, 1) == "i" then
+        pending_zls_diagnostics[bufnr] = {
+          err = err,
+          result = result,
+          ctx = ctx,
+          config = config,
+        }
+        return
+      end
+
+      publish_diagnostics(err, result, ctx, config)
+    end
+
+    vim.api.nvim_create_autocmd("InsertLeave", {
+      callback = function(args)
+        local pending = pending_zls_diagnostics[args.buf]
+        if not pending then
+          return
+        end
+
+        pending_zls_diagnostics[args.buf] = nil
+        publish_diagnostics(pending.err, pending.result, pending.ctx, pending.config)
+      end,
+    })
+
+    vim.api.nvim_create_autocmd("BufDelete", {
+      callback = function(args)
+        pending_zls_diagnostics[args.buf] = nil
+      end,
+    })
+
     for server, settings in pairs(servers) do
       vim.lsp.config(server, settings)
       vim.lsp.enable(server)
