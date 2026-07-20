@@ -27,7 +27,7 @@ return {
       { "<leader>d", group = "[D]otnet", icon = { icon = "󰪮" } },
       { "<leader>c", group = "[C]ode", icon = { icon = "" } },
       { "<leader>r", group = "[R]un" },
-      { "<leader>t", group = "[T]oggle" },
+      { "<leader>t", group = "[T]est" },
       { "<leader>w", group = "[W]indow" },
     })
 
