@@ -3,6 +3,7 @@ require("bh.windows")
 require("bh.clipboard")
 require("bh.insert-mode-tweaks")
 require("bh.rainbow-variables")
+require("bh.type-colors")
 
 --/telesco Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -17,7 +18,11 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
       { out, "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
-    vim.fn.getchar()
+    -- Only wait for a keypress when running interactively; in headless/CI runs
+    -- there is no UI and getchar() would block forever.
+    if #vim.api.nvim_list_uis() > 0 then
+      vim.fn.getchar()
+    end
     os.exit(1)
   end
 end
@@ -31,7 +36,11 @@ if installed_lazy_commit ~= lazy_commit then
       { out, "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
-    vim.fn.getchar()
+    -- Only wait for a keypress when running interactively; in headless/CI runs
+    -- there is no UI and getchar() would block forever.
+    if #vim.api.nvim_list_uis() > 0 then
+      vim.fn.getchar()
+    end
     os.exit(1)
   end
 end
