@@ -31,6 +31,27 @@ return {
       }
     end
 
+    -- mdslw: one sentence per line ("semantic line breaks"). `--max-width 0`
+    -- disables wrapping so each sentence stays on a single line regardless of
+    -- length; drop it (default 80) if you also want long sentences wrapped.
+    -- Requires the `mdslw` CLI on PATH (https://github.com/razziel89/mdslw).
+    --
+    -- `--suppressions` lists words ending in `.`/`?`/`!`/`:` that must NOT cause
+    -- a line break. mdslw's `--lang` covers de/en/es/fr/it but not Danish, and
+    -- it has no "period-before-lowercase" heuristic, so Danish abbreviations are
+    -- enumerated here (English ones come from the default `--lang ac`). Extend
+    -- the list as needed.
+    formatters.mdslw = {
+      prepend_args = {
+        "--max-width",
+        "0",
+        "--suppressions",
+        "pr. bl.a. ca. dvs. eks. ekskl. evt. f.eks. fx. hhv. inkl. jf. kl. kr. "
+          .. "m.fl. m.m. m.v. mht. mv. nr. osv. pga. stk. tlf. vedr. vha. "
+          .. "iflg. ift. ang. afd. fig.",
+      },
+    }
+
     conform.setup({
       formatters = formatters,
       formatters_by_ft = {
@@ -43,7 +64,11 @@ return {
         html = { "biome" },
         json = { "biome" },
         yaml = { "prettier" },
-        markdown = { "prettier" },
+        -- prettier normalizes block structure (e.g. blank lines around headings,
+        -- lists, tables); mdslw then splits prose one sentence per line. Order
+        -- matters: prettier runs first, mdslw last. prettier's default
+        -- proseWrap="preserve" keeps mdslw's line breaks, so the chain is stable.
+        markdown = { "prettier", "mdslw" },
         cs = { "csharpier" },
         lua = { "stylua" },
         http = { "kulala-fmt" },

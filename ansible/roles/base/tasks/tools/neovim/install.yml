@@ -67,3 +67,26 @@
   environment:
     PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
   shell: mise use -g stylua@latest
+
+# Markdown "semantic line breaks" formatter (one sentence per line), used by
+# conform for the `markdown` filetype. Not in mise's registry, so install it
+# with the `github` backend (downloads the GitHub release binary; `ubi` does the
+# same but is deprecated). `[exe=mdslw]` is required: the release asset is named
+# `mdslw_x86_64-unknown-linux-musl`, and without it the installed executable
+# keeps a mangled asset name instead of being called `mdslw`.
+- name: Install mdslw via mise
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/share/mise/installs/github-razziel89-mdslw"
+  environment:
+    PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
+  shell: mise use -g "github:razziel89/mdslw[exe=mdslw]"
+
+# Used by conform for `yaml` and (chained ahead of mdslw) `markdown`. mdslw only
+# splits sentences; prettier does the structural normalization such as blank
+# lines around headings.
+- name: Install prettier via mise
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/share/mise/installs/npm-prettier"
+  environment:
+    PATH: "{{ ansible_facts['env']['HOME'] }}/.local/bin:{{ ansible_facts['env']['PATH'] }}"  # mise is installed in .local/bin
+  shell: mise use -g "npm:prettier@latest"

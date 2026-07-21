@@ -146,6 +146,9 @@ return {
       -- Css
       cssls = {},
       zls = {},
+      -- Markdown: document/workspace symbols (heading outline), link
+      -- navigation (goto def/references) and link completion.
+      marksman = {},
     }
 
     local ensure_installed = vim.tbl_keys(servers or {})
