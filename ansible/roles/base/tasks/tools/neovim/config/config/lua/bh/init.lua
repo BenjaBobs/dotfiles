@@ -4,6 +4,7 @@ require("bh.clipboard")
 require("bh.insert-mode-tweaks")
 require("bh.rainbow-variables")
 require("bh.type-colors")
+require("bh.scroll-past-eof")
 
 --/telesco Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
