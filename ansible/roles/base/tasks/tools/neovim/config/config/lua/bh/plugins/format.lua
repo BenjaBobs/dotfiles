@@ -45,8 +45,12 @@ return {
       prepend_args = {
         "--max-width",
         "0",
+        -- End-of-sentence markers default to `?!:.`; drop the `:` so colons
+        -- (e.g. before a list or explanation) don't trigger a line break.
+        "--end-markers",
+        "?!.",
         "--suppressions",
-        "pr. bl.a. ca. dvs. eks. ekskl. evt. f.eks. fx. hhv. inkl. jf. kl. kr. "
+        "pr. bl.a. ca. dvs. eks. ekskl. evt. f.eks. fx. hhv. incl. inkl. jf. kl. kr. "
           .. "m.fl. m.m. m.v. mht. mv. nr. osv. pga. stk. tlf. vedr. vha. "
           .. "iflg. ift. ang. afd. fig.",
       },
