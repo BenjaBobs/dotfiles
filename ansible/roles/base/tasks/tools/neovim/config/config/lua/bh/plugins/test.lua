@@ -11,8 +11,12 @@ return {
       commit = "74b06c6c75e4eeb3108ec01852001636d85a932b",
     },
     {
-      "Issafalcon/neotest-dotnet",
-      commit = "e27c67a856ce67cc968b773d01a35ec07459bb8b",
+      -- Successor to Issafalcon/neotest-dotnet, which is unmaintained and broken
+      -- on Neovim 0.12 (it uses the iter_matches capture shape removed in 0.12).
+      -- Discovers tests through VSTest/Microsoft.Testing.Platform instead of
+      -- treesitter, so it handles every framework, TUnit included.
+      "nsidorenco/neotest-vstest",
+      commit = "8588c3c988c7ed49879dddf937b42681cfa7ce30",
     },
     {
       "marilari88/neotest-vitest",
@@ -91,7 +95,8 @@ return {
   config = function()
     require("neotest").setup({
       adapters = {
-        require("neotest-dotnet")({}),
+        -- Configured through vim.g.neotest_vstest, not call arguments.
+        require("neotest-vstest"),
         require("neotest-vitest")({
           filter_dir = function(name)
             return name ~= "node_modules"
