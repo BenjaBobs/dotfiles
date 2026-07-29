@@ -17,6 +17,10 @@ vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 
+-- Keep the visual selection after indenting so < / > can be repeated
+vim.keymap.set("x", "<", "<gv", { desc = "Indent left, keep selection" })
+vim.keymap.set("x", ">", ">gv", { desc = "Indent right, keep selection" })
+
 -- keys
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
