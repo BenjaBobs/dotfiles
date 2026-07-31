@@ -27,6 +27,9 @@ return {
         "c_sharp",
         "diff",
         "html",
+        -- Also covers the `jsonc` filetype: nvim-treesitter registers `jsonc`
+        -- as an alias for the `json` language, so there is no separate parser.
+        "json",
         "luadoc",
         "markdown",
         "markdown_inline",

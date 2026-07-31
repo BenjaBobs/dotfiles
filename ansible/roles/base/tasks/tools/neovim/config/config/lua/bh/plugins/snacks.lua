@@ -69,6 +69,22 @@ return {
       desc = "[F]ind in [B]uffer",
     },
     {
+      -- Symbol outline for the current buffer. Prefers LSP document symbols,
+      -- and falls back to the Treesitter tree for filetypes that have a parser
+      -- but no language server (json, yaml, ...). Kept here rather than in the
+      -- LspAttach handler so the mapping also exists in LSP-less buffers.
+      "<leader>fs",
+      function()
+        local clients = vim.lsp.get_clients({ bufnr = 0, method = "textDocument/documentSymbol" })
+        if #clients > 0 then
+          Snacks.picker.lsp_symbols()
+        else
+          Snacks.picker.treesitter()
+        end
+      end,
+      desc = "[F]ind [S]ymbols",
+    },
+    {
       "<leader>fo",
       function()
         require("bh.buffer-picker").open()
