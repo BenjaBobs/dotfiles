@@ -34,8 +34,10 @@ return {
         "markdown",
         "markdown_inline",
         "query",
+        "toml",
         "vim",
         "vimdoc",
+        "yaml",
         "javascript",
         "typescript",
         "tsx",
@@ -47,10 +49,15 @@ return {
       -- language (e.g. `cs` -> `c_sharp`); `vim.treesitter.start` errors when no
       -- parser is installed, so the pcall lets unsupported filetypes fall back
       -- to Vim's built-in syntax highlighting.
+      --
+      -- The highlight query has to be checked separately: a parser can sit on
+      -- the runtimepath with no matching query (stale `.so` files left behind by
+      -- the old master-branch layout do exactly this). `start` then succeeds and
+      -- clears 'syntax', leaving the buffer with no highlighting at all.
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(ev)
           local lang = vim.treesitter.language.get_lang(vim.bo[ev.buf].filetype)
-          if lang and pcall(vim.treesitter.start, ev.buf, lang) then
+          if lang and vim.treesitter.query.get(lang, "highlights") and pcall(vim.treesitter.start, ev.buf, lang) then
             vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end
         end,
