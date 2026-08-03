@@ -23,6 +23,45 @@ return {
       },
     }
 
+    -- biome formats JSON with its own `indentStyle` (tab by default), so a
+    -- space-indented file gets silently reindented on save. Detect the
+    -- indentation already present in the buffer and pass it explicitly.
+    --
+    -- The flags are JSON-scoped (`--json-formatter-*`), so the other biome
+    -- filetypes are untouched. If no indented line is found (empty or minified
+    -- file) nothing is passed and biome / biome.json decides. Note that CLI
+    -- flags win over a project's biome.json.
+    local function json_indent_args(bufnr)
+      if not vim.tbl_contains({ "json", "jsonc" }, vim.bo[bufnr].filetype) then
+        return {}
+      end
+
+      -- 256 lines is plenty: any pretty-printed JSON indents by line 2.
+      for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, 256, false)) do
+        if line:match("^\t") then
+          return { "--json-formatter-indent-style=tab" }
+        end
+
+        local spaces = line:match("^( +)%S")
+        if spaces then
+          return {
+            "--json-formatter-indent-style=space",
+            "--json-formatter-indent-width=" .. #spaces,
+          }
+        end
+      end
+
+      return {}
+    end
+
+    -- append (not prepend): the flags have to follow biome's `format`
+    -- subcommand, and conform prepends ahead of the whole builtin arg list.
+    formatters.biome = {
+      append_args = function(_, ctx)
+        return json_indent_args(ctx.buf)
+      end,
+    }
+
     if vim.fn.executable(csharpier) == 1 then
       formatters.csharpier = {
         command = csharpier,
