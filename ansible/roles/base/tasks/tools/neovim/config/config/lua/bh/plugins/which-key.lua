@@ -29,6 +29,7 @@ return {
       { "<leader>r", group = "[R]un" },
       { "<leader>t", group = "[T]est" },
       { "<leader>w", group = "[W]indow" },
+      { "<leader>s", group = "[S]urround" },
     })
 
     vim.keymap.set("n", "<leader>o", ":Fyler<CR>", { desc = "[O]pen Files" })
@@ -43,10 +44,8 @@ return {
     vim.keymap.set("v", "<A-Up>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
     vim.keymap.set("v", "<A-Down>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
 
-    -- Bracketing highlighted text
-    vim.keymap.set("v", "(", '"tdi(<C-r>t)<Esc>va(', { noremap = true, silent = true })
-    vim.keymap.set("v", "[", '"tdi[<C-r>t]<Esc>va[', { noremap = true, silent = true })
-    vim.keymap.set("v", "{", '"tdi{<C-r>t}<Esc>va{', { noremap = true, silent = true })
+    -- Bracketing highlighted text now lives in bh/plugins/pairs.lua, routed
+    -- through mini.surround (and extended to " ' `).
 
     -- Alt + left/right nav
     vim.keymap.set("n", "<A-Left>", "<C-o>", { noremap = true, silent = true })
