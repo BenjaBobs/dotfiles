@@ -55,6 +55,13 @@ return {
       desc = "[F]ind [K]eymaps",
     },
     {
+      "<leader>fu",
+      function()
+        Snacks.picker.undo()
+      end,
+      desc = "[F]ind [U]ndo History",
+    },
+    {
       "<leader>fn",
       function()
         Snacks.picker.files({ cwd = vim.fn.stdpath("config") })

@@ -1,6 +1,7 @@
 require("bh.vim-vars")
 require("bh.windows")
 require("bh.clipboard")
+require("bh.undo")
 require("bh.insert-mode-tweaks")
 require("bh.rainbow-variables")
 require("bh.type-colors")
