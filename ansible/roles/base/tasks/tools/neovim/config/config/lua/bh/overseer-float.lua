@@ -3,6 +3,7 @@ local TaskView = require("overseer.task_view")
 local M = {}
 
 local preview = nil
+local output = nil
 
 local function list_bufnr()
   local sidebar = require("overseer.task_list.sidebar").get_or_create()
@@ -74,10 +75,25 @@ local function preview_config()
   }
 end
 
+local function output_config()
+  local box = editor_box()
+
+  return {
+    relative = "editor",
+    style = "minimal",
+    border = "rounded",
+    width = box.width,
+    height = box.height,
+    row = box.row,
+    col = box.col,
+    title = " Task Output ",
+    title_pos = "center",
+  }
+end
+
 local function configure_list_window(winid, with_preview)
   local preview_hint = with_preview and "hide preview" or "show preview"
-  vim.wo[winid].winbar =
-    string.format(" Overseer  [? help] [Enter actions] [p %s] [q close] ", preview_hint)
+  vim.wo[winid].winbar = string.format(" Overseer  [? help] [Enter output] [a actions] [p %s] [q close] ", preview_hint)
   vim.wo[winid].wrap = false
   vim.wo[winid].cursorline = true
   vim.wo[winid].number = false
@@ -90,6 +106,63 @@ local function close_preview()
     preview:dispose()
   end
   preview = nil
+end
+
+function M.close_output()
+  if output and vim.api.nvim_win_is_valid(output.winid) then
+    vim.api.nvim_win_close(output.winid, false)
+  end
+  output = nil
+end
+
+-- Show a task's output in a float, replacing the task list. Overseer's own
+-- "open" actions assume the list is a docked side panel that can coexist with
+-- the output window, so they leave our float sitting on top of it.
+function M.open_output(task)
+  local bufnr = task:get_bufnr()
+  if not bufnr then
+    vim.notify("Task has no output buffer", vim.log.levels.WARN)
+    return
+  end
+
+  M.close()
+  M.close_output()
+
+  local winid = vim.api.nvim_open_win(bufnr, true, output_config())
+  output = { winid = winid, bufnr = bufnr }
+
+  -- `style = "minimal"` clears cursorline, and it wins over the WinEnter handler
+  -- in bh.windows, so set it back explicitly like configure_list_window does.
+  vim.wo[winid].winbar = " Task Output  [q close] "
+  vim.wo[winid].wrap = false
+  vim.wo[winid].cursorline = true
+  vim.wo[winid].number = false
+  vim.wo[winid].relativenumber = false
+  vim.wo[winid].signcolumn = "no"
+
+  -- Bound on the buffer, so it also fires if this output shows up in a window we
+  -- don't track (a vsplit from the action menu, say). Close whatever we're in.
+  for _, lhs in ipairs({ "q", "<Esc>" }) do
+    vim.keymap.set("n", lhs, function()
+      if output and vim.api.nvim_get_current_win() == output.winid then
+        M.close_output()
+      else
+        vim.cmd("close")
+      end
+    end, { buffer = bufnr, silent = true, desc = "Close task output" })
+  end
+
+  -- Keep our state in sync if the window goes away some other way (<C-w>c, :q).
+  vim.api.nvim_create_autocmd("WinClosed", {
+    pattern = tostring(winid),
+    once = true,
+    callback = function()
+      output = nil
+    end,
+  })
+
+  require("overseer.util").scroll_to_end(winid)
+  return winid
 end
 
 function M.open()
@@ -135,6 +208,10 @@ function M.refresh()
 
   if preview and not preview:is_win_closed() then
     vim.api.nvim_win_set_config(preview.winid, preview_config())
+  end
+
+  if output and vim.api.nvim_win_is_valid(output.winid) then
+    vim.api.nvim_win_set_config(output.winid, output_config())
   end
 end
 

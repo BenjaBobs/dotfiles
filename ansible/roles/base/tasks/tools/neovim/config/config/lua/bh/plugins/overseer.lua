@@ -38,7 +38,30 @@ return {
       min_width = { 110, 0.68 },
       max_width = { 170, 0.90 },
       default_detail = 1,
-      keymaps = {},
+      -- Only listed keys are overridden; every other overseer default survives.
+      keymaps = {
+        ["<CR>"] = {
+          "keymap.open",
+          opts = { dir = "float" },
+          desc = "Open task output in a float",
+        },
+        ["a"] = "keymap.run_action",
+      },
+    },
+    actions = {
+      -- Overseer's built-in open actions assume the task list is a docked side
+      -- panel, so they leave our float covering the output window. Route the
+      -- float variant through bh.overseer-float, which closes the list first
+      -- and binds q on the output buffer.
+      ["open float"] = {
+        desc = "open terminal in a floating window",
+        condition = function(task)
+          return task:get_bufnr() ~= nil
+        end,
+        run = function(task)
+          require("bh.overseer-float").open_output(task)
+        end,
+      },
     },
   },
   config = function(_, opts)
@@ -47,7 +70,7 @@ return {
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "OverseerList",
       callback = function(args)
-        vim.wo[0].winbar = " Overseer  [? help] [Enter actions] [p show preview] [q close] "
+        vim.wo[0].winbar = " Overseer  [? help] [Enter output] [a actions] [p show preview] [q close] "
         vim.wo[0].wrap = false
         vim.wo[0].cursorline = true
         vim.bo[args.buf].buflisted = false
