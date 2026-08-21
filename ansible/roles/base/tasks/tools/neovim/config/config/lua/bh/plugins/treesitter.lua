@@ -50,15 +50,18 @@ return {
       -- parser is installed, so the pcall lets unsupported filetypes fall back
       -- to Vim's built-in syntax highlighting.
       --
-      -- The highlight query has to be checked separately: a parser can sit on
-      -- the runtimepath with no matching query (stale `.so` files left behind by
-      -- the old master-branch layout do exactly this). `start` then succeeds and
-      -- clears 'syntax', leaving the buffer with no highlighting at all.
+      -- Queries have to be checked separately: a parser can sit on the
+      -- runtimepath without the query needed by a feature. Only replace the
+      -- filetype's built-in 'indentexpr' when an indent query exists; otherwise
+      -- nvim-treesitter's indenter can flatten indentation (Lua, C#, and Vim
+      -- currently rely on their native indent scripts in this setup).
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(ev)
           local lang = vim.treesitter.language.get_lang(vim.bo[ev.buf].filetype)
           if lang and vim.treesitter.query.get(lang, "highlights") and pcall(vim.treesitter.start, ev.buf, lang) then
-            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+            if vim.treesitter.query.get(lang, "indents") then
+              vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+            end
           end
         end,
       })
