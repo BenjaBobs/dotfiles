@@ -11,6 +11,44 @@ return {
     commit = "4a014143fcb4e9df26198ccb3ecff3b9e77a048c",
     event = "InsertEnter",
     opts = {},
+    config = function(_, opts)
+      require("mini.pairs").setup(opts)
+
+      local matching_pair = {
+        ["("] = ")",
+        ["["] = "]",
+        ["{"] = "}",
+      }
+
+      -- MiniPairs.cr() recognizes only adjacent pairs. Treat whitespace-only
+      -- pair contents the same way, so Enter inside `{ }`, `[  ]`, or `( )`
+      -- removes that padding and opens a properly indented blank line. This is
+      -- deliberately filetype-agnostic: the opening delimiter stays where it
+      -- was typed, while the active indentexpr decides the inner indentation.
+      local function whitespace_pair_cr()
+        if vim.g.minipairs_disable == true or vim.b.minipairs_disable == true then return end
+
+        local col = vim.api.nvim_win_get_cursor(0)[2]
+        local line = vim.api.nvim_get_current_line()
+        local before, after = line:sub(1, col), line:sub(col + 1)
+        local open, left_padding = before:match("([%(%[%{])(%s*)$")
+        local right_padding, close = after:match("^(%s*)([%)%]%}])")
+        if not open or matching_pair[open] ~= close then return end
+        if #left_padding == 0 and #right_padding == 0 then return end
+
+        return string.rep(vim.keycode("<BS>"), #left_padding)
+          .. string.rep(vim.keycode("<Del>"), #right_padding)
+          .. vim.keycode("<CR><C-o>O")
+      end
+
+      vim.keymap.set("i", "<CR>", function()
+        return whitespace_pair_cr() or MiniPairs.cr()
+      end, {
+        expr = true,
+        replace_keycodes = false,
+        desc = "MiniPairs <CR> with whitespace tolerance",
+      })
+    end,
   },
 
   -- Surround existing text: `gsaiw"` quotes a word, `gsr"'` swaps quote style,
