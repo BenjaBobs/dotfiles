@@ -25,6 +25,7 @@ return {
         "bash",
         "c",
         "c_sharp",
+        "css",
         "diff",
         "html",
         -- Also covers the `jsonc` filetype: nvim-treesitter registers `jsonc`
@@ -58,8 +59,19 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(ev)
           local lang = vim.treesitter.language.get_lang(vim.bo[ev.buf].filetype)
-          if lang and vim.treesitter.query.get(lang, "highlights") and pcall(vim.treesitter.start, ev.buf, lang) then
-            if vim.treesitter.query.get(lang, "indents") then
+          if not lang then
+            return
+          end
+          -- nvim-treesitter ships queries for every language it supports, so a
+          -- query file is on the runtimepath even for parsers that were never
+          -- installed. `query.get` compiles the query against the parser, so in
+          -- that case it *throws* instead of returning nil - hence the pcall.
+          local function has_query(name)
+            local ok, query = pcall(vim.treesitter.query.get, lang, name)
+            return ok and query ~= nil
+          end
+          if has_query("highlights") and pcall(vim.treesitter.start, ev.buf, lang) then
+            if has_query("indents") then
               vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
             end
           end
