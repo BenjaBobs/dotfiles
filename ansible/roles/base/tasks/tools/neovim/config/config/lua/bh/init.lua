@@ -1,11 +1,30 @@
-require("bh.vim-vars")
-require("bh.windows")
-require("bh.clipboard")
-require("bh.undo")
-require("bh.insert-mode-tweaks")
-require("bh.rainbow-variables")
-require("bh.type-colors")
-require("bh.scroll-past-eof")
+------------------
+-- Everything under lua/bh/ is grouped by what it does when required:
+--
+--   core/     -- requiring it changes the editor: options, keymaps, autocmds
+--   lib/      -- pure and inert until called: colour, encoding, utils
+--   features/ -- on-demand tools with an API, each owning its own keymap
+--   plugins/  -- lazy.nvim specs, loaded by the import below
+--
+-- Only core/ and the feature keymaps need requiring up front; everything else
+-- is pulled in on first use.
+------------------
+
+for _, mod in ipairs({
+  "core.vim-vars",
+  "core.windows",
+  "core.clipboard",
+  "core.undo",
+  "core.insert-mode-tweaks",
+  "core.rainbow-variables",
+  "core.type-colors",
+  "core.scroll-past-eof",
+  -- Feature entry points: each binds its own key and loads the rest lazily.
+  "features.explain.keys",
+  "features.transform.keys",
+}) do
+  require("bh." .. mod)
+end
 
 --/telesco Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"

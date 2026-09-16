@@ -94,7 +94,7 @@ return {
     {
       "<leader>fo",
       function()
-        require("bh.buffer-picker").open()
+        require("bh.features.buffer-picker").open()
       end,
       desc = "[F]ind [O]pen Buffers",
     },

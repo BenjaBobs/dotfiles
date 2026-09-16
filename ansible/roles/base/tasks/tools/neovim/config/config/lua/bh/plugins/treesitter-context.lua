@@ -14,7 +14,7 @@ return {
   lazy = false,
   keys = {
     {
-      "<leader>cc",
+      "<leader>cC",
       function()
         local context = require("treesitter-context")
         context.toggle()

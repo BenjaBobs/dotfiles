@@ -1,8 +1,8 @@
 function filePathComponent()
-  return require("bh.utils").find_root_relative_buffer_dir()
+  return require("bh.lib.utils").find_root_relative_buffer_dir()
 
   -- local bufferDir = vim.fn.expand("%:p:h")
-  -- local projectDir = require("bh.utils").find_root_dir(bufferDir, { ".git", "package.json" })
+  -- local projectDir = require("bh.lib.utils").find_root_dir(bufferDir, { ".git", "package.json" })
   --
   -- if projectDir ~= nil then
   --   -- remove one extra level so we don't sub the root dir

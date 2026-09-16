@@ -12,21 +12,21 @@ return {
     {
       "<leader>rr",
       function()
-        require("bh.tasks").pick()
+        require("bh.features.tasks").pick()
       end,
       desc = "[R]un Project Task",
     },
     {
       "<leader>rl",
       function()
-        require("bh.overseer-float").toggle()
+        require("bh.features.overseer-float").toggle()
       end,
       desc = "[R]un Task [L]ist",
     },
     {
       "<leader>rc",
       function()
-        require("bh.tasks").run_custom()
+        require("bh.features.tasks").run_custom()
       end,
       desc = "[R]un [C]ustom Task",
     },
@@ -59,7 +59,7 @@ return {
           return task:get_bufnr() ~= nil
         end,
         run = function(task)
-          require("bh.overseer-float").open_output(task)
+          require("bh.features.overseer-float").open_output(task)
         end,
       },
     },
@@ -75,20 +75,20 @@ return {
         vim.wo[0].cursorline = true
         vim.bo[args.buf].buflisted = false
         vim.keymap.set("n", "q", function()
-          require("bh.overseer-float").close()
+          require("bh.features.overseer-float").close()
         end, { buffer = args.buf, silent = true, desc = "Close task modal" })
         vim.keymap.set("n", "<Esc>", function()
-          require("bh.overseer-float").close()
+          require("bh.features.overseer-float").close()
         end, { buffer = args.buf, silent = true, desc = "Close task modal" })
         vim.keymap.set("n", "p", function()
-          require("bh.overseer-float").toggle_preview()
+          require("bh.features.overseer-float").toggle_preview()
         end, { buffer = args.buf, silent = true, desc = "Toggle preview" })
       end,
     })
 
     vim.api.nvim_create_autocmd("VimResized", {
       callback = function()
-        require("bh.overseer-float").refresh()
+        require("bh.features.overseer-float").refresh()
       end,
     })
   end,

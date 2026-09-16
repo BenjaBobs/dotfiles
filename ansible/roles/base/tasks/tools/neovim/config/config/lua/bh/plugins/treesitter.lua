@@ -35,6 +35,7 @@ return {
         "markdown",
         "markdown_inline",
         "query",
+        "sql",
         "toml",
         "vim",
         "vimdoc",

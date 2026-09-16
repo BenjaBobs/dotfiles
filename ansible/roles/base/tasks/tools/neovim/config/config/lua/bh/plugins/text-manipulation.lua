@@ -1,6 +1,13 @@
 -- Node types considered "large blocks" for vertical swapping.
 -- Walks up the tree from the cursor to find the first matching ancestor
 -- that has a named sibling to swap with.
+--
+-- `true` means "any named sibling is a valid partner", which holds for the
+-- JS/TS shapes below: they sit in bodies where every sibling is another
+-- declaration. A table refines that, which SQL needs:
+--   parent     - only count as a block when the parent is one of these
+--   not_parent - never count as a block under one of these parents
+--   same_type  - only swap with a sibling of the same type
 local block_types = {
   -- Functions/methods
   function_declaration = true,
@@ -15,12 +22,101 @@ local block_types = {
   -- Declarations
   export_statement = true,
   lexical_declaration = true,
-  variable_declaration = true,
+  -- JS's `var x = 1`. C# reuses the name for the `int _b = 2` *inside* a
+  -- `field_declaration`, where the line you mean is the parent and the previous
+  -- sibling is the `private` modifier -- so the walk used to stop here and swap
+  -- a declaration with a modifier on the same row, which changes nothing and
+  -- reports nothing. Excluding those parents lets it reach the real block.
+  variable_declaration = {
+    not_parent = {
+      field_declaration = true,
+      event_field_declaration = true,
+      local_declaration_statement = true,
+      using_statement = true,
+      for_statement = true,
+    },
+  },
   -- Type members
   property_signature = true,
   property_definition = true,
   public_field_definition = true,
+
+  -- C#. The names barely overlap with the JS/TS ones above -- a method is
+  -- `method_definition` there and `method_declaration` here, parameters are
+  -- `formal_parameters` there and `parameter_list` here -- so before this block
+  -- the only C# node either table matched was `class_declaration`, which has no
+  -- sibling to swap with in a one-class-per-file codebase. That is why every
+  -- swap in a C# buffer answered "No swappable block found".
+  method_declaration = true,
+  constructor_declaration = true,
+  destructor_declaration = true,
+  property_declaration = true,
+  field_declaration = true,
+  event_field_declaration = true,
+  indexer_declaration = true,
+  operator_declaration = true,
+  delegate_declaration = true,
+  record_declaration = true,
+  struct_declaration = true,
+  namespace_declaration = true,
+  file_scoped_namespace_declaration = true,
+  using_directive = true,
+  -- Enum members are one per line in any enum big enough to reorder, so they go
+  -- on the vertical keys; that is also why `enum_member_declaration_list` is
+  -- absent from the inline table below, where it would be unreachable.
+  enum_member_declaration = true,
+  local_declaration_statement = true,
+
+  -- SQL. `statement` is both a top-level statement and the body of a CTE; only
+  -- the former has statements either side of it, so it is restricted to the
+  -- three containers that actually hold a list of them. That restriction is
+  -- also what lets the walk fall through to `cte` when the cursor is inside a
+  -- CTE body, which is the swap you want there.
+  statement = { parent = { program = true, block = true, transaction = true } },
+  -- The rest sit among siblings of other kinds -- a `cte` is followed by the
+  -- `select` that consumes it, a `join` by the `where` after it -- so each is
+  -- pinned to its own type rather than swapping across the boundary.
+  -- `cte` is deliberately absent: CTEs are comma-separated, and a line-based
+  -- swap cannot move a separator that belongs to the position rather than to
+  -- either node. The walk falls through to the enclosing `statement`, which
+  -- moves the whole `WITH ...` query -- safe, if blunter.
+  join = { same_type = true },
 }
+
+-- Whether `node` counts as a swappable block here, returning its rule (a
+-- possibly empty table) or nil.
+local function block_rule(node)
+  local rule = block_types[node:type()]
+  if rule == nil then
+    return nil
+  end
+  if rule == true then
+    return {}
+  end
+  if rule.parent or rule.not_parent then
+    local parent = node:parent()
+    if rule.parent and not (parent and rule.parent[parent:type()]) then
+      return nil
+    end
+    if rule.not_parent and parent and rule.not_parent[parent:type()] then
+      return nil
+    end
+  end
+  return rule
+end
+
+-- Siblings that are never the intended swap partner.
+--
+-- The comment case is the obvious one. The keyword case is SQL: its grammar
+-- makes every keyword a *named* node -- `keyword_from`, `keyword_as`, and 369
+-- others -- so "next named sibling" otherwise lands on a bare `AS` and swaps a
+-- statement with it.
+local function is_skippable_sibling(node)
+  local t = node:type()
+  -- `modifier` is C#'s `public`/`private`/`static`: a sibling of the thing you
+  -- are moving, never a swap partner for it.
+  return t:match("comment") ~= nil or t:match("^keyword_") ~= nil or t == "modifier"
+end
 
 -- Node types where sibling-swap is appropriate (small inline things)
 local inline_parent_types = {
@@ -36,6 +132,37 @@ local inline_parent_types = {
   array = true,
   object = true,
   enum_body = true,
+
+  -- C#: the comma-separated lists.
+  parameter_list = true,
+  argument_list = true,
+  type_parameter_list = true,
+  type_argument_list = true,
+  bracketed_parameter_list = true,
+  bracketed_argument_list = true,
+  attribute_argument_list = true,
+  attribute_list = true,
+  -- `new[] { 1, 2, 3 }` and `new Foo { A = 1, B = 2 }`
+  initializer_expression = true,
+  tuple_expression = true,
+
+  -- SQL: the comma-separated lists.
+  --
+  -- `order_by` and `column_definitions` are deliberately absent. sibling-swap
+  -- always works at the innermost sibling level, which inside `x DESC` is
+  -- `x`↔`DESC` and inside `id INT` is `id`↔`INT` -- it produces `ORDER BY DESC
+  -- x` and `INT id` rather than reordering across the commas. Declining is
+  -- better than corrupting, so the guard falls through to the block keys, which
+  -- move the whole statement. `group_by` has no such wrapper node and works.
+  select_expression = true,
+  list = true,
+  -- `UPDATE ... SET a = 1, b = 2` puts the assignments straight under `update`
+  -- with no `assignment_list` wrapper, so the walk has to recognise the item
+  -- itself rather than a container.
+  assignment = true,
+  assignment_list = true,
+  ordered_columns = true,
+  group_by = true,
 }
 
 local function is_inside_inline_context()
@@ -44,7 +171,7 @@ local function is_inside_inline_context()
     if inline_parent_types[node:type()] then
       return true
     end
-    if block_types[node:type()] then
+    if block_rule(node) then
       return false
     end
     node = node:parent()
@@ -65,11 +192,13 @@ end
 local function find_block_node(direction)
   local node = vim.treesitter.get_node()
   while node do
-    if block_types[node:type()] then
+    local rule = block_rule(node)
+    if rule then
       -- Only return this node if it has a sibling in the desired direction
       local sibling = direction == "next" and node:next_named_sibling() or node:prev_named_sibling()
-      -- Skip comments to find a real sibling
-      while sibling and sibling:type():match("comment") do
+      -- Skip comments, keywords and -- where the rule asks for it -- siblings of
+      -- another type, to find a real partner
+      while sibling and (is_skippable_sibling(sibling) or (rule.same_type and sibling:type() ~= node:type())) do
         sibling = direction == "next" and sibling:next_named_sibling() or sibling:prev_named_sibling()
       end
       if sibling then
@@ -90,6 +219,30 @@ local function get_range_with_comments(n)
     prev = prev:prev_named_sibling()
   end
   return sr, er
+end
+
+-- Does this node have its lines to itself?
+--
+-- Swapping is line-based, so a node that begins or ends part-way through a line
+-- drags its neighbours along: the first CTE in `WITH first AS (` starts after
+-- `WITH`, and swapping those lines carries the keyword off with it.
+--
+-- A trailing `;` is fine and a trailing `,` is not, which looks arbitrary but is
+-- the whole distinction: `;` *terminates* an item, so every item has one and it
+-- travels correctly. `,` *separates* them, so only the non-final items have one
+-- and it belongs to the position rather than the node -- swap the lines and the
+-- comma ends up after the last item.
+local function owns_its_lines(node)
+  local sr, sc, er, ec = node:range()
+  local first = vim.api.nvim_buf_get_lines(0, sr, sr + 1, false)[1] or ""
+  local last = vim.api.nvim_buf_get_lines(0, er, er + 1, false)[1] or ""
+  if first:sub(1, sc):match("%S") then
+    return false
+  end
+  if last:sub(ec + 1):match("[^%s;]") then
+    return false
+  end
+  return true
 end
 
 local function swap_block(direction)
@@ -117,6 +270,19 @@ local function swap_block(direction)
     top_sr, top_er, bot_sr, bot_er = a_sr, a_er, b_sr, b_er
   else
     top_sr, top_er, bot_sr, bot_er = b_sr, b_er, a_sr, a_er
+  end
+
+  -- Two nodes can share a line: consecutive CTEs both touch the `), ` that
+  -- separates them. This swap is line-based, so a shared line would be written
+  -- twice and destroy both nodes. Refuse rather than corrupt.
+  if top_er >= bot_sr then
+    vim.notify("Blocks share a line, cannot swap line-wise", vim.log.levels.WARN)
+    return
+  end
+
+  if not (owns_its_lines(node) and owns_its_lines(sibling)) then
+    vim.notify("Block does not own its lines, cannot swap line-wise", vim.log.levels.WARN)
+    return
   end
 
   local top_lines = vim.api.nvim_buf_get_lines(buf, top_sr, top_er + 1, false)

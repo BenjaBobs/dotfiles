@@ -597,7 +597,7 @@ function M.run(task)
     env = task.env,
     strategy = task.strategy,
     metadata = {
-      source = "bh.tasks",
+      source = "bh.features.tasks",
       kind = task.kind,
       scope = task.scope,
       action = task.action,
@@ -641,7 +641,7 @@ function M.run_custom()
       cmd = command,
       cwd = vim.fn.getcwd(),
       metadata = {
-        source = "bh.tasks",
+        source = "bh.features.tasks",
         kind = "custom",
         command = command,
       },

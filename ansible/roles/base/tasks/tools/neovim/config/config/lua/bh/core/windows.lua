@@ -10,10 +10,10 @@ keymap("n", "<C-A-Up>", "<C-w>k", { desc = "Move to the window above" })
 keymap("n", "<C-A-Down>", "<C-w>j", { desc = "Move to the window below" })
 keymap("n", "<C-A-Left>", "<C-w>h", { desc = "Move to the left window" })
 keymap("n", "<C-A-Right>", "<C-w>l", { desc = "Move to the right window" })
-keymap("n", "<A-S-Left>", "<C-W>>", { desc = "Increase window width" })
-keymap("n", "<A-S-Right>", "<C-W><", { desc = "Decrease window width" })
-keymap("n", "<A-S-Up>", "<C-W>+", { desc = "Increase window height" })
-keymap("n", "<A-S-Down>", "<C-W>-", { desc = "Decrease window height" })
+-- <A-S-Arrow> used to resize windows here. Those four keys are the treesitter
+-- swap bindings in bh/plugins/text-manipulation.lua, and lazy.nvim registers
+-- its key stubs during `lazy.setup()` -- which bh/init.lua runs *after* this
+-- file -- so the swaps won and the resize maps had no effect anyway.
 
 -- Highlight the current line, but only in the focused window. `cursorline` is
 -- window-local, so we default it on (for the first window) and toggle it off
