@@ -22,8 +22,23 @@ return {
       sections = {
         lualine_a = { "mode" },
         lualine_b = { "branch", "diff", "diagnostics" },
-        lualine_c = { "filename" },
-        lualine_x = { filePathComponent, "encoding", "filetype", "filesize" },
+        lualine_c = { filePathComponent },
+        lualine_x = {
+          -- Sits before the file info so a running test is the first thing on
+          -- that side of the bar. Inert until a test is actually run.
+          {
+            function()
+              return require("bh.features.test-status").lualine()
+            end,
+            color = function()
+              return require("bh.features.test-status").lualine_color()
+            end,
+          },
+          "filename",
+          "encoding",
+          "filetype",
+          "filesize",
+        },
         lualine_y = { "progress" },
         lualine_z = { "location" },
       },

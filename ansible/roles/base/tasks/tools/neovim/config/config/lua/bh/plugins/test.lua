@@ -1,3 +1,11 @@
+-- Every keymap here goes through bh.features.test-status rather than calling
+-- neotest directly. neotest's run() returns immediately and does the real work
+-- in a coroutine, so without a wrapper there is nothing between the keypress
+-- and, a minute later, a result. See that module for the whole story.
+local function test_status()
+  return require("bh.features.test-status")
+end
+
 return {
   "nvim-neotest/neotest",
   commit = "4e2cd42c4252ee9d2435571d9adcdbc1d47931fe",
@@ -31,42 +39,42 @@ return {
     {
       "<leader>tt",
       function()
-        require("neotest").run.run()
+        test_status().run_nearest()
       end,
       desc = "[T]est Nearest",
     },
     {
       "<leader>tf",
       function()
-        require("neotest").run.run(vim.fn.expand("%"))
+        test_status().run_file()
       end,
       desc = "Test [F]ile",
     },
     {
       "<leader>ta",
       function()
-        require("neotest").run.run(vim.uv.cwd())
+        test_status().run_all()
       end,
       desc = "Test [A]ll",
     },
     {
       "<leader>tl",
       function()
-        require("neotest").run.run_last()
+        test_status().run_last()
       end,
       desc = "Test [L]ast",
     },
     {
       "<leader>tw",
       function()
-        require("neotest").watch.toggle(vim.fn.expand("%"))
+        test_status().watch_file()
       end,
       desc = "Test [W]atch File",
     },
     {
       "<leader>tx",
       function()
-        require("neotest").run.stop()
+        test_status().stop()
       end,
       desc = "[X] Test Stop",
     },
@@ -91,10 +99,31 @@ return {
       end,
       desc = "Test Output [P]anel",
     },
+    {
+      -- The "why is nothing happening" key: adapters, what was discovered where,
+      -- what is running right now, and the last thing neotest tried to say.
+      "<leader>ti",
+      function()
+        test_status().report()
+      end,
+      desc = "Test [I]nfo / status",
+    },
+    {
+      "<leader>tg",
+      function()
+        test_status().open_log()
+      end,
+      desc = "Test Lo[g]",
+    },
   },
   config = function()
+    local status = require("bh.features.test-status")
+
     require("neotest").setup({
-      adapters = {
+      -- INFO rather than WARN: the log is the only record of why a discovery
+      -- came back empty, and <leader>tg exists to read it.
+      log_level = vim.log.levels.INFO,
+      adapters = vim.tbl_map(status.instrument, {
         -- Configured through vim.g.neotest_vstest, not call arguments.
         require("neotest-vstest"),
         require("neotest-vitest")({
@@ -108,13 +137,23 @@ return {
           end,
         }),
         require("neotest-zig")({}),
-      },
+      }),
+      consumers = status.consumers(),
       output = {
         open_on_run = "short",
       },
       quickfix = {
         open = false,
       },
+      status = {
+        -- Signs share the gutter with git and diagnostics, so the test state
+        -- can be the thing that loses. Virtual text puts the spinner on the
+        -- line you just ran, which is where you are already looking.
+        virtual_text = true,
+        signs = true,
+      },
     })
+
+    status.setup()
   end,
 }
