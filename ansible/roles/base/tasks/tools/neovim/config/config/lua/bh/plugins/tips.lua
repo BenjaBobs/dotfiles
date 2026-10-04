@@ -8,11 +8,8 @@ return {
       tag = "0.4.0",
       commit = "f535005e6ad1016383f24e39559833759453564e",
     },
-    {
-      "MeanderingProgrammer/render-markdown.nvim",
-      tag = "v8.12.0",
-      commit = "e3c18ddd27a853f85a6f513a864cf4f2982b9f26",
-    },
+    -- Version and rendering options are configured in markdown.lua.
+    "MeanderingProgrammer/render-markdown.nvim",
   },
   lazy = false, -- Load on startup for daily tip
   opts = {

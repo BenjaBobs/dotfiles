@@ -1,7 +1,7 @@
 return {
   "MeanderingProgrammer/render-markdown.nvim",
-  tag = "v8.12.0",
-  commit = "e3c18ddd27a853f85a6f513a864cf4f2982b9f26",
+  tag = "v8.14.0",
+  commit = "640a3ec6d538bad17c328be373c7cad0293d9589",
   -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
   -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
   dependencies = {
