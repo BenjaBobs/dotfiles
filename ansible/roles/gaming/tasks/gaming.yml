@@ -5,9 +5,6 @@
 
 - name: Gaming setup
   block:
-    - name: Enable multilib repository
-      include_tasks: multilib/enable.yml
-
     - name: Install gaming packages
       pacman:
         name: "{{ gaming_packages }}"

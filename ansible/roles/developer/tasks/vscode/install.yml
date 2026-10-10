@@ -5,6 +5,8 @@
   become: yes
   community.general.flatpak:
     name: com.visualstudio.code
+    method: system
+    remote: flathub
     state: present
 
 - name: Install VSCode extensions

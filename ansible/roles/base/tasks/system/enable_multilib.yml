@@ -1,0 +1,19 @@
+---
+# GPU drivers and gaming packages both require the 32-bit repository.
+- name: Ensure multilib uses the system mirror list
+  become: yes
+  community.general.ini_file:
+    path: /etc/pacman.conf
+    section: multilib
+    option: Include
+    value: /etc/pacman.d/mirrorlist
+    state: present
+    create: false
+    backup: true
+  register: multilib_config
+
+- name: Refresh package databases after enabling multilib
+  become: yes
+  community.general.pacman:
+    update_cache: yes
+  when: multilib_config.changed

@@ -5,6 +5,8 @@
   become: yes
   community.general.flatpak:
     name: com.vivaldi.Vivaldi
+    method: system
+    remote: flathub
     state: present
 
 # Note: Vivaldi settings are typically synced via Vivaldi account

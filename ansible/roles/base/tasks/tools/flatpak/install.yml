@@ -1,0 +1,9 @@
+---
+# Flatpak itself is installed with the base packages.
+- name: Ensure system-wide Flathub repository exists
+  become: yes
+  community.general.flatpak_remote:
+    name: flathub
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    method: system
+    state: present

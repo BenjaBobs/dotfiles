@@ -8,11 +8,17 @@
     - name: Install base packages and AUR helper
       include_tasks: system/install_base_packages.yml
 
+    - name: Enable multilib repository
+      include_tasks: system/enable_multilib.yml
+
     - name: Configure gpu hardware drivers
       include_tasks: system/gpu_drivers.yml
 
 - name: Common tools setup
   block:
+    - name: Setup Flatpak repository
+      include_tasks: tools/flatpak/install.yml
+
     - name: Setup Mise
       include_tasks: tools/mise/install.yml
 
