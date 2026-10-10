@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "name": "shell-local",
+    "version": "1.0.0",
+    "description": "Project-scoped development shell with disposable state"
+  },
+  "extends": "base/agent-linux-local",
+  "network": {
+    "block": false,
+    "network_profile": null
+  },
+  "environment": {
+    "allow_vars": [
+      "XDG_CONFIG_HOME",
+      "XDG_DATA_HOME",
+      "XDG_STATE_HOME",
+      "XDG_RUNTIME_DIR"
+    ]
+  }
+}

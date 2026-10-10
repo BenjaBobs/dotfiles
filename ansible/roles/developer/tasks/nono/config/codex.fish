@@ -13,7 +13,7 @@ function codex --description 'Codex under a task-scoped nono policy'
         return 1
     end
     set -lx TMPDIR "$session_tmp"
-    set -lx CODEX_HOME "$HOME/.local/state/sandbox-agents/codex"
+    set -lx CODEX_HOME "$HOME/.codex"
     set -lx XDG_CACHE_HOME "$session_tmp/cache"
     set -lx CARGO_HOME "$session_tmp/cargo"
     set -lx NUGET_PACKAGES "$session_tmp/nuget"
@@ -26,15 +26,9 @@ function codex --description 'Codex under a task-scoped nono policy'
         sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
         return 1
     end
-    # Refresh changed package wiring on the host before entering nono, then read launch arguments.
-    set -l bridge_args (command python3 "$nono_config/bridges/agent-bridge.py" prepare codex | string split0)
-    if test $pipestatus[1] -ne 0; or test (count $bridge_args) -eq 0
-        sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
-        return 1
-    end
-    # Keep credentials in the dedicated home; the sandbox cannot use the desktop keyring.
+    # Keep credentials in the standard home; the sandbox cannot use the desktop keyring.
     set -l credential_args -c 'cli_auth_credentials_store="file"'
-    command nono run --profile codex-local -- "$agent_bin" --no-daemon --sandbox danger-full-access -a never $credential_args $bridge_args $argv
+    command nono run --profile codex-local -- "$agent_bin" --no-daemon --sandbox danger-full-access -a never $credential_args $argv
     set -l run_status $status
     sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
     return $run_status

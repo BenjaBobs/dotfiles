@@ -5,11 +5,11 @@
   "meta": {
     "name": "codex-local",
     "version": "1.0.0",
-    "description": "Local Linux Codex policy with dedicated state and filtered networking"
+    "description": "Local Linux Codex policy with standard state and filtered networking"
   },
   "filesystem": {
     "allow": [
-      // Allow persistent dedicated Codex settings, history and authentication state; the agent can read/write it.
+      // Allow persistent Codex settings, history and authentication state; the agent can read/write it.
       "$CODEX_HOME",
       // The pack helper writes proposed grants here; installed profiles remain read-only and promotion is external.
       "$NONO_CONFIG/profile-drafts"
@@ -17,7 +17,7 @@
   },
   "environment": {
     "allow_vars": [
-      // Make Codex use the dedicated state directory selected by the launcher, rather than its ordinary home.
+      // Make Codex use the standard state directory selected by the launcher, rather than its ordinary home.
       "CODEX_HOME",
       // Make the upstream draft helper locate nono under the same configuration root as the launcher.
       "XDG_CONFIG_HOME"

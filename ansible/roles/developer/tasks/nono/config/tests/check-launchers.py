@@ -32,22 +32,12 @@ with tempfile.TemporaryDirectory(prefix="nono-launcher-check-", dir=os.environ.g
     nono.write_text(
         "#!/usr/bin/python3\n"
         "import json, os, pathlib, sys\n"
-        "keys = ('TMPDIR', 'CODEX_HOME', 'CLAUDE_CONFIG_DIR', 'CLAUDE_CODE_TMPDIR', 'XDG_RUNTIME_DIR')\n"
+        "keys = ('TMPDIR', 'CODEX_HOME', 'CLAUDE_CONFIG_DIR', 'CLAUDE_CODE_TMPDIR', 'XDG_RUNTIME_DIR', 'XDG_DATA_HOME', 'XDG_STATE_HOME')\n"
         "record = {'args': sys.argv[1:], 'env': {k: os.environ.get(k) for k in keys}}\n"
         "pathlib.Path(os.environ['NONO_TEST_CALL']).write_text(json.dumps(record))\n"
         "sys.exit(37)\n"
     )
     nono.chmod(0o700)
-
-    bridge_python = mock_bin / "python3"
-    bridge_python.write_text(
-        "#!/usr/bin/python3\n"
-        "import os, sys\n"
-        "assert sys.argv[2] == 'prepare'\n"
-        "if os.environ.get('NONO_TEST_FAILURE') == 'bridge': sys.exit(13)\n"
-        "sys.stdout.buffer.write(b'--bridge-test\\0multiline\\nquote \\\" ;$token\\0')\n"
-    )
-    bridge_python.chmod(0o700)
 
     env = os.environ.copy()
     env.update({
@@ -83,7 +73,7 @@ exit $status
 """
 
     for agent, profile in (("codex", "codex-local"), ("claude", "claude-local")):
-        for failure in ("", "agent", "setup", "mkdir", "bridge", "nono"):
+        for failure in ("", "agent", "setup", "mkdir", "nono"):
             for log in (call_log, cleanup_log, direct_log, setup_log):
                 log.unlink(missing_ok=True)
             env["NONO_TEST_FAILURE"] = failure
@@ -118,11 +108,10 @@ exit $status
                 assert args[:4] == ["run", "--profile", profile, "--"]
                 assert args[4] == str(mock_bin / agent)
                 assert args[-3:] == ["--model", "value with spaces", "literal;$token"]
-                assert args[-5:-3] == ["--bridge-test", 'multiline\nquote " ;$token']
                 assert "--allow-net" not in args
                 assert call["env"]["TMPDIR"] == str(session)
                 key = "CODEX_HOME" if agent == "codex" else "CLAUDE_CONFIG_DIR"
-                assert call["env"][key].endswith(f"/.local/state/sandbox-agents/{agent}")
+                assert call["env"][key].endswith(f"/.{agent}")
                 if agent == "claude":
                     assert call["env"]["CLAUDE_CODE_TMPDIR"] == str(session)
                     assert call["env"]["XDG_RUNTIME_DIR"] == str(session)
@@ -150,7 +139,7 @@ exit $status
         assert call['args'][:4] == ['run', '--profile', 'codex-local', '--']
         assert call['args'][-len(args):] == args
         assert 'cli_auth_credentials_store="file"' in call['args']
-        assert call['env']['CODEX_HOME'].endswith('/.local/state/sandbox-agents/codex')
+        assert call['env']['CODEX_HOME'].endswith('/.codex')
     print('codex: login, device login, status, help and version all routed through nono')
 
     for subcommand in ('login', 'status', 'logout'):
@@ -171,3 +160,36 @@ exit $status
         if subcommand == 'login':
             assert args[args.index('--listen-port') + 1] == '0'
     print('claude: auth commands stay sandboxed; callback listener granted only for auth login')
+
+    (mock_bin / "fish").symlink_to(FISH)
+    shell_harness = harness.replace(
+        "$argv[2] --model 'value with spaces' 'literal;$token'",
+        "$argv[2] -c 'printf \"value with spaces; $literal\"'",
+    )
+    for failure in ("", "setup", "mkdir", "nono"):
+        for log in (call_log, cleanup_log, direct_log, setup_log):
+            log.unlink(missing_ok=True)
+        env["NONO_TEST_FAILURE"] = failure
+        if failure == "nono":
+            nono.rename(mock_bin / "nono-disabled")
+        try:
+            result = subprocess.run(
+                [FISH, "--no-config", "-c", shell_harness, str(ROOT / "sandbox.fish"), "sandbox"],
+                env=env, capture_output=True, text=True,
+            )
+        finally:
+            if failure == "nono":
+                (mock_bin / "nono-disabled").rename(nono)
+        assert result.returncode == (37 if not failure else 127 if failure == "nono" else 1), (failure, result.stderr)
+        assert call_log.exists() == (not failure), failure
+        assert cleanup_log.exists() == (failure != "setup"), failure
+        if not failure:
+            call = json.loads(call_log.read_text())
+            assert call["args"] == [
+                "run", "--profile", "shell-local", "--allow-net", "--", "/usr/bin/env",
+                f"XDG_CONFIG_HOME={session}/config", f"XDG_DATA_HOME={session}/data",
+                f"XDG_STATE_HOME={session}/state", f"XDG_RUNTIME_DIR={session}/runtime",
+                str(mock_bin / "fish"),
+                "--no-config", "--interactive", "-c", 'printf "value with spaces; $literal"',
+            ], call
+    print("sandbox: shell routing, arguments, disposable state, cleanup and failure checks passed")

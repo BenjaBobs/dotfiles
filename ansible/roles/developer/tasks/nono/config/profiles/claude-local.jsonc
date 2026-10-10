@@ -5,15 +5,19 @@
   "meta": {
     "name": "claude-local",
     "version": "1.0.0",
-    "description": "Linux Claude Code with dedicated subscription state"
+    "description": "Linux Claude Code with standard subscription state"
   },
   "filesystem": {
-    // The launcher selects the matching CLAUDE_CONFIG_DIR before capabilities are prepared.
-    // Persist dedicated settings, plugins, history and subscription credentials; the agent can read/write them.
+    // The launcher selects the standard Claude configuration directory.
+    // Persist settings, plugins, history and subscription credentials; the agent can read/write them.
     "allow": [
-      "$XDG_STATE_HOME/sandbox-agents/claude",
+      "$HOME/.claude",
       // Permit the package's persistent-fix workflow to draft grants; promotion remains outside the sandbox.
       "$NONO_CONFIG/profile-drafts"
+    ],
+    "allow_file": [
+      // Standard-home Claude stores global preferences and login metadata beside its directory.
+      "$HOME/.claude.json"
     ],
     "unix_socket_dir_bind": [
       // Claude uses PID-named sockets; allow connect/bind only in the disposable session directory.
@@ -38,13 +42,11 @@
   "environment": {
     // Shared runtime variables are inherited additively; no API-key or cloud-credential wildcards.
     "allow_vars": [
-      // Retain the state root used to derive the exact dedicated Claude directory; the root itself is not granted.
-      "XDG_STATE_HOME",
       // Direct Claude's runtime sockets to the launcher's disposable session root.
       "XDG_RUNTIME_DIR",
       // Retain the configuration root when the package guidance prepares a nono profile draft.
       "XDG_CONFIG_HOME",
-      // Make Claude use its dedicated settings, plugins, history and subscription-credential directory.
+      // Make Claude use its settings, plugins, history and subscription-credential directory.
       "CLAUDE_CONFIG_DIR",
       // Direct Claude internal temporary files into the same session directory used by the filesystem grant.
       "CLAUDE_CODE_TMPDIR",

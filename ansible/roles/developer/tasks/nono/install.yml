@@ -19,15 +19,6 @@
           - nono_config_home is match('^/')
         fail_msg: "nono requires Linux, a configured architecture checksum and an absolute config home."
 
-    - name: Verify bridge Python requirement
-      ansible.builtin.command:
-        argv:
-          - /usr/bin/python3
-          - -c
-          - "import sys; assert sys.version_info >= (3, 11), 'nono bridges require Python >= 3.11'"
-      changed_when: false
-      when: not ansible_check_mode
-
     - name: Create user-owned nono installation directories
       ansible.builtin.file:
         path: "{{ item }}"
@@ -40,11 +31,10 @@
         - "{{ nono_config_home }}/nono/profiles/base"
         - "{{ nono_config_home }}/nono/profiles/support"
         - "{{ nono_config_home }}/nono/hooks"
-        - "{{ nono_config_home }}/nono/bridges"
         - "{{ nono_config_home }}/nono/profile-drafts"
         - "{{ nono_config_home }}/fish/functions"
-        - "{{ nono_user_home }}/.local/state/sandbox-agents/codex"
-        - "{{ nono_user_home }}/.local/state/sandbox-agents/claude"
+        - "{{ nono_user_home }}/.codex"
+        - "{{ nono_user_home }}/.claude"
 
     - name: Download the pinned official nono release
       ansible.builtin.get_url:
@@ -112,7 +102,7 @@
       loop_control:
         label: "{{ item.path | relpath(nono_source_dir ~ '/profiles') }}"
 
-    - name: Copy nono hooks, bridge and fish launchers
+    - name: Copy nono hooks and fish launchers
       ansible.builtin.copy:
         src: "{{ nono_source_dir }}/{{ item.src }}"
         dest: "{{ nono_config_home }}/{{ item.dest }}"
@@ -122,9 +112,9 @@
       loop:
         - { src: hooks/tmp-setup.sh, dest: nono/hooks/tmp-setup.sh }
         - { src: hooks/tmp-cleanup.sh, dest: nono/hooks/tmp-cleanup.sh }
-        - { src: bridges/agent-bridge.py, dest: nono/bridges/agent-bridge.py }
         - { src: codex.fish, dest: fish/functions/codex.fish }
         - { src: claude.fish, dest: fish/functions/claude.fish }
+        - { src: sandbox.fish, dest: fish/functions/sandbox.fish }
 
     - name: Check installed signed packages
       ansible.builtin.stat:
