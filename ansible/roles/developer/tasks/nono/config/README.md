@@ -14,11 +14,11 @@ ansible/roles/developer/tasks/nono/config/
 ├── profiles/
 │   ├── codex-local.jsonc
 │   ├── claude-local.jsonc
-│   └── base/
-│       ├── agent-linux-base.jsonc
-│       ├── agent-linux-local.jsonc
-│       └── support/
-│           └── support-*.jsonc
+│   ├── base/
+│   │   ├── agent-linux-base.jsonc
+│   │   └── agent-linux-local.jsonc
+│   └── support/
+│       └── support-*.jsonc
 ├── codex.fish
 ├── claude.fish
 ├── hooks/
@@ -79,7 +79,7 @@ Back up the existing Codex and Claude profiles, temporary hooks and any fish def
 ```sh
 nono_config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 mkdir -p "$nono_config_home/nono/profiles" "$nono_config_home/nono/hooks" "$nono_config_home/nono/bridges" "$nono_config_home/fish/functions"
-cp ansible/roles/developer/tasks/nono/config/profiles/*.jsonc ansible/roles/developer/tasks/nono/config/profiles/base/*.jsonc ansible/roles/developer/tasks/nono/config/profiles/base/support/*.jsonc "$nono_config_home/nono/profiles/"
+cp -R ansible/roles/developer/tasks/nono/config/profiles/. "$nono_config_home/nono/profiles/"
 cp ansible/roles/developer/tasks/nono/config/hooks/tmp-setup.sh "$nono_config_home/nono/hooks/tmp-setup.sh"
 cp ansible/roles/developer/tasks/nono/config/hooks/tmp-cleanup.sh "$nono_config_home/nono/hooks/tmp-cleanup.sh"
 cp ansible/roles/developer/tasks/nono/config/bridges/agent-bridge.py "$nono_config_home/nono/bridges/agent-bridge.py"
@@ -96,8 +96,9 @@ Leave registry-managed nono package files unchanged.
 Install the relevant signed packages as described in [bridge setup](bridges/INSTALL.md).
 The wrappers automatically create or refresh their dedicated-home bridge before entering nono.
 The launchers now require the bridges and Python 3.11 or newer whenever their agent executable is present.
-The source hierarchy is flattened on installation because nono 0.79's inheritance resolver expects these bare profile names in the user profile directory.
-Copy the JSONC files as shown above rather than recursively copying `profiles/`.
+Installation preserves `profiles/base/` and `profiles/support/`. Inheritance uses
+`base/…` and `support/…` references, verified with nono 0.79.0. Older flat copies
+of these fragments are no longer used; review and remove them separately.
 
 On first interactive launch, run `codex` and select **Sign in with Device Code**.
 Open the displayed URL in your browser and enter the code. Alternatively, run
@@ -119,21 +120,21 @@ Do not restore `--allow-net`, which overrides the profile's network filtering in
 ## Compose tool support
 
 Edit the `extends` array in [profiles/base/agent-linux-local.jsonc](profiles/base/agent-linux-local.jsonc) to select support shared by both agents.
-Keep `agent-linux-base` first and add the support profiles needed in that environment.
+Keep `base/agent-linux-base` first and add the support profiles needed in that environment.
 For example, a Python and .NET environment can use:
 
 ```json
 "extends": [
-  "agent-linux-base",
-  "support-python",
-  "support-dotnet",
-  "support-git",
-  "support-mise"
+  "base/agent-linux-base",
+  "support/support-python",
+  "support/support-dotnet",
+  "support/support-git",
+  "support/support-mise"
 ]
 ```
 
 The current selection retains all tool support from the earlier configuration.
-Each support profile has its own file under [profiles/base/support/](profiles/base/support/):
+Each support profile has its own file under [profiles/support/](profiles/support/):
 
 | Profile | Explicit support |
 | --- | --- |
@@ -155,9 +156,9 @@ Host installations remain read-only and disposable caches remain under the launc
 The launchers still prepare Cargo and .NET cache locations, but only selected support profiles admit their environment variables.
 Mise is now selected through `support-mise`, with no separate `--extends mise-dev` hidden in the launchers.
 
-To give the agents different tool sets, replace their `extends: "agent-linux-local"` with arrays selecting `agent-linux-base` and their respective support profiles.
+To give the agents different tool sets, replace their `extends: "base/agent-linux-local"` with arrays selecting `base/agent-linux-base` and their respective support profiles.
 Keep the agent-specific state and network declarations in their existing files.
-Install all selected profiles in the same user profile directory, then inspect the composed result with `nono profile show codex-local --json` or `nono profile show claude-local --json`.
+Preserve the profile directory structure, then inspect the composed result with `nono profile show codex-local --json` or `nono profile show claude-local --json`.
 Named user-profile lookup supports these JSONC files in the reviewed version.
 
 ## Command names

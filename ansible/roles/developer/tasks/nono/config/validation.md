@@ -9,7 +9,7 @@ and `bootstrap.sh` passed `bash -n`.
 
 Official 0.79.0 Linux archive names and SHA-256 hashes were checked against the
 release assets. Deployment pins those hashes and the previously tested signed
-package versions, copies configuration with backups, flattens profile names and
+package versions, copies configuration with backups, preserves profile directories and
 refuses conflicting JSON profiles. It preserves existing packages and unrelated
 configuration. Claude authentication remains a manual step outside nono;
 Codex login runs inside nono using device-code authentication as described below.
@@ -18,6 +18,14 @@ A disposable Ansible execution test could not run because the enclosing nono
 sandbox denied `/dev/shm`, which Ansible multiprocessing requires. Deployment
 idempotence and a real installation therefore remain unverified. No live config,
 system packages or agent authentication were changed during implementation.
+
+## Nested profile installation
+
+Profiles retain sibling `base/` and `support/` directories on deployment.
+Both agent profiles resolved and passed dry runs with nono 0.79.0 in a disposable
+configuration root. Their composed policies matched the flat layout after
+excluding the changed `extends` references. Ansible syntax and the launcher
+and bridge fixture checks passed. Existing flat fragments are left for review.
 
 ## Policy validation
 
@@ -96,7 +104,7 @@ Both concrete profiles also passed nono's named-profile resolution after annotat
 
 ## Profile folders
 
-Agent profiles now live in `profiles/`, shared Linux profiles in `profiles/base/`, and tool support in `profiles/base/support/`.
+Agent profiles now live in `profiles/`, shared Linux profiles in `profiles/base/`, and tool support in `profiles/support/`.
 All 14 profile files were moved without changing their contents.
 The installation procedure copies all three source levels into one user profile directory, preserving bare-name inheritance supported by nono 0.79.
 Both concrete profiles resolved successfully and passed policy dry runs using that installation layout.

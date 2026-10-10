@@ -7,24 +7,24 @@
   },
   "extends": [
     // Always retain the common Linux isolation, credential denials and exact temporary-directory grant.
-    "agent-linux-base",
+    "base/agent-linux-base",
     // Select .NET CLI tools, NuGet reads and the .NET session-state variables.
-    "support-dotnet",
+    "support/support-dotnet",
     // Select installed Rust/Cargo executables and disposable Cargo state.
-    "support-rust",
+    "support/support-rust",
     // Select the upstream Python runtime grants.
-    "support-python",
+    "support/support-python",
     // Select Node runtime grants and read-only pnpm storage.
-    "support-node",
+    "support/support-node",
     // Select upstream access needed by installed Nix tools.
-    "support-nix",
+    "support/support-nix",
     // Select host Git settings used for project operations.
-    "support-git",
+    "support/support-git",
     // Select the mise manager and installed tool versions without a launcher-only extension.
-    "support-mise",
+    "support/support-mise",
     // Retain the supplied Neovim runtime access; omit if editor use is unnecessary.
-    "support-editor",
+    "support/support-editor",
     // Retain the supplied Stride installation access; writable state remains unconfigured.
-    "support-stride"
+    "support/support-stride"
   ]
 }

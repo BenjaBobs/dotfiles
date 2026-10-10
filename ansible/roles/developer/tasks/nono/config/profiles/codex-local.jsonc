@@ -1,7 +1,7 @@
 {
   // Concrete Codex state, authentication and network policy; do not override filtering with --allow-net.
   // Share the selected Linux/tool support while keeping Codex state specific to this profile.
-  "extends": "agent-linux-local",
+  "extends": "base/agent-linux-local",
   "meta": {
     "name": "codex-local",
     "version": "1.0.0",

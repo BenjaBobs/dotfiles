@@ -1,7 +1,7 @@
 {
   // Share Linux restrictions without inheriting a registry profile's writable host state.
   // Share the selected Linux/tool support while keeping Claude state and destinations separate.
-  "extends": "agent-linux-local",
+  "extends": "base/agent-linux-local",
   "meta": {
     "name": "claude-local",
     "version": "1.0.0",

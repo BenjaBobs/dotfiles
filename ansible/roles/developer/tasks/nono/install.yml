@@ -37,6 +37,8 @@
         - "{{ nono_user_home }}/.local/bin"
         - "{{ nono_download_dir }}"
         - "{{ nono_config_home }}/nono/profiles"
+        - "{{ nono_config_home }}/nono/profiles/base"
+        - "{{ nono_config_home }}/nono/profiles/support"
         - "{{ nono_config_home }}/nono/hooks"
         - "{{ nono_config_home }}/nono/bridges"
         - "{{ nono_config_home }}/nono/profile-drafts"
@@ -69,47 +71,46 @@
         follow: false
       when: not ansible_check_mode
 
-    - name: Find source profiles for flat installation
+    - name: Find source profiles for installation
       ansible.builtin.find:
         paths: "{{ nono_source_dir }}/profiles"
         patterns: '*.jsonc'
         recurse: true
       register: nono_profiles
 
-    - name: Verify profile sources and unique destination names
+    - name: Verify profile sources
       ansible.builtin.assert:
         that:
           - nono_profiles.matched > 0
-          - (nono_profiles.files | map(attribute='path') | map('basename') | list | length) == (nono_profiles.files | map(attribute='path') | map('basename') | unique | list | length)
-        fail_msg: "nono source profiles are missing or have duplicate basenames."
+        fail_msg: "nono source profiles are missing."
 
     - name: Check for JSON profiles shadowing managed JSONC profiles
       ansible.builtin.stat:
-        path: "{{ nono_config_home }}/nono/profiles/{{ item.path | basename | regex_replace('\\.jsonc$', '.json') }}"
+        path: "{{ nono_config_home }}/nono/profiles/{{ item.path | relpath(nono_source_dir ~ '/profiles') | regex_replace('\\.jsonc$', '.json') }}"
       loop: "{{ nono_profiles.files }}"
       loop_control:
-        label: "{{ item.path | basename }}"
+        label: "{{ item.path | relpath(nono_source_dir ~ '/profiles') }}"
       register: nono_profile_conflicts
 
     - name: Require review of shadowing JSON profiles
       ansible.builtin.assert:
         that: not item.stat.exists
-        fail_msg: "Back up and move aside {{ nono_config_home }}/nono/profiles/{{ item.item.path | basename | regex_replace('\\.jsonc$', '.json') }} before deploying its managed JSONC counterpart."
+        fail_msg: "Back up and move aside {{ nono_config_home }}/nono/profiles/{{ item.item.path | relpath(nono_source_dir ~ '/profiles') | regex_replace('\\.jsonc$', '.json') }} before deploying its managed JSONC counterpart."
       loop: "{{ nono_profile_conflicts.results }}"
       loop_control:
-        label: "{{ item.item.path | basename }}"
+        label: "{{ item.item.path | relpath(nono_source_dir ~ '/profiles') }}"
 
     # Copies keep edits in an agent-writable checkout from changing installed policy.
-    - name: Copy profiles into the flat nono profile directory
+    - name: Copy profiles preserving their directory structure
       ansible.builtin.copy:
         src: "{{ item.path }}"
-        dest: "{{ nono_config_home }}/nono/profiles/{{ item.path | basename }}"
+        dest: "{{ nono_config_home }}/nono/profiles/{{ item.path | relpath(nono_source_dir ~ '/profiles') }}"
         mode: '0644'
         backup: true
         follow: false
       loop: "{{ nono_profiles.files }}"
       loop_control:
-        label: "{{ item.path | basename }}"
+        label: "{{ item.path | relpath(nono_source_dir ~ '/profiles') }}"
 
     - name: Copy nono hooks, bridge and fish launchers
       ansible.builtin.copy:
