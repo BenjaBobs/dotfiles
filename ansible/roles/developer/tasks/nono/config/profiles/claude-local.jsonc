@@ -15,6 +15,10 @@
       // Permit the package's persistent-fix workflow to draft grants; promotion remains outside the sandbox.
       "$NONO_CONFIG/profile-drafts"
     ],
+    "unix_socket_dir_bind": [
+      // Claude uses PID-named sockets; allow connect/bind only in the disposable session directory.
+      "$TMPDIR/cc-socks"
+    ],
     "read": [
       // The native launcher in ~/.local/bin resolves into this installation directory.
       "$HOME/.local/share/claude",
@@ -25,13 +29,19 @@
   "network": {
     // Supply Claude's API/service destinations separately from Codex and without unrestricted --allow-net.
     // Inspect the resolved upstream destination policy; this is not an API-only allowlist.
-    "network_profile": "claude-code"
+    "network_profile": "claude-code",
+    "allow_domain": [
+      // Observed startup denial; official plugin executables and native version/download service.
+      "downloads.claude.ai"
+    ]
   },
   "environment": {
     // Shared runtime variables are inherited additively; no API-key or cloud-credential wildcards.
     "allow_vars": [
       // Retain the state root used to derive the exact dedicated Claude directory; the root itself is not granted.
       "XDG_STATE_HOME",
+      // Direct Claude's runtime sockets to the launcher's disposable session root.
+      "XDG_RUNTIME_DIR",
       // Retain the configuration root when the package guidance prepares a nono profile draft.
       "XDG_CONFIG_HOME",
       // Make Claude use its dedicated settings, plugins, history and subscription-credential directory.

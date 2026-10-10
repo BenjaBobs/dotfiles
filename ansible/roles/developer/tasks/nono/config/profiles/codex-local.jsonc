@@ -27,10 +27,15 @@
     // Use nono's Codex destination policy; its full allowlist is broader than the additions below.
     "network_profile": "codex",
     "allow_domain": [
+      // Device-code login requests and token exchange; URL-opening permission alone does not allow HTTPS.
+      "auth.openai.com",
       // Retain the supplied ChatGPT service/authentication destination; actual runtime need is unverified.
       "chatgpt.com",
       // Retain the supplied ancillary destination pending runtime verification of its need.
-      "ab.chatgpt.com"
+      "ab.chatgpt.com",
+      // Observed content-download denials; restrict to these regional hosts rather than the whole CDN.
+      "sdmntprsouthcentralus.oaiusercontent.com",
+      "sdmntprcentralus.oaiusercontent.com"
     ]
   },
   "open_urls": {

@@ -32,7 +32,9 @@ function codex --description 'Codex under a task-scoped nono policy'
         sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
         return 1
     end
-    command nono run --profile codex-local -- "$agent_bin" --no-daemon --sandbox danger-full-access -a never $bridge_args $argv
+    # Keep credentials in the dedicated home; the sandbox cannot use the desktop keyring.
+    set -l credential_args -c 'cli_auth_credentials_store="file"'
+    command nono run --profile codex-local -- "$agent_bin" --no-daemon --sandbox danger-full-access -a never $credential_args $bridge_args $argv
     set -l run_status $status
     sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
     return $run_status

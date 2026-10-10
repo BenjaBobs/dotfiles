@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix="nono-launcher-check-", dir=os.environ.g
     nono.write_text(
         "#!/usr/bin/python3\n"
         "import json, os, pathlib, sys\n"
-        "keys = ('TMPDIR', 'CODEX_HOME', 'CLAUDE_CONFIG_DIR', 'CLAUDE_CODE_TMPDIR')\n"
+        "keys = ('TMPDIR', 'CODEX_HOME', 'CLAUDE_CONFIG_DIR', 'CLAUDE_CODE_TMPDIR', 'XDG_RUNTIME_DIR')\n"
         "record = {'args': sys.argv[1:], 'env': {k: os.environ.get(k) for k in keys}}\n"
         "pathlib.Path(os.environ['NONO_TEST_CALL']).write_text(json.dumps(record))\n"
         "sys.exit(37)\n"
@@ -125,4 +125,49 @@ exit $status
                 assert call["env"][key].endswith(f"/.local/state/sandbox-agents/{agent}")
                 if agent == "claude":
                     assert call["env"]["CLAUDE_CODE_TMPDIR"] == str(session)
+                    assert call["env"]["XDG_RUNTIME_DIR"] == str(session)
+                    assert '--listen-port' not in args
+                else:
+                    assert 'cli_auth_credentials_store="file"' in args
         print(f"{agent}: routing, arguments, exit status, cleanup and failure checks passed")
+
+    auth_harness = harness.replace(
+        "$argv[2] --model 'value with spaces' 'literal;$token'",
+        "$argv[2] $argv[3..-1]",
+    )
+    for args in (['login'], ['login', '--device-auth'], ['login', 'status'], ['--help'], ['--version']):
+        for log in (call_log, cleanup_log, direct_log, setup_log):
+            log.unlink(missing_ok=True)
+        env['NONO_TEST_FAILURE'] = ''
+        result = subprocess.run(
+            [FISH, '--no-config', '-c', auth_harness, str(ROOT / 'codex.fish'), 'codex', *args],
+            env=env, capture_output=True, text=True,
+        )
+        assert result.returncode == 37, (args, result.stderr)
+        assert not direct_log.exists(), 'Authentication bypassed nono'
+        assert cleanup_log.exists(), args
+        call = json.loads(call_log.read_text())
+        assert call['args'][:4] == ['run', '--profile', 'codex-local', '--']
+        assert call['args'][-len(args):] == args
+        assert 'cli_auth_credentials_store="file"' in call['args']
+        assert call['env']['CODEX_HOME'].endswith('/.local/state/sandbox-agents/codex')
+    print('codex: login, device login, status, help and version all routed through nono')
+
+    for subcommand in ('login', 'status', 'logout'):
+        for log in (call_log, cleanup_log, direct_log, setup_log):
+            log.unlink(missing_ok=True)
+        result = subprocess.run(
+            [FISH, '--no-config', '-c', auth_harness, str(ROOT / 'claude.fish'), 'claude', 'auth', subcommand],
+            env=env, capture_output=True, text=True,
+        )
+        assert result.returncode == 37, (subcommand, result.stderr)
+        assert not direct_log.exists(), 'Claude authentication bypassed nono'
+        assert cleanup_log.exists(), subcommand
+        call = json.loads(call_log.read_text())
+        args = call['args']
+        assert args[:3] == ['run', '--profile', 'claude-local']
+        assert args[args.index('--') + 1:] == [str(mock_bin / 'claude'), 'auth', subcommand]
+        assert ('--listen-port' in args) == (subcommand == 'login')
+        if subcommand == 'login':
+            assert args[args.index('--listen-port') + 1] == '0'
+    print('claude: auth commands stay sandboxed; callback listener granted only for auth login')

@@ -155,6 +155,7 @@
           Run this playbook outside nono to deploy reviewed changes.
           Ensure ~/.local/bin is on PATH, remove conflicting fish aliases from
           startup/local_config.fish, and open a fresh fish shell.
-          Prepare dedicated agent authentication outside nono; see ansible/roles/developer/tasks/nono/config/README.md.
+          Select Device Code when Codex prompts for login; Claude login
+          setup is described in ansible/roles/developer/tasks/nono/config/README.md.
           Signed package pulls also apply upstream wiring to ordinary agent homes.
           Existing packages, credentials and unrelated config files are preserved.

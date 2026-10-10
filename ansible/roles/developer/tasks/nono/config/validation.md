@@ -11,7 +11,8 @@ Official 0.79.0 Linux archive names and SHA-256 hashes were checked against the
 release assets. Deployment pins those hashes and the previously tested signed
 package versions, copies configuration with backups, flattens profile names and
 refuses conflicting JSON profiles. It preserves existing packages and unrelated
-configuration. Authentication remains a manual step outside nono.
+configuration. Claude authentication remains a manual step outside nono;
+Codex login runs inside nono using device-code authentication as described below.
 
 A disposable Ansible execution test could not run because the enclosing nono
 sandbox denied `/dev/shm`, which Ansible multiprocessing requires. Deployment
@@ -137,3 +138,45 @@ An unchanged preparation preserved settings and metadata modification times and 
 Checks confirmed preservation of unrelated settings, refusal of unsupported destinations and conflicting paths, and failure when packages are missing or an unchanged Claude plugin is deliberately disabled.
 Both launcher checks and fish syntax checks passed with the new action, retaining failure cleanup and the early absent-agent behavior.
 No sandbox profiles or live configuration were changed by this update.
+
+## Codex device-code login
+
+A user-run device-code attempt reported a denied HTTPS request to
+`auth.openai.com/api/accounts/deviceauth/usercode`. The concrete Codex profile
+now explicitly allows `auth.openai.com`; its URL-opening declaration did not
+provide network access. The launcher routes login through nono and selects file
+credential storage in the dedicated home, avoiding desktop keyring access.
+No desktop-bus, additional filesystem or callback-listener grants were added.
+
+Launcher fixtures cover normal launch and login/device login/status/help/version
+commands, verifying argument preservation, cleanup and routing through nono.
+Completing real device-code authentication still requires an end-to-end check.
+No live credentials were read or changed.
+
+Subsequent user-run Codex sessions reported HTTPS denials for
+`sdmntprsouthcentralus.oaiusercontent.com` and
+`sdmntprcentralus.oaiusercontent.com`. These two specific content hosts were added
+to the Codex allowlist; no wildcard for `*.oaiusercontent.com` was added.
+The exact requests and asset types were not inspected.
+
+## Claude callback listener
+
+The installed Claude 2.1.296 failed before presenting its manual-code fallback
+because binding the OAuth callback server to `127.0.0.1:0` was denied. The wrapper
+now adds `--listen-port 0` only for `claude auth login`, permitting a kernel-assigned
+callback port while keeping authentication inside nono. Other auth commands and
+regular sessions retain their existing port restrictions. Auth subcommands omit
+the bridge's interactive system-prompt arguments.
+
+Nono 0.79 accepted this grant in a disposable `claude-local` policy dry run.
+Fixture checks verify the grant is limited to auth login and that authentication
+still routes through nono. The enclosing sandbox denied execution of the native
+Claude binary, so a completed real login remains unverified.
+
+The user's subsequent diagnostic reported a bind denial for a PID-named socket
+under `$TMPDIR/cc-socks` and a blocked request to `downloads.claude.ai`. Claude's
+launcher now selects the session root as `XDG_RUNTIME_DIR` and creates `cc-socks`
+before entering nono. Its profile grants `unix_socket_dir_bind` only to that
+session directory and allows the documented download hostname. The host
+`/run/systemd/resolve/io.systemd.Resolve` socket remains ungranted: the diagnostic
+alone, with exit status 0, did not establish a DNS failure requiring host access.

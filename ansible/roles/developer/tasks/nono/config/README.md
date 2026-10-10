@@ -35,12 +35,23 @@ nono and deploys these files through the system setup playbook. Run from the rep
 ./bootstrap.sh dev
 ```
 
+To deploy only nono using the same installation task:
+
+```sh
+bash ansible/roles/developer/tasks/nono/install.sh
+```
+
+This also checks dependencies and installs missing signed packages. Replaced
+config files are backed up. Run it outside nono; it asks for your sudo password
+for package dependencies. Additional Ansible arguments such as `--check --diff`
+can be passed to the script.
+
 Run deployment from an ordinary terminal outside nono. The task installs the
 checksum-verified official nono 0.79.0 binary into `~/.local/bin`, plus Python,
 fish and `jq`. Ensure `~/.local/bin` is on PATH. Missing signed packages are pulled
 at the tested Codex 0.2.3 and Claude 0.1.4 versions; existing packages are preserved.
 Package pulls also apply upstream wiring to ordinary agent homes. Back up their
-settings before the first installation; authentication is not copied or automated.
+settings before the first installation; existing authentication is not copied.
 The agent executables themselves are installed separately.
 
 Configuration is copied, with backups of replaced files, rather than symlinked:
@@ -88,8 +99,17 @@ The launchers now require the bridges and Python 3.11 or newer whenever their ag
 The source hierarchy is flattened on installation because nono 0.79's inheritance resolver expects these bare profile names in the user profile directory.
 Copy the JSONC files as shown above rather than recursively copying `profiles/`.
 
-Before using the launcher, prepare `~/.local/state/sandbox-agents/codex` with the intended Codex configuration and authentication outside the sandbox.
-The launcher selects this dedicated home and does not copy the normal Codex home's credentials, plugins or history.
+On first interactive launch, run `codex` and select **Sign in with Device Code**.
+Open the displayed URL in your browser and enter the code. Alternatively, run
+`codex login --device-auth`. All Codex commands, including login, run inside nono.
+The profile allows HTTPS to `auth.openai.com` for device-code authentication.
+Credentials use file storage in `~/.local/state/sandbox-agents/codex`, so no desktop
+keyring access is needed. Later launches reuse that login. Device-code login avoids
+the browser callback listener and does not require desktop-bus access.
+Device-code login must be enabled in your ChatGPT account or workspace settings.
+Noninteractive workloads require a saved login.
+Transfer intended Codex configuration separately. The launcher does not copy the
+normal Codex home's credentials, plugins or history.
 This dedicated state remains persistent and writable by the agent.
 
 Start a fresh fish shell after installing the functions.
@@ -163,14 +183,21 @@ python3 ansible/roles/developer/tasks/nono/config/tests/check-bridges.py
 The `claude` function uses `~/.local/state/sandbox-agents/claude` as its dedicated `CLAUDE_CONFIG_DIR`.
 Claude Code stores settings, plugins and history under that directory, and Linux subscription credentials move there too.
 See the official [environment reference](https://code.claude.com/docs/en/env-vars) and [credential storage documentation](https://code.claude.com/docs/en/authentication#credential-management).
-Prepare the dedicated login from an ordinary terminal outside nono:
+Prepare the dedicated login through the installed fish wrapper:
 
 ```sh
-mkdir -p "$HOME/.local/state/sandbox-agents/claude"
-env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN -u CLAUDE_CODE_OAUTH_TOKEN CLAUDE_CONFIG_DIR="$HOME/.local/state/sandbox-agents/claude" claude
+claude auth login
 ```
 
-Use `/login` in that session to select your work subscription.
+Select your work subscription. This command runs inside nono with a temporary
+`--listen-port 0` grant for Claude's dynamically assigned OAuth callback listener.
+Regular agent sessions, auth status and logout do not receive this grant.
+Claude's runtime sockets use `cc-socks` under the disposable session directory;
+the profile grants socket connect/bind only there. The documented
+`downloads.claude.ai` service is allowed for plugin executables and version checks.
+If automatic browser opening is blocked, open the displayed URL manually.
+Re-authenticate with `claude auth login` rather than `/login` inside a regular
+agent session, whose callback listener remains restricted.
 Transfer the intended work settings explicitly, including company-required integrations; the launcher does not copy your normal Claude configuration.
 The candidate retains read access to `/etc/claude-code` for managed configuration, but compliance with your actual company setup has not been verified.
 Then launch `claude` from your project in a fresh fish shell.
