@@ -127,6 +127,7 @@
           4. Use ProtonUp-Qt to install Proton GE
           {% endif %}
 
-          Configuration files are symlinked from this repo.
-          Changes to configs will be tracked by git.
+          Tool configurations are symlinked from this repo.
+          Nono policies and launchers are copied; rerun deployment after edits.
+          For agent login and migration, see ansible/roles/developer/tasks/nono/config/README.md.
           ===================================

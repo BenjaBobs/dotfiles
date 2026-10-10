@@ -1,0 +1,40 @@
+{
+  // Retains the reviewed read-only /proc diagnostic baseline; NuGet configuration can contain credentials.
+  "meta": {
+    "name": "support-dotnet",
+    "version": "1.0.0",
+    "description": "Read-only .NET tools and shared NuGet packages"
+  },
+  "filesystem": {
+    "read": [
+      // Retain the supplied ASP.NET development-certificate trust read; exact workload need is unverified.
+      "$HOME/.aspnet/dev-certs/trust",
+      // Execute installed .NET global tools without modifying the host tool installation.
+      "$HOME/.dotnet/tools",
+      // Read reusable NuGet HTTP downloads without permitting shared-cache poisoning.
+      "$HOME/.local/share/NuGet/http-cache",
+      // Read already restored NuGet packages; new restores use the session NUGET_PACKAGES directory.
+      "$HOME/.nuget/packages",
+      // Proposed read-only diagnostic baseline for .NET; required reads and any write needs remain untested.
+      "/proc"
+    ],
+    "read_file": [
+      // Read configured NuGet package sources; this also exposes credentials embedded in that file.
+      "$HOME/.nuget/NuGet/NuGet.Config"
+    ]
+  },
+  "environment": {
+    "allow_vars": [
+      // Direct new package restores to the disposable directory chosen by the launcher.
+      "NUGET_PACKAGES",
+      // Give the .NET CLI disposable user state; runfile compatibility still needs a workload test.
+      "DOTNET_CLI_HOME",
+      // Preserve the launcher setting that disables persistent MSBuild node reuse.
+      "MSBUILDDISABLENODEREUSE",
+      // Preserve the launcher preference to opt out of .NET CLI telemetry.
+      "DOTNET_CLI_TELEMETRY_OPTOUT",
+      // Preserve the launcher preference to suppress the .NET CLI startup banner.
+      "DOTNET_NOLOGO"
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  // Shared enforcement baseline; concrete agent profiles provide state and network policy.
+  "meta": {
+    "name": "agent-linux-base",
+    "version": "1.0.0",
+    "description": "Shared Linux isolation and session-scoped temporary state"
+  },
+  // Keep upstream credential denials and system runtime access without the registry agent profiles.
+  "extends": "default",
+  "groups": {
+    "include": [
+      {
+        // Expose Linux hardware/runtime metadata used by host tools; this is read-only.
+        "name": "linux_sysfs_read",
+        "when": "linux"
+      },
+      // Retain upstream protection against unlinking protected paths; project and temp grants still permit deletion.
+      "unlink_protection"
+    ],
+    "exclude": [
+      // Remove broad writes to the host cache; compliant tools use the disposable XDG_CACHE_HOME instead.
+      "user_caches_linux",
+      // Remove shared /tmp writes; restore only the selected terminal, descriptor and device paths below.
+      "system_write_linux",
+      // Exclude the broad upstream Cargo-home grant; support-rust supplies narrow installation reads instead.
+      "rust_runtime"
+    ]
+  },
+  "security": {
+    // Restrict workload signals to its sandbox domain rather than arbitrary host processes.
+    "signal_mode": "isolated",
+    // Keep enforcement decisions outside the agent; do not approve extra capabilities automatically.
+    "capability_elevation": false
+  },
+  "workdir": {
+    // Let the agent edit the project approved at launch and create build output there.
+    "access": "readwrite"
+  },
+  "rollback": {
+    "exclude_globs": [
+      // Retain the upstream transient-file exclusion if rollback is enabled; this does not enable rollback.
+      "*.tmp.[0-9]*.[0-9]*"
+    ]
+  },
+  "filesystem": {
+    "allow": [
+      // Grant only the exact session directory created by the trusted launcher before policy preparation.
+      "$TMPDIR"
+    ],
+    "write_file": [
+      // Support shell redirection to the standard discard device.
+      "/dev/null",
+      // Retain the default policy compatibility grant; a specific workload need for writes is unverified.
+      "/dev/zero",
+      // Retain the default policy compatibility grant for this error-testing device; write need is unverified.
+      "/dev/full",
+      // Permit interactive CLI terminal I/O without granting desktop services.
+      "/dev/tty"
+    ],
+    "write": [
+      // Permit pseudo-terminal I/O used by interactive tools.
+      "/dev/pts",
+      // Support commands that access their own open descriptors; this is the narrow exception to read-only /proc.
+      "/proc/self/fd"
+    ],
+    "read": [
+      // Read shared agent instructions and skills without allowing the workload to modify them.
+      "$HOME/.agents",
+      // Read installed nono integrations without modifying registry-managed package artifacts.
+      "$NONO_PACKAGES",
+      // Read active policy definitions without allowing changes to future sandbox policy.
+      "$NONO_CONFIG/profiles",
+      // Execute user-installed tools and shims without replacing them; symlink targets need their own grants.
+      "$HOME/.local/bin"
+    ]
+  },
+  "environment": {
+    "allow_vars": [
+      // Find installed executables; avoid writable tool-state directories on PATH.
+      "PATH",
+      // Locate home configuration, subject to the separate filesystem grants.
+      "HOME",
+      // Retain the normal user name for tools that identify the current user.
+      "USER",
+      // Retain the login name expected by some command-line tools.
+      "LOGNAME",
+      // Let tools identify the configured shell.
+      "SHELL",
+      // Let interactive commands select terminal capabilities.
+      "TERM",
+      // Retain terminal color capability information.
+      "COLORTERM",
+      // Preserve the selected language and text encoding.
+      "LANG",
+      // Preserve locale categories; this wildcard does not broadly admit credential variables.
+      "LC_*",
+      // Preserve the selected timezone for time-sensitive command output.
+      "TZ",
+      // Point temporary-file consumers at the session directory granted above.
+      "TMPDIR",
+      // Point XDG-compliant caches at disposable session storage instead of the host cache.
+      "XDG_CACHE_HOME"
+    ]
+  },
+  "linux": {
+    // Mediate pathname UNIX sockets; do not grant Wayland, X11 or the desktop bus implicitly.
+    "af_unix_mediation": "pathname"
+  }
+}

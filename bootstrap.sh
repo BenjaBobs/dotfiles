@@ -54,6 +54,7 @@ show_help() {
     printf "    - Neovim with full configuration\n"
     printf "    - Visual Studio Code\n"
     printf "    - Podman & podman-compose\n"
+    printf "    - Nono agent sandbox, signed packages and copied launcher configuration\n"
     printf "    - Programming languages managed via mise (Node.js, Python, Go, etc.)\n"
     printf "    - CLI tools: ripgrep, fd, fzf, lazygit, gh\n\n"
 
@@ -71,7 +72,7 @@ show_help() {
     printf "    - Sudo privileges\n\n"
 
     printf "${GREEN}NOTES:${NC}\n"
-    printf "    - All dotfiles are symlinked from this repo\n\n"
+    printf "    - Tool configs are symlinked; nono policies and launchers use copies with backups\n\n"
 }
 
 install_prerequisites() {

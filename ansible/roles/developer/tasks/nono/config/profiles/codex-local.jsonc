@@ -1,0 +1,44 @@
+{
+  // Concrete Codex state, authentication and network policy; do not override filtering with --allow-net.
+  // Share the selected Linux/tool support while keeping Codex state specific to this profile.
+  "extends": "agent-linux-local",
+  "meta": {
+    "name": "codex-local",
+    "version": "1.0.0",
+    "description": "Local Linux Codex policy with dedicated state and filtered networking"
+  },
+  "filesystem": {
+    "allow": [
+      // Allow persistent dedicated Codex settings, history and authentication state; the agent can read/write it.
+      "$CODEX_HOME",
+      // The pack helper writes proposed grants here; installed profiles remain read-only and promotion is external.
+      "$NONO_CONFIG/profile-drafts"
+    ]
+  },
+  "environment": {
+    "allow_vars": [
+      // Make Codex use the dedicated state directory selected by the launcher, rather than its ordinary home.
+      "CODEX_HOME",
+      // Make the upstream draft helper locate nono under the same configuration root as the launcher.
+      "XDG_CONFIG_HOME"
+    ]
+  },
+  "network": {
+    // Use nono's Codex destination policy; its full allowlist is broader than the additions below.
+    "network_profile": "codex",
+    "allow_domain": [
+      // Retain the supplied ChatGPT service/authentication destination; actual runtime need is unverified.
+      "chatgpt.com",
+      // Retain the supplied ancillary destination pending runtime verification of its need.
+      "ab.chatgpt.com"
+    ]
+  },
+  "open_urls": {
+    "allow_origins": [
+      // Retain the upstream Codex authentication origin for supervisor-mediated URL opening.
+      "https://auth.openai.com"
+    ],
+    // Allow local authentication callback URLs; this is not a grant to arbitrary local services.
+    "allow_localhost": true
+  }
+}

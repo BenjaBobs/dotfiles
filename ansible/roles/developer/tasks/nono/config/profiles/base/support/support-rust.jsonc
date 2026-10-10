@@ -1,0 +1,34 @@
+{
+  // Grant installed executables without exposing the host Cargo storage root.
+  "meta": {
+    "name": "support-rust",
+    "version": "1.0.0",
+    "description": "Read-only Rust installation with disposable Cargo state"
+  },
+  "filesystem": {
+    "read": [
+      // Read installed Rust toolchains used by rustup shims without changing the host installation.
+      "$HOME/.rustup",
+      // Execute installed Cargo tools and rustup shims without exposing the entire host Cargo home.
+      "$HOME/.cargo/bin"
+    ],
+    "deny": [
+      // Keep current host Cargo credentials outside the sandbox; do not replace this with a Cargo-root grant.
+      "$HOME/.cargo/credentials.toml",
+      // Also exclude Cargo credentials stored at the legacy path.
+      "$HOME/.cargo/credentials"
+    ]
+  },
+  "environment": {
+    "allow_vars": [
+      // Point Cargo downloads and configuration at disposable session storage; compatibility remains untested.
+      "CARGO_HOME"
+    ]
+  },
+  "rollback": {
+    "exclude_patterns": [
+      // Exclude regenerable Rust build output if rollback is explicitly enabled.
+      "target"
+    ]
+  }
+}

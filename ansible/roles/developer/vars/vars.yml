@@ -20,3 +20,20 @@ vscode_extensions:
   - eamodio.gitlens
   - esbenp.prettier-vscode
   - dbaeumer.vscode-eslint
+
+# Tested nono release and official Linux archive checksums.
+nono_version: "0.79.0"
+nono_release_checksums:
+  x86_64: "36dfeeb6e8c6a30c43f80ba239e2460af43047c008153af527fdd893c1f02392"
+  aarch64: "c4a4f4b9ae318574d30d352127a34dcc919c4d6682ee8fbd30bb8d2bd2e0e85d"
+nono_user_home: "{{ ansible_facts['env']['HOME'] }}"
+nono_config_home: "{{ ansible_facts['env'].get('XDG_CONFIG_HOME', '') or (nono_user_home ~ '/.config') }}"
+nono_source_dir: "{{ role_path }}/tasks/nono/config"
+nono_download_dir: "{{ nono_user_home }}/.cache/dotfiles/nono/{{ nono_version }}/{{ ansible_facts['architecture'] }}"
+# Pull these tested versions only when the corresponding package is absent.
+# Existing packages are preserved; updates are an explicit nono maintenance step.
+nono_packages:
+  - name: codex
+    version: "0.2.3"
+  - name: claude
+    version: "0.1.4"

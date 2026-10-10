@@ -1,0 +1,20 @@
+{
+  // Use the upstream Python runtime group without adding persistent writable state.
+  "meta": {
+    "name": "support-python",
+    "version": "1.0.0",
+    "description": "Installed Python runtime support"
+  },
+  "groups": {
+    "include": [
+      // Use upstream Python runtime paths; effective grants depend on the installed nono version and platform.
+      "python_runtime"
+    ]
+  },
+  "rollback": {
+    "exclude_patterns": [
+      // Exclude regenerable Python bytecode if rollback is explicitly enabled.
+      "__pycache__"
+    ]
+  }
+}

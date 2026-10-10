@@ -16,3 +16,6 @@
 
     - name: Configure podman for docker compat
       include_tasks: podman-docker/install.yml
+
+    - name: Setup nono agent sandbox
+      include_tasks: nono/install.yml

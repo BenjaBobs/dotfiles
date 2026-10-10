@@ -1,0 +1,160 @@
+---
+- name: Install nono runtime dependencies
+  become: true
+  community.general.pacman:
+    name:
+      - python
+      - jq
+      - fish
+    state: present
+
+- name: Deploy nono for the login user
+  become: false
+  block:
+    - name: Check supported nono platform
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['system'] == 'Linux'
+          - ansible_facts['architecture'] in nono_release_checksums
+          - nono_config_home is match('^/')
+        fail_msg: "nono requires Linux, a configured architecture checksum and an absolute config home."
+
+    - name: Verify bridge Python requirement
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/python3
+          - -c
+          - "import sys; assert sys.version_info >= (3, 11), 'nono bridges require Python >= 3.11'"
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Create user-owned nono installation directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0700'
+      loop:
+        - "{{ nono_user_home }}/.local/bin"
+        - "{{ nono_download_dir }}"
+        - "{{ nono_config_home }}/nono/profiles"
+        - "{{ nono_config_home }}/nono/hooks"
+        - "{{ nono_config_home }}/nono/bridges"
+        - "{{ nono_config_home }}/nono/profile-drafts"
+        - "{{ nono_config_home }}/fish/functions"
+        - "{{ nono_user_home }}/.local/state/sandbox-agents/codex"
+        - "{{ nono_user_home }}/.local/state/sandbox-agents/claude"
+
+    - name: Download the pinned official nono release
+      ansible.builtin.get_url:
+        url: "https://github.com/nolabs-ai/nono/releases/download/v{{ nono_version }}/nono-v{{ nono_version }}-{{ ansible_facts['architecture'] }}-unknown-linux-gnu.tar.gz"
+        dest: "{{ nono_download_dir }}/nono.tar.gz"
+        checksum: "sha256:{{ nono_release_checksums[ansible_facts['architecture']] }}"
+        mode: '0600'
+      when: not ansible_check_mode
+
+    - name: Extract the pinned nono binary
+      ansible.builtin.unarchive:
+        src: "{{ nono_download_dir }}/nono.tar.gz"
+        dest: "{{ nono_download_dir }}"
+        remote_src: true
+      when: not ansible_check_mode
+
+    - name: Install the user nono binary
+      ansible.builtin.copy:
+        src: "{{ nono_download_dir }}/nono"
+        dest: "{{ nono_user_home }}/.local/bin/nono"
+        remote_src: true
+        mode: '0755'
+        backup: true
+        follow: false
+      when: not ansible_check_mode
+
+    - name: Find source profiles for flat installation
+      ansible.builtin.find:
+        paths: "{{ nono_source_dir }}/profiles"
+        patterns: '*.jsonc'
+        recurse: true
+      register: nono_profiles
+
+    - name: Verify profile sources and unique destination names
+      ansible.builtin.assert:
+        that:
+          - nono_profiles.matched > 0
+          - (nono_profiles.files | map(attribute='path') | map('basename') | list | length) == (nono_profiles.files | map(attribute='path') | map('basename') | unique | list | length)
+        fail_msg: "nono source profiles are missing or have duplicate basenames."
+
+    - name: Check for JSON profiles shadowing managed JSONC profiles
+      ansible.builtin.stat:
+        path: "{{ nono_config_home }}/nono/profiles/{{ item.path | basename | regex_replace('\\.jsonc$', '.json') }}"
+      loop: "{{ nono_profiles.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
+      register: nono_profile_conflicts
+
+    - name: Require review of shadowing JSON profiles
+      ansible.builtin.assert:
+        that: not item.stat.exists
+        fail_msg: "Back up and move aside {{ nono_config_home }}/nono/profiles/{{ item.item.path | basename | regex_replace('\\.jsonc$', '.json') }} before deploying its managed JSONC counterpart."
+      loop: "{{ nono_profile_conflicts.results }}"
+      loop_control:
+        label: "{{ item.item.path | basename }}"
+
+    # Copies keep edits in an agent-writable checkout from changing installed policy.
+    - name: Copy profiles into the flat nono profile directory
+      ansible.builtin.copy:
+        src: "{{ item.path }}"
+        dest: "{{ nono_config_home }}/nono/profiles/{{ item.path | basename }}"
+        mode: '0644'
+        backup: true
+        follow: false
+      loop: "{{ nono_profiles.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
+
+    - name: Copy nono hooks, bridge and fish launchers
+      ansible.builtin.copy:
+        src: "{{ nono_source_dir }}/{{ item.src }}"
+        dest: "{{ nono_config_home }}/{{ item.dest }}"
+        mode: '0644'
+        backup: true
+        follow: false
+      loop:
+        - { src: hooks/tmp-setup.sh, dest: nono/hooks/tmp-setup.sh }
+        - { src: hooks/tmp-cleanup.sh, dest: nono/hooks/tmp-cleanup.sh }
+        - { src: bridges/agent-bridge.py, dest: nono/bridges/agent-bridge.py }
+        - { src: codex.fish, dest: fish/functions/codex.fish }
+        - { src: claude.fish, dest: fish/functions/claude.fish }
+
+    - name: Check installed signed packages
+      ansible.builtin.stat:
+        path: "{{ nono_config_home }}/nono/packages/nolabs-ai/{{ item.name }}/package.json"
+      loop: "{{ nono_packages }}"
+      register: nono_installed_packages
+
+    - name: Pull missing signed nono packages
+      ansible.builtin.command:
+        argv:
+          - "{{ nono_user_home }}/.local/bin/nono"
+          - pull
+          - "nolabs-ai/{{ item.item.name }}@{{ item.item.version }}"
+      environment:
+        HOME: "{{ nono_user_home }}"
+        XDG_CONFIG_HOME: "{{ nono_config_home }}"
+      loop: "{{ nono_installed_packages.results }}"
+      loop_control:
+        label: "nolabs-ai/{{ item.item.name }}"
+      when:
+        - not ansible_check_mode
+        - not item.stat.exists
+      changed_when: true
+
+    - name: Explain agent setup after deployment
+      ansible.builtin.debug:
+        msg: |
+          nono config is managed by copies from {{ nono_source_dir }}.
+          Run this playbook outside nono to deploy reviewed changes.
+          Ensure ~/.local/bin is on PATH, remove conflicting fish aliases from
+          startup/local_config.fish, and open a fresh fish shell.
+          Prepare dedicated agent authentication outside nono; see ansible/roles/developer/tasks/nono/config/README.md.
+          Signed package pulls also apply upstream wiring to ordinary agent homes.
+          Existing packages, credentials and unrelated config files are preserved.

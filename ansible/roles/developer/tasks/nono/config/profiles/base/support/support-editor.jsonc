@@ -1,0 +1,14 @@
+{
+  // Retain the supplied editor runtime grant; omit when the agent does not use it.
+  "meta": {
+    "name": "support-editor",
+    "version": "1.0.0",
+    "description": "Read-only Neovim runtime"
+  },
+  "filesystem": {
+    "read": [
+      // Read the supplied Neovim runtime, plugins and data; no demonstrated agent workload requires this yet.
+      "$HOME/.local/share/nvim"
+    ]
+  }
+}

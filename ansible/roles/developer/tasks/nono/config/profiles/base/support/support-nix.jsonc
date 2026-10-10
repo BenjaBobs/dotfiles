@@ -1,0 +1,14 @@
+{
+  // Retain upstream Nix runtime grants; review them after nono updates.
+  "meta": {
+    "name": "support-nix",
+    "version": "1.0.0",
+    "description": "Installed Nix runtime support"
+  },
+  "groups": {
+    "include": [
+      // Use upstream Nix store/runtime paths for installed tools; this does not grant arbitrary host state.
+      "nix_runtime"
+    ]
+  }
+}

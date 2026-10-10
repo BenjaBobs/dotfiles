@@ -1,0 +1,20 @@
+{
+  // Read shared Git settings without permitting modification.
+  "meta": {
+    "name": "support-git",
+    "version": "1.0.0",
+    "description": "Read-only host Git configuration"
+  },
+  "groups": {
+    "include": [
+      // Read upstream-selected user Git settings required for project Git commands.
+      "git_config"
+    ]
+  },
+  "filesystem": {
+    "read_file": [
+      // Read the supplied shared Git settings; read-only access still exposes any embedded secrets.
+      "$HOME/.gitconfig.shared"
+    ]
+  }
+}

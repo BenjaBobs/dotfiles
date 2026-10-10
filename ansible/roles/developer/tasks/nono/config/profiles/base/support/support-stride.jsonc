@@ -1,0 +1,14 @@
+{
+  // Tool-specific writable state still needs separate configuration.
+  "meta": {
+    "name": "support-stride",
+    "version": "1.0.0",
+    "description": "Read-only Stride installation"
+  },
+  "filesystem": {
+    "read": [
+      // Read the supplied Stride installation; its precise contents and writable-state needs remain unverified.
+      "$HOME/.local/share/stride"
+    ]
+  }
+}

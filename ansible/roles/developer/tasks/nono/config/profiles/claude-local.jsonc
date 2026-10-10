@@ -1,0 +1,45 @@
+{
+  // Share Linux restrictions without inheriting a registry profile's writable host state.
+  // Share the selected Linux/tool support while keeping Claude state and destinations separate.
+  "extends": "agent-linux-local",
+  "meta": {
+    "name": "claude-local",
+    "version": "1.0.0",
+    "description": "Linux Claude Code with dedicated subscription state"
+  },
+  "filesystem": {
+    // The launcher selects the matching CLAUDE_CONFIG_DIR before capabilities are prepared.
+    // Persist dedicated settings, plugins, history and subscription credentials; the agent can read/write them.
+    "allow": [
+      "$XDG_STATE_HOME/sandbox-agents/claude",
+      // Permit the package's persistent-fix workflow to draft grants; promotion remains outside the sandbox.
+      "$NONO_CONFIG/profile-drafts"
+    ],
+    "read": [
+      // The native launcher in ~/.local/bin resolves into this installation directory.
+      "$HOME/.local/share/claude",
+      // Preserve access to company-managed Claude Code settings and instructions.
+      "/etc/claude-code"
+    ]
+  },
+  "network": {
+    // Supply Claude's API/service destinations separately from Codex and without unrestricted --allow-net.
+    // Inspect the resolved upstream destination policy; this is not an API-only allowlist.
+    "network_profile": "claude-code"
+  },
+  "environment": {
+    // Shared runtime variables are inherited additively; no API-key or cloud-credential wildcards.
+    "allow_vars": [
+      // Retain the state root used to derive the exact dedicated Claude directory; the root itself is not granted.
+      "XDG_STATE_HOME",
+      // Retain the configuration root when the package guidance prepares a nono profile draft.
+      "XDG_CONFIG_HOME",
+      // Make Claude use its dedicated settings, plugins, history and subscription-credential directory.
+      "CLAUDE_CONFIG_DIR",
+      // Direct Claude internal temporary files into the same session directory used by the filesystem grant.
+      "CLAUDE_CODE_TMPDIR",
+      // Preserve the launcher setting that disables automatic updates to the read-only host installation.
+      "DISABLE_AUTOUPDATER"
+    ]
+  }
+}

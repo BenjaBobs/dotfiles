@@ -1,0 +1,18 @@
+{
+  // Select mise here rather than through hidden launcher extensions; configuration may contain credentials.
+  "meta": {
+    "name": "support-mise",
+    "version": "1.0.0",
+    "description": "Installed mise tools and configuration"
+  },
+  // Inherit nono's installed mise-manager runtime grants; upstream changes remain a policy dependency.
+  "extends": "mise-dev",
+  "filesystem": {
+    "read": [
+      // Execute existing mise-managed tool versions without installing or replacing host tools.
+      "$HOME/.local/share/mise",
+      // Read mise configuration for tool selection; audit it for embedded credentials.
+      "$HOME/.config/mise"
+    ]
+  }
+}

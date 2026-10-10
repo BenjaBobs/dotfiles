@@ -1,0 +1,28 @@
+{
+  // Use installed tools; writable pnpm stores still need task-specific configuration.
+  "meta": {
+    "name": "support-node",
+    "version": "1.0.0",
+    "description": "Installed Node runtime and read-only pnpm storage"
+  },
+  "groups": {
+    "include": [
+      // Use upstream Node runtime paths; inspect the resolved group after nono updates.
+      "node_runtime"
+    ]
+  },
+  "filesystem": {
+    "read": [
+      // Use the existing pnpm installation/store read-only; writable stores need separate configuration.
+      "$HOME/.local/share/pnpm"
+    ]
+  },
+  "rollback": {
+    "exclude_patterns": [
+      // Exclude regenerable JavaScript dependencies if rollback is explicitly enabled.
+      "node_modules",
+      // Exclude regenerable Next.js build output if rollback is explicitly enabled.
+      ".next"
+    ]
+  }
+}
