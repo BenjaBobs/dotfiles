@@ -13,8 +13,10 @@
       "$HOME/.dotnet/tools",
       // Read reusable NuGet HTTP downloads without permitting shared-cache poisoning.
       "$HOME/.local/share/NuGet/http-cache",
-      // Read already restored NuGet packages; new restores use the session NUGET_PACKAGES directory.
+      // Read packages restored outside the sandbox; NUGET_PACKAGES points here, so a restore needing anything new fails closed.
       "$HOME/.nuget/packages",
+      // Resolve local dotnet tools (CSharpier, dotnet-affected) restored outside; never writable, as it maps tool names to packages run on the host.
+      "$HOME/.dotnet/toolResolverCache",
       // Proposed read-only diagnostic baseline for .NET; required reads and any write needs remain untested.
       "/proc"
     ],

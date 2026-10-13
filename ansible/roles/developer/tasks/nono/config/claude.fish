@@ -20,12 +20,15 @@ function claude --description 'Claude Code under a task-scoped nono policy'
     set -lx DISABLE_AUTOUPDATER 1
     set -lx XDG_CACHE_HOME "$session_tmp/cache"
     set -lx CARGO_HOME "$session_tmp/cargo"
-    set -lx NUGET_PACKAGES "$session_tmp/nuget"
+    # Restores happen outside the sandbox; inside, packages are read from the shared cache it may not write.
+    set -lx NUGET_PACKAGES "$HOME/.nuget/packages"
     set -lx DOTNET_CLI_HOME "$session_tmp/dotnet"
     set -lx MSBUILDDISABLENODEREUSE 1
     set -lx DOTNET_CLI_TELEMETRY_OPTOUT 1
     set -lx DOTNET_NOLOGO 1
-    mkdir -p -- "$CLAUDE_CONFIG_DIR" "$XDG_CACHE_HOME" "$CARGO_HOME" "$NUGET_PACKAGES" "$DOTNET_CLI_HOME" "$XDG_RUNTIME_DIR/cc-socks"
+    mkdir -p -- "$CLAUDE_CONFIG_DIR" "$XDG_CACHE_HOME" "$CARGO_HOME" "$DOTNET_CLI_HOME/.dotnet" "$XDG_RUNTIME_DIR/cc-socks"
+    # Local dotnet tools resolve through the host's cache, which the profile grants read-only.
+    and ln -sfn -- "$HOME/.dotnet/toolResolverCache" "$DOTNET_CLI_HOME/.dotnet/toolResolverCache"
     if test $status -ne 0
         sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
         return 1
