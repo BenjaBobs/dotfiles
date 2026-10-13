@@ -3,6 +3,12 @@ if status is-interactive
 end
 zoxide init fish | source
 ~/.local/bin/mise activate fish | source
+# Expose private mode (fish -P) to starship, which can't see unexported vars
+if set -q fish_private_mode
+    set -gx FISH_PRIVATE_MODE 1
+else
+    set -e FISH_PRIVATE_MODE
+end
 starship init fish | source
 set EDITOR nvim
 

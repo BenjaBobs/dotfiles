@@ -1,6 +1,7 @@
 "$schema" = "https://starship.rs/config-schema.json"
 
 format = """
+${env_var.FISH_PRIVATE_MODE}\
 [](red)\
 $os\
 $username\
@@ -30,6 +31,9 @@ $line_break\
 $character"""
 
 palette = "catppuccin_mocha"
+
+[env_var.FISH_PRIVATE_MODE]
+format = "[](fg:mauve)[ 󰗹 private ](bold bg:mauve fg:crust)[](fg:mauve) "
 
 [os]
 disabled = false
