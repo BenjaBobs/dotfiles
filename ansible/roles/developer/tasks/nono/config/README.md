@@ -31,7 +31,7 @@ bash ansible/roles/developer/tasks/nono/install.sh
 
 The same task runs through `./bootstrap.sh dev` or `./bootstrap.sh dev,gaming`.
 Additional Ansible arguments such as `--check --diff` can be passed to the script.
-It installs the checksum-verified nono 0.79.0 binary in `~/.local/bin`, required tools,
+It installs the checksum-verified nono 0.80.0 binary in `~/.local/bin`, required tools,
 and missing signed Codex 0.2.3 / Claude 0.1.4 packages. Existing packages are preserved.
 Pins are in the developer role's `vars/vars.yml`; update packages with `nono update`.
 The agent executables themselves are installed separately.

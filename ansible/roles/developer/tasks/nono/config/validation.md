@@ -19,3 +19,16 @@ Live agent homes were not inspected or changed: the enclosing nono boundary
 reported them as ungranted. The user confirmed that deployment succeeded.
 Interactive agent/shell launches and subscription authentication with the
 standard homes remain runtime checks.
+
+## nono 0.80.0 upgrade
+
+Checked on 2026-10-16 from a live `claude-local` session.
+
+- The session launched with the unchanged profiles.
+- 40 and 200 back-to-back connects to a granted pathname Unix socket all
+  succeeded. On 0.79.0, connects beyond a burst of five failed with a silent
+  `EPERM` (supervisor rate limiter, nolabs-ai/nono#1420, fixed by #2047).
+- An ungranted socket (`/run/user/1000/bus`) was still denied with `EACCES`.
+
+The 0.79.0 dry runs and launcher fixtures above were not repeated, and
+`codex-local` and `shell-local` were not launched on 0.80.0.
