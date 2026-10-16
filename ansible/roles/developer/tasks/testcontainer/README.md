@@ -11,9 +11,11 @@ testcontainer logs postgres
 ```
 
 Run it in an ordinary terminal; it needs podman and the systemd user instance.
-Inside nono, connect through `$TESTCONTAINER_SOCKET_DIR/<service>`, for example
-Npgsql `Host=$TESTCONTAINER_SOCKET_DIR/postgres;Username=postgres;Database=postgres`.
+Inside nono, `$TESTCONTAINER_POSTGRES` holds the Npgsql connection string
+(`Host=$TESTCONTAINER_SOCKET_DIR/postgres;Username=postgres;Database=postgres`).
 The postgres container trusts socket connections, so no password is needed.
+Other services connect through `$TESTCONTAINER_SOCKET_DIR/<service>`; the base
+directory itself is not listable inside nono.
 
 ## Install
 

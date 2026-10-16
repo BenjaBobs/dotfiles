@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix="nono-launcher-check-", dir=os.environ.g
     nono.write_text(
         "#!/usr/bin/python3\n"
         "import json, os, pathlib, sys\n"
-        "keys = ('TMPDIR', 'CODEX_HOME', 'CLAUDE_CONFIG_DIR', 'CLAUDE_CODE_TMPDIR', 'XDG_RUNTIME_DIR', 'XDG_DATA_HOME', 'XDG_STATE_HOME', 'TESTCONTAINER_SOCKET_DIR')\n"
+        "keys = ('TMPDIR', 'CODEX_HOME', 'CLAUDE_CONFIG_DIR', 'CLAUDE_CODE_TMPDIR', 'XDG_RUNTIME_DIR', 'XDG_DATA_HOME', 'XDG_STATE_HOME', 'TESTCONTAINER_SOCKET_DIR', 'TESTCONTAINER_POSTGRES')\n"
         "record = {'args': sys.argv[1:], 'env': {k: os.environ.get(k) for k in keys}}\n"
         "pathlib.Path(os.environ['NONO_TEST_CALL']).write_text(json.dumps(record))\n"
         "sys.exit(37)\n"
@@ -114,6 +114,8 @@ exit $status
                 assert "--allow-net" not in args
                 assert call["env"]["TMPDIR"] == str(session)
                 assert call["env"]["TESTCONTAINER_SOCKET_DIR"].endswith("/.local/state/testcontainers")
+                assert call["env"]["TESTCONTAINER_POSTGRES"] == (
+                    f'Host={call["env"]["TESTCONTAINER_SOCKET_DIR"]}/postgres;Username=postgres;Database=postgres')
                 key = "CODEX_HOME" if agent == "codex" else "CLAUDE_CONFIG_DIR"
                 assert call["env"][key].endswith(f"/.{agent}")
                 if agent == "claude":

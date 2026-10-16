@@ -22,6 +22,8 @@ function sandbox --description 'Fish under a project-scoped nono policy'
     set -lx DOTNET_NOLOGO 1
     # Socket directories of host-started test containers (see testcontainer).
     set -lx TESTCONTAINER_SOCKET_DIR "$HOME/.local/state/testcontainers"
+    # Npgsql connection string for the postgres test container (no password over the socket).
+    set -lx TESTCONTAINER_POSTGRES "Host=$TESTCONTAINER_SOCKET_DIR/postgres;Username=postgres;Database=postgres"
     mkdir -p -- "$session_tmp/config" "$session_tmp/data" "$session_tmp/state" "$XDG_CACHE_HOME" "$session_tmp/runtime" "$CARGO_HOME" "$NUGET_PACKAGES" "$DOTNET_CLI_HOME"
     if test $status -ne 0
         sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"

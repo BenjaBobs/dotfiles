@@ -24,6 +24,8 @@ function codex --description 'Codex under a task-scoped nono policy'
     set -lx DOTNET_NOLOGO 1
     # Socket directories of host-started test containers (see testcontainer).
     set -lx TESTCONTAINER_SOCKET_DIR "$HOME/.local/state/testcontainers"
+    # Npgsql connection string for the postgres test container (no password over the socket).
+    set -lx TESTCONTAINER_POSTGRES "Host=$TESTCONTAINER_SOCKET_DIR/postgres;Username=postgres;Database=postgres"
     mkdir -p -- "$CODEX_HOME" "$XDG_CACHE_HOME" "$CARGO_HOME" "$DOTNET_CLI_HOME/.dotnet"
     # Local dotnet tools resolve through the host's cache, which the profile grants read-only.
     and ln -sfn -- "$HOME/.dotnet/toolResolverCache" "$DOTNET_CLI_HOME/.dotnet/toolResolverCache"

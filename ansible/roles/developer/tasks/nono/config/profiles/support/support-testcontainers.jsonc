@@ -15,7 +15,9 @@
   "environment": {
     "allow_vars": [
       // Let tests locate the socket directories, e.g. Npgsql `Host=$TESTCONTAINER_SOCKET_DIR/postgres`.
-      "TESTCONTAINER_SOCKET_DIR"
+      "TESTCONTAINER_SOCKET_DIR",
+      // Npgsql connection string for the postgres test container.
+      "TESTCONTAINER_POSTGRES"
     ]
   }
 }
