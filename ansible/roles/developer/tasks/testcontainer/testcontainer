@@ -34,9 +34,14 @@ define_service() {
             container_user=999:999
             # podman cannot set tmpfs ownership; postgres creates and owns its PGDATA subdirectory.
             env_args=(-e POSTGRES_PASSWORD=postgres -e PGDATA=/var/lib/postgresql/data/pgdata)
-            tmpfs_args=(--tmpfs /var/lib/postgresql/data:rw,size=1g,mode=1777)
+            tmpfs_args=(--tmpfs /var/lib/postgresql/data:rw,size=3g,mode=1777)
             # Socket only; the container has no network anyway.
-            cmd_args=(-c "listen_addresses=" -c log_connections=off)
+            # Data lives on a throwaway tmpfs, so drop durability and keep WAL small:
+            # the default max_wal_size (1GB) alone can fill the tmpfs.
+            cmd_args=(-c "listen_addresses=" -c log_connections=off
+                -c fsync=off -c synchronous_commit=off -c full_page_writes=off
+                -c wal_level=minimal -c max_wal_senders=0
+                -c max_wal_size=256MB -c min_wal_size=32MB)
             # The entrypoint runs a temporary server on the same socket during init;
             # only the final server runs as PID 1.
             ready_cmd='pg_isready -q -h /var/run/postgresql && [ "$(cat /proc/1/comm)" = postgres ]'

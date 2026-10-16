@@ -56,6 +56,12 @@ the container is the boundary. All sandbox sessions share each service's data.
   on memory, even though only the unit's limit was reached. A client in the middle of a
   query may hang until its own timeout instead of failing immediately.
 - After a kill, the old socket stays in the directory; the next `up` removes it.
+- Inside nono, connecting to a missing socket fails with `Permission denied`, exactly like
+  a missing grant. When a connection is refused, check `testcontainer status` before
+  suspecting the profile; never grant the directory with `--allow`.
+- Postgres runs without durability (`fsync=off`, minimal WAL) on a 3GB tmpfs. Tests that
+  create databases without dropping them eventually fill it, and postgres then shuts down
+  with `No space left on device`.
 
 ## Adding a service
 
