@@ -78,8 +78,10 @@ show_help() {
 install_prerequisites() {
     echo -e "${BLUE}Installing prerequisites...${NC}"
 
-    # Update system
-    sudo pacman -Syu --needed --noconfirm git ansible
+    # Keep the full upgrade interactive so package conflicts can be resolved.
+    # --noconfirm declines removals whose prompt defaults to No.
+    echo -e "${YELLOW}Review pacman's upgrade prompts, including any conflicting package removals.${NC}"
+    sudo pacman -Syu --needed git ansible
 
     # Ensure Ansible uses the repo config and local collections
     export ANSIBLE_CONFIG="$ANSIBLE_DIR/ansible.cfg"
