@@ -1,0 +1,21 @@
+{
+  // Connect-only access to sockets of test containers started outside nono with `testcontainer`.
+  "meta": {
+    "name": "support-testcontainers",
+    "version": "1.0.0",
+    "description": "Connect to gVisor test container sockets"
+  },
+  "filesystem": {
+    // One grant per service: grants cover direct children only, and each container gets its own directory.
+    // The containers run under gVisor without network and cannot connect to host sockets in these directories.
+    "unix_socket_dir": [
+      "$HOME/.local/state/testcontainers/postgres"
+    ]
+  },
+  "environment": {
+    "allow_vars": [
+      // Let tests locate the socket directories, e.g. Npgsql `Host=$TESTCONTAINER_SOCKET_DIR/postgres`.
+      "TESTCONTAINER_SOCKET_DIR"
+    ]
+  }
+}

@@ -30,6 +30,17 @@ nono_user_home: "{{ ansible_facts['env']['HOME'] }}"
 nono_config_home: "{{ ansible_facts['env'].get('XDG_CONFIG_HOME', '') or (nono_user_home ~ '/.config') }}"
 nono_source_dir: "{{ role_path }}/tasks/nono/config"
 nono_download_dir: "{{ nono_user_home }}/.cache/dotfiles/nono/{{ nono_version }}/{{ ansible_facts['architecture'] }}"
+# Tested gVisor release and GitHub release archive checksums.
+gvisor_version: "20261005.0"
+gvisor_release_checksums:
+  x86_64: "0a8a9058b9f11791a2097f03190c2ddc5b963c3dbee5bb9fd8497f4801c42f92"
+  aarch64: "f8bd7cb4e989db445255c20e6c2962498e5b5bd1ec1407bfcf187fbd5f184a2a"
+gvisor_install_dir: /usr/local/lib/gvisor
+# Fixed path shared with the testcontainer script and support-testcontainers profile.
+testcontainer_base_dir: "{{ nono_user_home }}/.local/state/testcontainers"
+# Keep in sync with the script's services and the profile's socket grants.
+testcontainer_services:
+  - postgres
 # Pull these tested versions only when the corresponding package is absent.
 # Existing packages are preserved; updates are an explicit nono maintenance step.
 nono_packages:

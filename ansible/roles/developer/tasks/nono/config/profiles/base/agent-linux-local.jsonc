@@ -25,6 +25,8 @@
     // Retain the supplied Neovim runtime access; omit if editor use is unnecessary.
     "support/support-editor",
     // Retain the supplied Stride installation access; writable state remains unconfigured.
-    "support/support-stride"
+    "support/support-stride",
+    // Connect to sockets of test containers started outside nono with `testcontainer`.
+    "support/support-testcontainers"
   ]
 }

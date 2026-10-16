@@ -19,3 +19,6 @@
 
     - name: Setup nono agent sandbox
       include_tasks: nono/install.yml
+
+    - name: Setup gVisor test containers
+      include_tasks: testcontainer/install.yml

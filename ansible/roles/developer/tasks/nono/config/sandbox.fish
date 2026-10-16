@@ -20,6 +20,8 @@ function sandbox --description 'Fish under a project-scoped nono policy'
     set -lx MSBUILDDISABLENODEREUSE 1
     set -lx DOTNET_CLI_TELEMETRY_OPTOUT 1
     set -lx DOTNET_NOLOGO 1
+    # Socket directories of host-started test containers (see testcontainer).
+    set -lx TESTCONTAINER_SOCKET_DIR "$HOME/.local/state/testcontainers"
     mkdir -p -- "$session_tmp/config" "$session_tmp/data" "$session_tmp/state" "$XDG_CACHE_HOME" "$session_tmp/runtime" "$CARGO_HOME" "$NUGET_PACKAGES" "$DOTNET_CLI_HOME"
     if test $status -ne 0
         sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"

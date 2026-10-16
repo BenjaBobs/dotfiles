@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+# Run hardened gVisor test containers whose Unix sockets nono sandboxes may connect to.
+set -euo pipefail
+
+# Fixed path: nono profiles grant each service directory by this exact location.
+base_dir="$HOME/.local/state/testcontainers"
+runsc="${TESTCONTAINER_RUNSC:-/usr/local/lib/gvisor/current/runsc}"
+ready_timeout="${TESTCONTAINER_READY_TIMEOUT:-120}"
+
+usage() {
+    cat <<'EOF'
+Usage: testcontainer <command> [service]
+
+Commands:
+  up <service>      Start the service and wait until it accepts connections
+  down <service>    Stop the service; its data is discarded
+  status            Show running test containers
+  logs <service>    Show the service's journal
+  path <service>    Print the socket directory to connect to
+  services          List known services
+
+Services run outside nono; sandboxes reach them only through their socket directory.
+EOF
+}
+
+# Each service defines: image, socket mount point, container user, environment,
+# tmpfs mounts, command arguments and a readiness check run inside the container.
+define_service() {
+    case "$1" in
+        postgres)
+            image=docker.io/library/postgres:16
+            socket_mount=/var/run/postgresql
+            # The image's postgres user; running as it avoids the root entrypoint's chown.
+            container_user=999:999
+            # podman cannot set tmpfs ownership; postgres creates and owns its PGDATA subdirectory.
+            env_args=(-e POSTGRES_PASSWORD=postgres -e PGDATA=/var/lib/postgresql/data/pgdata)
+            tmpfs_args=(--tmpfs /var/lib/postgresql/data:rw,size=1g,mode=1777)
+            # Socket only; the container has no network anyway.
+            cmd_args=(-c "listen_addresses=" -c log_connections=off)
+            # The entrypoint runs a temporary server on the same socket during init;
+            # only the final server runs as PID 1.
+            ready_cmd='pg_isready -q -h /var/run/postgresql && [ "$(cat /proc/1/comm)" = postgres ]'
+            ;;
+        *)
+            echo "testcontainer: unknown service '$1' (see: testcontainer services)" >&2
+            exit 2
+            ;;
+    esac
+}
+
+services() { echo postgres; }
+
+require_service() {
+    if [ $# -lt 1 ] || [ -z "$1" ]; then
+        usage >&2
+        exit 2
+    fi
+    define_service "$1"
+}
+
+unit() { echo "testcontainer@$1.service"; }
+container() { echo "testcontainer-$1"; }
+
+# Called by the systemd unit; runs in the foreground inside the unit's resource limits.
+run_service() {
+    local service="$1" dir
+    dir="$base_dir/$service"
+    if [ ! -d "$dir" ] || [ -L "$dir" ]; then
+        echo "testcontainer: $dir is missing; deploy it with the developer role" >&2
+        exit 1
+    fi
+    if [ ! -x "$runsc" ]; then
+        echo "testcontainer: gVisor runtime not found at $runsc" >&2
+        exit 1
+    fi
+    # Clear stale sockets and give the directory to the container user. find -delete
+    # does not follow symlinks, so container-planted links cannot redirect it.
+    podman unshare find "$dir" -mindepth 1 -delete
+    podman unshare chown "$container_user" "$dir"
+    # Traversable for the host user, who connects to the world-connectable socket.
+    podman unshare chmod 0755 "$dir"
+
+    exec podman run --rm --replace --name "$(container "$service")" \
+        --cgroups=split \
+        --runtime "$runsc" \
+        --runtime-flag=ignore-cgroups \
+        --runtime-flag=host-uds=create \
+        --network=none \
+        --cap-drop=all \
+        --security-opt=no-new-privileges \
+        --read-only \
+        --user "$container_user" \
+        --pull=missing \
+        --log-driver=passthrough \
+        "${tmpfs_args[@]}" \
+        "${env_args[@]}" \
+        -v "$dir:$socket_mount" \
+        "$image" "${cmd_args[@]}"
+}
+
+is_ready() {
+    podman exec "$(container "$1")" sh -c "$ready_cmd" >/dev/null 2>&1
+}
+
+up() {
+    local service="$1" deadline
+    systemctl --user start "$(unit "$service")"
+    deadline=$((SECONDS + ready_timeout))
+    until is_ready "$service"; do
+        if ! systemctl --user is-active --quiet "$(unit "$service")"; then
+            echo "testcontainer: $service stopped during startup" >&2
+            journalctl --user -u "$(unit "$service")" -n 30 --no-pager >&2
+            exit 1
+        fi
+        if [ "$SECONDS" -ge "$deadline" ]; then
+            echo "testcontainer: $service not ready after ${ready_timeout}s" >&2
+            journalctl --user -u "$(unit "$service")" -n 30 --no-pager >&2
+            exit 1
+        fi
+        sleep 0.5
+    done
+    echo "$service ready: $base_dir/$service"
+}
+
+command="${1:-}"
+shift || true
+case "$command" in
+    up) require_service "$@"; up "$1" ;;
+    down) require_service "$@"; systemctl --user stop "$(unit "$1")" ;;
+    status) systemctl --user list-units --no-pager --all 'testcontainer@*' ;;
+    logs) require_service "$@"; journalctl --user -u "$(unit "$1")" --no-pager ;;
+    path) require_service "$@"; echo "$base_dir/$1" ;;
+    services) services ;;
+    _run) require_service "$@"; run_service "$1" ;;
+    -h | --help | help) usage ;;
+    *) usage >&2; exit 2 ;;
+esac

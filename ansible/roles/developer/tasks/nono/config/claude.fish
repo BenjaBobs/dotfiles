@@ -26,6 +26,8 @@ function claude --description 'Claude Code under a task-scoped nono policy'
     set -lx MSBUILDDISABLENODEREUSE 1
     set -lx DOTNET_CLI_TELEMETRY_OPTOUT 1
     set -lx DOTNET_NOLOGO 1
+    # Socket directories of host-started test containers (see testcontainer).
+    set -lx TESTCONTAINER_SOCKET_DIR "$HOME/.local/state/testcontainers"
     mkdir -p -- "$CLAUDE_CONFIG_DIR" "$XDG_CACHE_HOME" "$CARGO_HOME" "$DOTNET_CLI_HOME/.dotnet" "$XDG_RUNTIME_DIR/cc-socks"
     # Local dotnet tools resolve through the host's cache, which the profile grants read-only.
     and ln -sfn -- "$HOME/.dotnet/toolResolverCache" "$DOTNET_CLI_HOME/.dotnet/toolResolverCache"

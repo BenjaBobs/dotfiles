@@ -1,0 +1,104 @@
+---
+# gVisor test containers reachable from nono sandboxes through Unix sockets.
+- name: Check supported gVisor platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['architecture'] in gvisor_release_checksums
+    fail_msg: "gVisor requires a configured architecture checksum."
+
+- name: Install gVisor archive dependency
+  become: true
+  community.general.pacman:
+    name: zstd
+    state: present
+
+# runsc re-executes itself as an unprivileged user, so it must live outside the 0700 home.
+# Root ownership also keeps it out of reach of sandboxed agents.
+- name: Create the gVisor release directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ gvisor_install_dir }}/{{ gvisor_version }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download the pinned gVisor release
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/google/gvisor/releases/download/release-{{ gvisor_version }}/gvisor-{{ ansible_facts['architecture'] }}.tar.zstd"
+    dest: "{{ gvisor_install_dir }}/{{ gvisor_version }}.tar.zstd"
+    checksum: "sha256:{{ gvisor_release_checksums[ansible_facts['architecture']] }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: not ansible_check_mode
+
+# The archive holds runsc and the gvisor-bin/ helpers it expects beside it.
+- name: Extract the pinned gVisor release
+  become: true
+  ansible.builtin.command:
+    argv:
+      - tar
+      - --zstd
+      - --no-same-owner
+      - -xf
+      - "{{ gvisor_install_dir }}/{{ gvisor_version }}.tar.zstd"
+      - -C
+      - "{{ gvisor_install_dir }}/{{ gvisor_version }}"
+    creates: "{{ gvisor_install_dir }}/{{ gvisor_version }}/runsc"
+  when: not ansible_check_mode
+
+- name: Select the pinned gVisor release
+  become: true
+  ansible.builtin.file:
+    src: "{{ gvisor_version }}"
+    dest: "{{ gvisor_install_dir }}/current"
+    state: link
+    force: true
+  when: not ansible_check_mode
+
+- name: Deploy test containers for the login user
+  become: false
+  block:
+    - name: Create user directories for the test container tooling
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0700'
+      loop:
+        - "{{ nono_user_home }}/.local/bin"
+        - "{{ nono_user_home }}/.config/systemd/user"
+        # Keeps the world-connectable sockets private to this user.
+        - "{{ testcontainer_base_dir }}"
+
+    # Created only when missing: containers take ownership of their directory at start.
+    # Directories must exist before a sandbox starts, or nono skips their grants.
+    - name: Create socket directories for nono grants
+      ansible.builtin.command:
+        argv: [mkdir, -m, '0755', --, "{{ testcontainer_base_dir }}/{{ item }}"]
+        creates: "{{ testcontainer_base_dir }}/{{ item }}"
+      loop: "{{ testcontainer_services }}"
+
+    - name: Install the testcontainer script
+      ansible.builtin.copy:
+        src: "{{ role_path }}/tasks/testcontainer/testcontainer"
+        dest: "{{ nono_user_home }}/.local/bin/testcontainer"
+        mode: '0755'
+        backup: true
+        follow: false
+
+    - name: Install the testcontainer systemd user unit
+      ansible.builtin.copy:
+        src: "{{ role_path }}/tasks/testcontainer/testcontainer@.service"
+        dest: "{{ nono_user_home }}/.config/systemd/user/testcontainer@.service"
+        mode: '0644'
+        backup: true
+        follow: false
+      register: testcontainer_unit
+
+    - name: Reload systemd user units
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+        scope: user
+      when: testcontainer_unit is changed
