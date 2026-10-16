@@ -24,8 +24,10 @@ EOF
 }
 
 # Each service defines: image, socket mount point, container user, environment,
-# tmpfs mounts, command arguments and a readiness check run inside the container.
+# tmpfs mounts, command arguments, optional extra podman arguments and a readiness
+# check run inside the container.
 define_service() {
+    extra_args=()
     case "$1" in
         postgres)
             image=docker.io/library/postgres:16
@@ -41,7 +43,14 @@ define_service() {
             cmd_args=(-c "listen_addresses=" -c log_connections=off
                 -c fsync=off -c synchronous_commit=off -c full_page_writes=off
                 -c wal_level=minimal -c max_wal_senders=0
-                -c max_wal_size=256MB -c min_wal_size=32MB)
+                -c max_wal_size=256MB -c min_wal_size=32MB
+                # The lock table holds max_locks_per_transaction x max_connections entries;
+                # migrations and DROP SCHEMA ... CASCADE exhausted the default 64 x 100.
+                # Each connection costs about two host tasks, so stay well under TasksMax.
+                -c max_locks_per_transaction=256 -c max_connections=500
+                -c shared_buffers=64MB)
+            # Dynamic shared memory for parallel queries; podman defaults /dev/shm to 64MB.
+            extra_args=(--shm-size=512m)
             # The entrypoint runs a temporary server on the same socket during init;
             # only the final server runs as PID 1.
             ready_cmd='pg_isready -q -h /var/run/postgresql && [ "$(cat /proc/1/comm)" = postgres ]'
@@ -98,6 +107,7 @@ run_service() {
         --pull=missing \
         --log-driver=passthrough \
         "${tmpfs_args[@]}" \
+        "${extra_args[@]}" \
         "${env_args[@]}" \
         -v "$dir:$socket_mount" \
         "$image" "${cmd_args[@]}"

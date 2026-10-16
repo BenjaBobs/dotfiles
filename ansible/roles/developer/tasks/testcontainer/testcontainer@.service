@@ -5,10 +5,12 @@ Description=gVisor test container %i
 Type=exec
 ExecStart=%h/.local/bin/testcontainer _run %i
 # runsc runs with ignore-cgroups, so these unit limits are the only resource bounds.
-# With gVisor, the tmpfs data directory (3G for postgres) counts towards MemoryMax.
-MemoryMax=4G
+# With gVisor, the tmpfs data directory (3G for postgres) counts towards MemoryMax,
+# and memory ran at about twice the data size: 1.4G of data peaked at 2.9G.
+MemoryMax=5G
 MemorySwapMax=0
-CPUQuota=200%
+# Migration tests kept 2 cores saturated; 4 still leaves the host responsive.
+CPUQuota=400%
 # gVisor uses about two host threads per guest process and keeps them after exit:
 # 97 postgres connections reached about 260 tasks. Memory bounds fork bombs too.
 TasksMax=2048
