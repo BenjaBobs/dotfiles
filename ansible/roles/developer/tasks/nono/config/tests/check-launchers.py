@@ -161,7 +161,7 @@ exit $status
         call = json.loads(call_log.read_text())
         args = call['args']
         assert args[:3] == ['run', '--profile', 'claude-local']
-        assert args[args.index('--') + 1:] == [str(mock_bin / 'claude'), 'auth', subcommand]
+        assert args[args.index('--') + 1:] == [str(mock_bin / 'claude'), '--dangerously-skip-permissions', 'auth', subcommand]
         assert ('--listen-port' in args) == (subcommand == 'login')
         if subcommand == 'login':
             assert args[args.index('--listen-port') + 1] == '0'

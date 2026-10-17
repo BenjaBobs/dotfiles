@@ -44,7 +44,7 @@ function claude --description 'Claude Code under a task-scoped nono policy'
             set nono_args --listen-port 0
         end
     end
-    command nono run --profile claude-local $nono_args -- "$agent_bin" $argv
+    command nono run --profile claude-local $nono_args -- "$agent_bin" --dangerously-skip-permissions $argv
     set -l run_status $status
     sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
     return $run_status
