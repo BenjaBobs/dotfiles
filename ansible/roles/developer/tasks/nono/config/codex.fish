@@ -8,7 +8,7 @@ function codex --description 'Codex under a task-scoped nono policy'
     if set -q XDG_CONFIG_HOME; and test -n "$XDG_CONFIG_HOME"
         set nono_config "$XDG_CONFIG_HOME/nono"
     end
-    set -l session_tmp (sh "$nono_config/hooks/tmp-setup.sh")
+    set -l session_tmp (sh "$nono_config/launcher/tmp-setup.sh")
     if test $status -ne 0; or test (count $session_tmp) -ne 1
         return 1
     end
@@ -30,13 +30,13 @@ function codex --description 'Codex under a task-scoped nono policy'
     # Local dotnet tools resolve through the host's cache, which the profile grants read-only.
     and ln -sfn -- "$HOME/.dotnet/toolResolverCache" "$DOTNET_CLI_HOME/.dotnet/toolResolverCache"
     if test $status -ne 0
-        sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
+        sh "$nono_config/launcher/tmp-cleanup.sh" "$session_tmp"
         return 1
     end
     # Keep credentials in the standard home; the sandbox cannot use the desktop keyring.
     set -l credential_args -c 'cli_auth_credentials_store="file"'
     command nono run --profile codex-local -- "$agent_bin" --no-daemon --sandbox danger-full-access -a never $credential_args $argv
     set -l run_status $status
-    sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
+    sh "$nono_config/launcher/tmp-cleanup.sh" "$session_tmp"
     return $run_status
 end

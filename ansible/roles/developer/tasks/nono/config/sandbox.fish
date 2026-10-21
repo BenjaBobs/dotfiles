@@ -8,7 +8,7 @@ function sandbox --description 'Fish under a project-scoped nono policy'
     if set -q XDG_CONFIG_HOME; and test -n "$XDG_CONFIG_HOME"
         set nono_config "$XDG_CONFIG_HOME/nono"
     end
-    set -l session_tmp (sh "$nono_config/hooks/tmp-setup.sh")
+    set -l session_tmp (sh "$nono_config/launcher/tmp-setup.sh")
     if test $status -ne 0; or test (count $session_tmp) -ne 1
         return 1
     end
@@ -26,7 +26,7 @@ function sandbox --description 'Fish under a project-scoped nono policy'
     set -lx TESTCONTAINER_POSTGRES "Host=$TESTCONTAINER_SOCKET_DIR/postgres;Username=postgres;Database=postgres"
     mkdir -p -- "$session_tmp/config" "$session_tmp/data" "$session_tmp/state" "$XDG_CACHE_HOME" "$session_tmp/runtime" "$CARGO_HOME" "$NUGET_PACKAGES" "$DOTNET_CLI_HOME"
     if test $status -ne 0
-        sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
+        sh "$nono_config/launcher/tmp-cleanup.sh" "$session_tmp"
         return 1
     end
     # Redirect shell state after nono resolves its own configuration and protected state.
@@ -35,6 +35,6 @@ function sandbox --description 'Fish under a project-scoped nono policy'
         "XDG_STATE_HOME=$session_tmp/state" "XDG_RUNTIME_DIR=$session_tmp/runtime" \
         "$shell_bin" --no-config --interactive $argv
     set -l run_status $status
-    sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
+    sh "$nono_config/launcher/tmp-cleanup.sh" "$session_tmp"
     return $run_status
 end

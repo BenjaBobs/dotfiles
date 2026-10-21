@@ -8,7 +8,7 @@ function claude --description 'Claude Code under a task-scoped nono policy'
     if set -q XDG_CONFIG_HOME; and test -n "$XDG_CONFIG_HOME"
         set nono_config "$XDG_CONFIG_HOME/nono"
     end
-    set -l session_tmp (sh "$nono_config/hooks/tmp-setup.sh")
+    set -l session_tmp (sh "$nono_config/launcher/tmp-setup.sh")
     if test $status -ne 0; or test (count $session_tmp) -ne 1
         return 1
     end
@@ -34,7 +34,7 @@ function claude --description 'Claude Code under a task-scoped nono policy'
     # Local dotnet tools resolve through the host's cache, which the profile grants read-only.
     and ln -sfn -- "$HOME/.dotnet/toolResolverCache" "$DOTNET_CLI_HOME/.dotnet/toolResolverCache"
     if test $status -ne 0
-        sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
+        sh "$nono_config/launcher/tmp-cleanup.sh" "$session_tmp"
         return 1
     end
     # Login binds port 0 so the kernel can select an available callback port.
@@ -46,6 +46,6 @@ function claude --description 'Claude Code under a task-scoped nono policy'
     end
     command nono run --profile claude-local $nono_args -- "$agent_bin" --dangerously-skip-permissions $argv
     set -l run_status $status
-    sh "$nono_config/hooks/tmp-cleanup.sh" "$session_tmp"
+    sh "$nono_config/launcher/tmp-cleanup.sh" "$session_tmp"
     return $run_status
 end

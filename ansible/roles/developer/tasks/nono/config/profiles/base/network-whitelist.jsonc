@@ -1,0 +1,30 @@
+{
+  // Shared web destinations for every agent; agent profiles add their own service domains.
+  // allow_domain entries from all profiles combine additively, so nothing here can be removed downstream.
+  "meta": {
+    "name": "network-whitelist",
+    "version": "1.0.0",
+    "description": "Extra proxy destinations shared by all agent profiles"
+  },
+  "network": {
+    "allow_domain": [
+      // .NET documentation and blog posts read by agents.
+      "devblogs.microsoft.com",
+      "learn.microsoft.com",
+      // GitHub Pages project sites; github.com itself comes from each agent's network_profile.
+      "*.github.io",
+      // Slack platform documentation.
+      "docs.slack.dev",
+      // HubSpot developer documentation.
+      "developers.hubspot.com",
+      // Bun runtime documentation.
+      "bun.com",
+      "bun.sh",
+      // Zod schema library documentation.
+      "zod.dev",
+      "www.zod.dev",
+      // Vite build tool documentation.
+      "vite.dev"
+    ]
+  }
+}

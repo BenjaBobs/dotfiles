@@ -1,6 +1,6 @@
 # Nono configuration
 
-The developer role installs nono and deploys these profiles, hooks and fish functions.
+The developer role installs nono and deploys these profiles, launcher scripts and fish functions.
 Configuration is copied with backups, so editing the checkout does not change installed policy.
 
 ```text
@@ -11,13 +11,14 @@ config/
 │   ├── shell-local.jsonc
 │   ├── base/
 │   │   ├── agent-linux-base.jsonc
-│   │   └── agent-linux-local.jsonc
+│   │   ├── agent-linux-local.jsonc
+│   │   └── network-whitelist.jsonc
 │   └── support/
 │       └── support-*.jsonc
 ├── codex.fish
 ├── claude.fish
 ├── sandbox.fish
-├── hooks/
+├── launcher/
 └── tests/
 ```
 
@@ -90,7 +91,9 @@ select access, rather than restricting which languages can execute.
 Launch from the narrow project directory you want writable. Tool installations
 remain read-only, while build caches use the launcher-created temporary directory.
 The selected tool and Git configuration can itself contain secrets; review its contents.
-Codex and Claude have separate filtered network policies. Do not add `--allow-net`
+Codex and Claude have separate filtered network policies. Add web destinations both
+agents may reach to [network-whitelist.jsonc](profiles/base/network-whitelist.jsonc);
+`allow_domain` entries combine additively across profiles. Do not add `--allow-net`
 to their wrappers. Clipboard, Wayland, X11 and desktop-bus access are not granted.
 
 The packages can help diagnose denials and write proposed profiles under

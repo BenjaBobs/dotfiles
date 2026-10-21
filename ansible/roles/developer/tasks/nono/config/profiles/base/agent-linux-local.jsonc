@@ -8,6 +8,8 @@
   "extends": [
     // Always retain the common Linux isolation, credential denials and exact temporary-directory grant.
     "base/agent-linux-base",
+    // Add the shared web destinations; each agent profile still selects its own network_profile.
+    "base/network-whitelist",
     // Select .NET CLI tools, NuGet reads and the .NET session-state variables.
     "support/support-dotnet",
     // Select installed Rust/Cargo executables and disposable Cargo state.

@@ -30,7 +30,7 @@
         - "{{ nono_config_home }}/nono/profiles"
         - "{{ nono_config_home }}/nono/profiles/base"
         - "{{ nono_config_home }}/nono/profiles/support"
-        - "{{ nono_config_home }}/nono/hooks"
+        - "{{ nono_config_home }}/nono/launcher"
         - "{{ nono_config_home }}/nono/profile-drafts"
         - "{{ nono_config_home }}/fish/functions"
         - "{{ nono_user_home }}/.codex"
@@ -102,7 +102,7 @@
       loop_control:
         label: "{{ item.path | relpath(nono_source_dir ~ '/profiles') }}"
 
-    - name: Copy nono hooks and fish launchers
+    - name: Copy launcher session scripts and fish launchers
       ansible.builtin.copy:
         src: "{{ nono_source_dir }}/{{ item.src }}"
         dest: "{{ nono_config_home }}/{{ item.dest }}"
@@ -110,11 +110,17 @@
         backup: true
         follow: false
       loop:
-        - { src: hooks/tmp-setup.sh, dest: nono/hooks/tmp-setup.sh }
-        - { src: hooks/tmp-cleanup.sh, dest: nono/hooks/tmp-cleanup.sh }
+        - { src: launcher/tmp-setup.sh, dest: nono/launcher/tmp-setup.sh }
+        - { src: launcher/tmp-cleanup.sh, dest: nono/launcher/tmp-cleanup.sh }
         - { src: codex.fish, dest: fish/functions/codex.fish }
         - { src: claude.fish, dest: fish/functions/claude.fish }
         - { src: sandbox.fish, dest: fish/functions/sandbox.fish }
+
+    # The session scripts previously lived in a folder that implied they were nono hooks.
+    - name: Remove the superseded session-script folder
+      ansible.builtin.file:
+        path: "{{ nono_config_home }}/nono/hooks"
+        state: absent
 
     - name: Check installed signed packages
       ansible.builtin.stat:
